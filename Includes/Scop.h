@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/05/29 12:15:03 by slopez           ###   ########.fr       */
+/*   Updated: 2021/05/29 14:08:03 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 # define SCOP_H
 
 #include "Prototypes.Parsing.h"
+
+#include <stdlib.h>
 
 typedef struct s_vec3i
 {
@@ -37,9 +39,15 @@ typedef struct s_vec2f
 
 typedef struct s_parser
 {
-	t_vec3f		v;
-	t_vec3f		n;
-	t_vec2f		vt;
+	size_t		v_alloc;
+	size_t		vn_alloc;
+	size_t		vt_alloc;
+	size_t		v_count;
+	size_t		vn_count;
+	size_t		vt_count;
+	t_vec3f		*v;
+	t_vec3f		*vn;
+	t_vec2f		*vt;
 }				t_parser;
 
 typedef struct s_scop

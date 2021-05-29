@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/05/29 14:08:03 by slopez           ###   ########.fr       */
+/*   Updated: 2021/05/29 14:51:36 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,11 @@
 #include "Prototypes.Parsing.h"
 
 #include <stdlib.h>
+
+/*
+** Do not touch thoses variables
+*/
+#define REALLOC_SIZE 500
 
 typedef struct s_vec3i
 {
@@ -39,9 +44,6 @@ typedef struct s_vec2f
 
 typedef struct s_parser
 {
-	size_t		v_alloc;
-	size_t		vn_alloc;
-	size_t		vt_alloc;
 	size_t		v_count;
 	size_t		vn_count;
 	size_t		vt_count;

@@ -47,10 +47,6 @@ void	_realloc_end(size_t count, size_t size, size_t *alloc_count, void **array)
 
 void	parser_realloc_end(t_parser *parser, size_t v_count, size_t vn_count, size_t vt_count)
 {
-	printf("\033[0;32m[debug] v  %8zu / %-8zu\n", v_count, parser->v_count);
-	printf("[debug] vn %8zu / %-8zu\n", vn_count, parser->vn_count);
-	printf("[debug] vt %8zu / %-8zu\n\033[0m", vt_count, parser->vt_count);
-	
 	_realloc_end(v_count, sizeof(t_vec3f), &parser->v_count, (void *) &parser->v);
 	_realloc_end(vn_count, sizeof(t_vec3f), &parser->vn_count, (void *) &parser->vn);
 	_realloc_end(vt_count, sizeof(t_vec2f), &parser->vt_count, (void *) &parser->vt);
@@ -65,9 +61,6 @@ void	parser_realloc(size_t *count, size_t *alloc, size_t size, void **array)
 	if (!(*array = realloc(*array, size * *alloc)))
 		die("Erreor realloc");
 }
-
-
-
 
 void parser_init(t_scop *scop, char *file)
 {
@@ -119,7 +112,6 @@ void parser_init(t_scop *scop, char *file)
 	parser.v_count 	= (st.st_size / 200);
 	parser.vt_count = (st.st_size / 200);
 
-
 	if (!(parser.v 	= calloc(parser.v_count, sizeof(t_vec3f))))
 		die("Error calloc v");
 	if (!(parser.vn = calloc(parser.vn_count, sizeof(t_vec3f))))
@@ -162,23 +154,7 @@ void parser_init(t_scop *scop, char *file)
 		} 
 	}
 
-
-	for (size_t i = 0; i < scop->nb_mats; i++) {
-		printf("> %s\n", scop->materials[i].material_name);
-		printf("  gl_buffer_size: %zu\n", scop->materials[i].gl_buffer_size);
-
-		// for (size_t j = 0; j < scop->materials[i].gl_buffer_size; j++)
-		// {
-		// 	printf("%.2f ", scop->materials[i].gl_buffer[j]);
-		// }
-	}
-
 	parser_realloc_end(&parser, v_count, vn_count, vt_count);
-
-	printf("\033[0;32m\n[debug] %-5s %zu\n", "V", v_count);
-	printf("[debug] %-5s %zu\n", "VT", vt_count);
-	printf("[debug] %-5s %zu\n", "VN", vn_count);
-	printf("[debug] %-5s %zu\n\033[0;m", "F", f_count);
 
 	parser_free(&parser);
 	free(line);

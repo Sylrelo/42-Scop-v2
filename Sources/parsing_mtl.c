@@ -21,7 +21,6 @@ void    _realloc_mtl(size_t *count, size_t *alloc, void **materials)
 {
 	if (*alloc > *count)
 		return ;
-    printf("mt alloc %zu %zu\n", *alloc, *count);
 
 	*alloc += 10;
 	if (!(*materials = realloc(*materials, sizeof(t_mat) * *alloc)))
@@ -76,22 +75,12 @@ void    parser_mtl_start(t_scop *scop, char path[256], char *file)
             scop->materials->gl_buffer = NULL;
             tmp_nb_mats++;
         }
-        // printf("%s", line);
 	}
     
 	free(line);
     scop->materials = realloc(scop->materials, sizeof(t_mat) * tmp_nb_mats);
     scop->nb_mats = tmp_nb_mats;
-    
-    for (size_t i = 0; i < tmp_nb_mats; i++) {
-        printf("- \033[1;36m%s\033[0m\n", scop->materials[i].material_name);
-        printf("  - Kd %.2f %.2f %.2f\n", scop->materials[i].kd.x, scop->materials[i].kd.y, scop->materials[i].kd.z);
-        printf("  - Ks %.2f %.2f %.2f\n", scop->materials[i].ks.x, scop->materials[i].ks.y, scop->materials[i].ks.z);
-        printf("  - Tf %.2f %.2f %.2f\n", scop->materials[i].tf.x, scop->materials[i].tf.y, scop->materials[i].tf.z);
-    }
+
     fclose(fp);
-    
    // free(scop->materials);
-    printf("nb mats %zu\n", tmp_nb_mats);
-    printf("nb mats %zu\n", scop->nb_mats);
 }

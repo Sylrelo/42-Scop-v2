@@ -33,8 +33,6 @@ static void mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size)
         die("Realloc failed for mat_push_buffer");
 
     _floatncat(material->gl_buffer, buffer, material->gl_buffer_size, buffer_size);
-    // printf("(%.2f, %.2f, %.2f) - %.2f %.2f %.2f - %.2f %.2f\n", buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7]);
-
     material->gl_buffer_size += buffer_size;
 }
 
@@ -88,11 +86,6 @@ size_t    parse_triangle(t_parser *parser, t_mat *material, char *line)
        buffer[7] = parser->vt[index_vt - 1].y;
     }
 
-    //printf("%s\n", line);
-   // printf("(%f, %f, %f)\n", parser->v[index_v - 1].x, parser->v[index_v - 1].y, parser->v[index_v - 1].z);
-    // printf("(%.2f, %.2f, %.2f) - %.2f %.2f %.2f - %.2f %.2f\n", buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7]);
-
-
     mat_push_buffer(material, buffer, 8);
     return (1);
 }
@@ -101,6 +94,7 @@ size_t parse_face(t_parser *parser, t_mat *materials, size_t material_count, cha
 {
     const ssize_t material_id = get_material_id(materials, material_count, last_mtl);
 	const ssize_t sides_count = _strcountchr(line, ' ') + 1;
+    char *token = NULL;
 
     if (!last_mtl || material_id == -1)
     {
@@ -114,21 +108,10 @@ size_t parse_face(t_parser *parser, t_mat *materials, size_t material_count, cha
 		return (0);
 	}
 
-    char    *token;
-    // size_t  nb_tri;
-
     token = strtok(line, " ");
 	while (token != NULL) {
         parse_triangle(parser, &materials[material_id], _strtrim(token));
 		token = strtok(NULL, " ");
 	}
-	// printf("\n");;
-
-
-    //printf("%s buffer size = %zu\n", last_mtl, materials[material_id].gl_buffer_size);
-
-    // (void)parser;
-	//printf("[%s] %zu %zu %s", last_mtl, sides_count, _strcountchr(line, '/'), line);
     return (1);
-    // return parse_triangle(parser, &materials[material_id], line);
 }

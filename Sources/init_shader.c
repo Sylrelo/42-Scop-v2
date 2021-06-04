@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/04 14:31:59 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 14:41:01 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/04 15:51:19 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ static char *load_file(char *file, int *size)
 	return (data);
 }
 
-static int load_shader(char *file, unsigned int type)
+static int  load_shader(char *file, unsigned int type)
 {
 	int			len;
 	char		*source;
@@ -72,7 +72,7 @@ static int load_shader(char *file, unsigned int type)
 	return (shader);
 }
 
-int    create_shader_program(char *file_vertex, char *file_fragment)
+int         create_shader_program(char *file_vertex, char *file_fragment)
 {
     int			program;
 	int			success;

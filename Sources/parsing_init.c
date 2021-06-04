@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 14:56:10 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/04 16:12:06 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,25 @@ void	parser_realloc(size_t *count, size_t *alloc, size_t size, void **array)
 		die("Erreor realloc");
 }
 
-void parse_face(char *line) 
+
+size_t	strcountchr(char *line, char character)
 {
-	//printf("%s", line);
+	size_t	len = 0;
+	size_t	count = 0;
+
+	while (line[len] != NULL)
+	{
+		if (line[len] == character)
+			count++;
+		len++;
+	}
+	return (count);
+}
+
+void parse_face(t_parser *parser, char *last_mtl, char *line) 
+{
+
+	printf("[%s] %zu %s", last_mtl, strcountchr(line, '/'), line);
 	(void) line;
 }
 
@@ -152,14 +168,14 @@ void parser_init(t_scop *scop, char *file)
 		}
 		else if (!strncmp(line, "f ", 2)) 
 		{
-			//last_mtl
-			parse_face(line);
+			parse_face(&parser, last_mtl, line);
 			f_count++;
 			scop->nb_triangles++;
 		} 
 		else if (!strncmp(line, "usemtl ", 7))
 		{
-			strcpy(last_mtl, line);
+			strcpy(last_mtl, line + 7);
+			last_mtl[strlen(last_mtl) - 1] = 0;
 		}
 	}
 	parser_realloc_end(&parser, v_count, vn_count, vt_count);

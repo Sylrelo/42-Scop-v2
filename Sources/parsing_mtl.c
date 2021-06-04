@@ -70,8 +70,7 @@ void    parser_mtl_start(t_scop *scop, char path[256], char *file)
         else if (!strncmp(line, "newmtl ", 7))
         {
             _realloc_mtl(&tmp_nb_mats, &scop->nb_mats, (void *) &scop->materials);
-            line[strlen(line) - 1] = 0;
-            strcpy(scop->materials[tmp_nb_mats].material_name, line + 7);
+            strcpy(scop->materials[tmp_nb_mats].material_name, _strtrim(line + 7));
             scop->materials->tmp_allocated = 0;
             scop->materials->gl_buffer_size = 0;
             scop->materials->gl_buffer = NULL;

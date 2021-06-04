@@ -96,7 +96,7 @@ void	display_loop(t_scop *scop)
 		{
 			if (mat_i > 0)
 				offset += scop->materials[mat_i - 1].gl_buffer_size;
-			glDrawArrays(GL_TRIANGLES, 3 * offset, 3 * scop->materials[mat_i].gl_buffer_size);
+			glDrawArrays(GL_TRIANGLES, (offset / 8), (scop->materials[mat_i].gl_buffer_size / 8));
 			mat_i++;
 		}
 		glfwSwapBuffers(scop->window);
@@ -147,7 +147,7 @@ void	init_opengl_buffer(t_scop *scop)
     // 		printf("%.2f ", tmp_buffer[o]);
 	// }
 
-	glBufferData(GL_ARRAY_BUFFER, (buffer_size * sizeof(float)), tmp_buffer, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, (buffer_size * sizeof(float)), (void *) tmp_buffer, GL_DYNAMIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(3 * sizeof(float)));
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(6 * sizeof(float)));

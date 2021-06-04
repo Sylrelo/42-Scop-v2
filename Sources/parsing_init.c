@@ -85,6 +85,7 @@ void parser_init(t_scop *scop, char *file)
 
 	char	last_mtl[256];
 
+	memset(last_mtl, 0, 256);
 	fp = fopen(file, "r");
 
 	stat(file, &st);
@@ -132,6 +133,10 @@ void parser_init(t_scop *scop, char *file)
 		{
 			parser_mtl_start(scop, path, line + 7);
 		}
+		else if (!strncmp(line, "usemtl ", 7))
+		{
+			strcpy(last_mtl, _strtrim(line + 7));
+		}
 		else if (!strncmp(line, "v ", 2)) 
 		{
 			parser_realloc(&v_count, &parser.v_count, sizeof(t_vec3f), (void *) &parser.v);
@@ -152,14 +157,9 @@ void parser_init(t_scop *scop, char *file)
 		}
 		else if (!strncmp(line, "f ", 2)) 
 		{
-			scop->nb_triangles += parse_face(&parser, scop->materials, scop->nb_mats, last_mtl, line + 2);
+			scop->nb_triangles += parse_face(&parser, scop->materials, scop->nb_mats, last_mtl, _strtrim(line + 2));
 			f_count++;
 		} 
-		else if (!strncmp(line, "usemtl ", 7))
-		{
-			strcpy(last_mtl, line + 7);
-			last_mtl[strlen(last_mtl) - 1] = 0;
-		}
 	}
 
 

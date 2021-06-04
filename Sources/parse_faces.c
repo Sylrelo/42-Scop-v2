@@ -56,7 +56,12 @@ size_t    parse_triangle(t_parser *parser, t_mat *material, char *line)
 		face_type = VERTICE | TEXTURE;
 	else if (sscanf(line, "%zd", &index_v) == 1)
 		face_type = VERTICE;
-	
+	else
+    {
+        printf("Error face definition\n");
+        return (0);
+    }
+
     if (((face_type & VERTICE) && index_v - 1 >= parser->v_count) 
         || ((face_type & TEXTURE) && index_vt - 1 >= parser->vt_count) 
         || ((face_type & NORMAL) && index_vn - 1 >= parser->vn_count))
@@ -73,14 +78,14 @@ size_t    parse_triangle(t_parser *parser, t_mat *material, char *line)
     }
     if (face_type & NORMAL)
     {
-    //    buffer[3] = parser->vn[index_vn - 1].x;
-    //    buffer[4] = parser->vn[index_vn - 1].y;
-    //    buffer[5] = parser->vn[index_vn - 1].z;
+       buffer[3] = parser->vn[index_vn - 1].x;
+       buffer[4] = parser->vn[index_vn - 1].y;
+       buffer[5] = parser->vn[index_vn - 1].z;
     }
     if (face_type & TEXTURE)
     {
-    //    buffer[6] = parser->vt[index_vt - 1].x;
-    //    buffer[7] = parser->vt[index_vt - 1].y;
+       buffer[6] = parser->vt[index_vt - 1].x;
+       buffer[7] = parser->vt[index_vt - 1].y;
     }
 
     //printf("%s\n", line);
@@ -95,7 +100,7 @@ size_t    parse_triangle(t_parser *parser, t_mat *material, char *line)
 size_t parse_face(t_parser *parser, t_mat *materials, size_t material_count, char *last_mtl, char *line) 
 {
     const ssize_t material_id = get_material_id(materials, material_count, last_mtl);
-	const ssize_t sides_count = _strcountchr(line, ' ');
+	const ssize_t sides_count = _strcountchr(line, ' ') + 1;
 
     if (!last_mtl || material_id == -1)
     {

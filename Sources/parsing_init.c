@@ -6,11 +6,12 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 12:40:32 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/04 14:48:34 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Scop.h"
+#include "Prototypes.Parsing.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,9 +47,9 @@ void	_realloc_end(size_t count, size_t size, size_t *alloc_count, void **array)
 
 void	parser_realloc_end(t_parser *parser, size_t v_count, size_t vn_count, size_t vt_count)
 {
-	printf("v  %8zu / %-8zu\n", v_count, parser->v_count);
-	printf("vn %8zu / %-8zu\n", vn_count, parser->vn_count);
-	printf("vt %8zu / %-8zu\n", vt_count, parser->vt_count);
+	printf("\033[0;32m[debug] v  %8zu / %-8zu\n", v_count, parser->v_count);
+	printf("[debug] vn %8zu / %-8zu\n", vn_count, parser->vn_count);
+	printf("[debug] vt %8zu / %-8zu\n\033[0m", vt_count, parser->vt_count);
 	
 	_realloc_end(v_count, sizeof(t_vec3f), &parser->v_count, (void *) &parser->v);
 	_realloc_end(vn_count, sizeof(t_vec3f), &parser->vn_count, (void *) &parser->vn);
@@ -90,6 +91,8 @@ void parser_init(t_scop *scop, char *file)
 
 	stat(file, &st);
 
+
+	// void get_file_relative_path()
 	char	*file_tmp;
 	char 	*token;
 	char 	path[256];
@@ -107,16 +110,13 @@ void parser_init(t_scop *scop, char *file)
 		path_len += strlen(token) + 1;
 		token = strtok(NULL, "/");
 	}
-
 	path[path_len] = 0;
-	printf("Path of file : %s\n", path);
-
+	//-------------------------
 
 	parser.vn_count = (st.st_size / 200);
 	parser.v_count 	= (st.st_size / 200);
 	parser.vt_count = (st.st_size / 200);
 
-	printf("Initial size %zu\n", parser.vn_count);
 
 	if (!(parser.v 	= calloc(parser.v_count, sizeof(t_vec3f))))
 		die("Error calloc v");
@@ -129,7 +129,7 @@ void parser_init(t_scop *scop, char *file)
 	{
 		if (!strncmp(line, "mtllib ", 7)) 
 		{
-			parser_mtl_start(&scop, &parser, path, line + 7);
+			parser_mtl_start(scop, &parser, path, line + 7);
 		}
 		else if (!strncmp(line, "v ", 2)) 
 		{
@@ -162,10 +162,10 @@ void parser_init(t_scop *scop, char *file)
 	}
 	parser_realloc_end(&parser, v_count, vn_count, vt_count);
 
-	printf("\n\n%-5s %zu\n", "V", v_count);
-	printf("%-5s %zu\n", "VT", vt_count);
-	printf("%-5s %zu\n", "VN", vn_count);
-	printf("%-5s %zu\n", "F", f_count);
+	printf("\033[0;32m\n[debug] %-5s %zu\n", "V", v_count);
+	printf("[debug] %-5s %zu\n", "VT", vt_count);
+	printf("[debug] %-5s %zu\n", "VN", vn_count);
+	printf("[debug] %-5s %zu\n\033[0;m", "F", f_count);
 
 	parser_free(&parser);
 	free(line);

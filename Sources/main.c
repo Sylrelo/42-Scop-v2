@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 14:30:54 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/04 14:49:04 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ void	init_window(GLFWwindow **window)
 {
 	if (!glfwInit())
 		die("glfwInit failed.");
+	printf("[OpenGL] Initializing GLFW\n");
 
 	glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -31,6 +32,7 @@ void	init_window(GLFWwindow **window)
 	glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	*window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+	printf("[OpenGL] Creating window\n");
 	if (!window)
 	{
 		glfwTerminate();
@@ -43,6 +45,7 @@ void	init_window(GLFWwindow **window)
 		glfwTerminate();
 		die("gl3wInit failed.");
 	}
+	printf("[OpenGL] Initializing GL3W\n");
 	glfwSetInputMode(*window, GLFW_STICKY_KEYS, 1);
 	glfwSwapInterval(1);
 }
@@ -61,10 +64,12 @@ int main(int argc, char *argv[])
 {
 	t_scop	scop;
 
+	printf("[Scop] Starting parser\n");
 	parser_init(&scop, argv[1]);
 
 	init_window(&scop.window);
 	//
+
 
 	glGenBuffers(1, &scop.vbo);  
 	glBindBuffer(GL_ARRAY_BUFFER, scop.vbo);
@@ -72,7 +77,10 @@ int main(int argc, char *argv[])
 	glGenVertexArrays(1, &scop.vao);  
 	glBindVertexArray(scop.vao);
 
+	scop.program = create_shader_program("Shaders/vertex.glsl", "Shaders/fragment.glsl");
 	//
+
+	printf("[Scop] Ready\n");
 	display_loop(&scop);
 
 	(void)argv;

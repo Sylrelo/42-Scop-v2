@@ -1,6 +1,7 @@
 {
 	"files.associations": {
 		"stat.h": "c",
-		"prototypes.parsing.h": "c"
+		"prototypes.parsing.h": "c",
+		"scop.h": "c"
 	}
 }

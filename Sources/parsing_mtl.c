@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/04 11:18:58 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 12:37:16 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/04 12:47:15 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,9 @@
 
 void    _realloc_mtl(size_t *count, size_t *alloc, void **materials)
 {
-    if (*count == 0 && *alloc == 0) {
-	    if (!(*materials = calloc(sizeof(t_mat), 5)))
-		    die("Erreor realloc");
-        *alloc = 5;
-        return;
-    }
-
-    printf("%zu %zu\n", *alloc, *count);
 	if (*alloc > *count)
 		return ;
+    printf("mt alloc %zu %zu\n", *alloc, *count);
 
 	*alloc += 10;
 	if (!(*materials = realloc(*materials, sizeof(t_mat) * *alloc)))
@@ -70,7 +63,8 @@ void    parser_mtl_start(t_scop *scop, t_parser *parser, char path[256], char *f
         {
             sscanf(line, "Tf %f %f %f", &scop->materials[tmp_nb_mats - 1].tf.x, &scop->materials[tmp_nb_mats - 1].tf.y, &scop->materials[tmp_nb_mats - 1].tf.z);
         }
-        else if (!strncmp(line, "newmtl ", 7)) {
+        else if (!strncmp(line, "newmtl ", 7))
+        {
             _realloc_mtl(&tmp_nb_mats, &scop->nb_mats, (void *) &scop->materials);
             line[strlen(line) - 1] = 0;
             strcpy(scop->materials[tmp_nb_mats].material_name, line + 7);
@@ -80,16 +74,18 @@ void    parser_mtl_start(t_scop *scop, t_parser *parser, char path[256], char *f
 	}
     
 	free(line);
-
-    for (int i = 0; i < tmp_nb_mats; i++) {
-        printf("- %s\n", scop->materials[i].material_name);
-        printf("  Kd %.2f %.2f %.2f\n", scop->materials[i].kd.x, scop->materials[i].kd.y, scop->materials[i].kd.z);
-        printf("  Ks %.2f %.2f %.2f\n", scop->materials[i].ks.x, scop->materials[i].ks.y, scop->materials[i].ks.z);
-        printf("  Tf %.2f %.2f %.2f\n", scop->materials[i].tf.x, scop->materials[i].tf.y, scop->materials[i].tf.z);
+    scop->materials = realloc(scop->materials, sizeof(t_mat) * tmp_nb_mats);
+    scop->nb_mats = tmp_nb_mats;
+    
+    for (size_t i = 0; i < tmp_nb_mats; i++) {
+        printf("- \033[1;36m%s\033[0m\n", scop->materials[i].material_name);
+        printf("  - Kd %.2f %.2f %.2f\n", scop->materials[i].kd.x, scop->materials[i].kd.y, scop->materials[i].kd.z);
+        printf("  - Ks %.2f %.2f %.2f\n", scop->materials[i].ks.x, scop->materials[i].ks.y, scop->materials[i].ks.z);
+        printf("  - Tf %.2f %.2f %.2f\n", scop->materials[i].tf.x, scop->materials[i].tf.y, scop->materials[i].tf.z);
     }
+    fclose(fp);
     
     printf("nb mats %zu\n", tmp_nb_mats);
     printf("nb mats %zu\n", scop->nb_mats);
-    exit (1);
-    
+    free(scop->materials);
 }

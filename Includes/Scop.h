@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 12:37:21 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/04 12:40:44 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,5 +63,8 @@ typedef struct s_scop
 	size_t		nb_mats;
 	t_mat		*materials;
 }				t_scop;
+
+
+void	die(char *string);
 
 #endif

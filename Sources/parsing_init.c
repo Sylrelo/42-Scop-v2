@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 12:18:31 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/04 12:40:32 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,6 @@
 #include <string.h>
 
 typedef struct stat t_stat;
-
-void	die(char *string)
-{
-	printf("%s\n", string);
-	exit (1);
-}
 
 void	parser_free(t_parser *parser)
 {

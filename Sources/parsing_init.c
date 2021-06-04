@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_init.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slopez <slopez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/05/29 17:09:11 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/04 12:18:31 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,16 @@ void	die(char *string)
 {
 	printf("%s\n", string);
 	exit (1);
+}
+
+void	parser_free(t_parser *parser)
+{
+	if (parser->v_count)
+		free(parser->v);
+	if (parser->vt_count)
+		free(parser->vt);
+	if (parser->vn_count)
+		free(parser->vn);
 }
 
 void	_realloc_end(size_t count, size_t size, size_t *alloc_count, void **array)
@@ -64,9 +74,10 @@ void	parser_realloc(size_t *count, size_t *alloc, size_t size, void **array)
 void parse_face(char *line) 
 {
 	//printf("%s", line);
+	(void) line;
 }
 
-void parser_init(char *file)
+void parser_init(t_scop *scop, char *file)
 {
 	t_parser parser;
 	size_t	f_count 	= 0;
@@ -78,10 +89,34 @@ void parser_init(char *file)
 	ssize_t	read 		= 0;
 	size_t	len 		= 0;
 	t_stat	st;
+	
+	char	last_mtl[256];
 
 	fp = fopen(file, "r");
 
 	stat(file, &st);
+
+	char	*file_tmp;
+	char 	*token;
+	char 	path[256];
+	size_t	path_len;
+
+	path_len = 0;
+
+	file_tmp = strdup(file);
+	token = strtok(file, "/");
+	while (token != NULL) {
+		if (!strcmp(token, strrchr(file_tmp, '/') + 1)) 
+			break ;
+		strcat(path, token);
+		strcat(path, "/");
+		path_len += strlen(token) + 1;
+		token = strtok(NULL, "/");
+	}
+
+	path[path_len] = 0;
+	printf("Path of file : %s\n", path);
+
 
 	parser.vn_count = (st.st_size / 200);
 	parser.v_count 	= (st.st_size / 200);
@@ -98,28 +133,39 @@ void parser_init(char *file)
 
 	while ((read = getline(&line, &len, (FILE *) fp)) != -1)
 	{
-		if (!strncmp(line, "v ", 2)) {
+		if (!strncmp(line, "mtllib ", 7)) 
+		{
+			parser_mtl_start(&scop, &parser, path, line + 7);
+		}
+		else if (!strncmp(line, "v ", 2)) 
+		{
 			parser_realloc(&v_count, &parser.v_count, sizeof(t_vec3f), (void *) &parser.v);
 			sscanf(line, "v %f %f %f", &parser.v[v_count].x, &parser.v[v_count].y, &parser.v[v_count].z);
 			v_count++;
 		} 
-		else if (!strncmp(line, "vn ", 3)) {
+		else if (!strncmp(line, "vn ", 3)) 
+		{
 			parser_realloc(&vn_count, &parser.vn_count, sizeof(t_vec3f), (void *) &parser.vn);
 			sscanf(line, "vn %f %f %f", &parser.vn[vn_count].x, &parser.vn[vn_count].y, &parser.vn[vn_count].z);
 			vn_count++;
 		}
-		else if (!strncmp(line, "vt ", 3)) {
+		else if (!strncmp(line, "vt ", 3)) 
+		{
 			parser_realloc(&vt_count, &parser.vt_count, sizeof(t_vec2f), (void *) &parser.vt);
 			sscanf(line, "vt %f %f", &parser.vt[vt_count].x, &parser.vt[vt_count].y);
 			vt_count++;
 		}
-		else if (!strncmp(line, "f ", 2)) {
+		else if (!strncmp(line, "f ", 2)) 
+		{
+			//last_mtl
 			parse_face(line);
 			f_count++;
+		} 
+		else if (!strncmp(line, "usemtl ", 7))
+		{
+			strcpy(last_mtl, line);
 		}
 	}
-
-
 	parser_realloc_end(&parser, v_count, vn_count, vt_count);
 
 	printf("\n\n%-5s %zu\n", "V", v_count);
@@ -127,9 +173,8 @@ void parser_init(char *file)
 	printf("%-5s %zu\n", "VN", vn_count);
 	printf("%-5s %zu\n", "F", f_count);
 
-	// for (int i = 0; i < parser.v_count; i++) {
-	// 	printf("%f %f %f\n", parser.v[i].x, parser.v[i].y, parser.v[i].z);
-	// }
+	parser_free(&parser);
+	free(line);
+	free(file_tmp);
 	fclose(fp);
-
 }

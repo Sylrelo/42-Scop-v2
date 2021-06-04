@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Scop.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slopez <slopez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/05/29 17:09:07 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/04 12:37:21 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SCOP_H
 # define SCOP_H
 
-#include "Prototypes.Parsing.h"
 
 #include <stdlib.h>
 
@@ -48,9 +47,21 @@ typedef struct s_parser
 	t_vec2f		*vt;
 }				t_parser;
 
+typedef struct	s_mat
+{
+	char		material_name[256];
+	uint16_t	tex_id;
+	t_vec3f		kd;
+	t_vec3f		ks;
+	t_vec3f		tf;
+	float		*gl_buffer;
+	size_t		gl_buffer_size;
+}				t_mat;
+
 typedef struct s_scop
 {
-	
+	size_t		nb_mats;
+	t_mat		*materials;
 }				t_scop;
 
 #endif

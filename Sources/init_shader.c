@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/04 14:31:59 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 15:51:19 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/04 16:24:47 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,3 +96,4 @@ int         create_shader_program(char *file_vertex, char *file_fragment)
 	glDeleteShader(fragment);
 	return (program);
 }
+

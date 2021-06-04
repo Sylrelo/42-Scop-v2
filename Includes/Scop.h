@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 12:40:44 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/04 14:29:14 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 
 
 #include <stdlib.h>
-
+#include "GL/gl3w.h"
+#include <GLFW/glfw3.h>
 
 typedef struct s_vec3i
 {
@@ -60,8 +61,12 @@ typedef struct	s_mat
 
 typedef struct s_scop
 {
-	size_t		nb_mats;
-	t_mat		*materials;
+	GLFWwindow		*window;
+	GLuint			vao;
+	GLuint			vbo;
+
+	size_t			nb_mats;
+	t_mat			*materials;
 }				t_scop;
 
 

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/04 11:18:58 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 12:47:15 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/04 14:30:47 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void    _realloc_mtl(size_t *count, size_t *alloc, void **materials)
 
 void    parser_mtl_start(t_scop *scop, t_parser *parser, char path[256], char *file)
 {
+    return ;
     char    filepath[256];
     FILE 	*fp;
 	char	*line 		= 0;
@@ -85,7 +86,7 @@ void    parser_mtl_start(t_scop *scop, t_parser *parser, char path[256], char *f
     }
     fclose(fp);
     
+   // free(scop->materials);
     printf("nb mats %zu\n", tmp_nb_mats);
     printf("nb mats %zu\n", scop->nb_mats);
-    free(scop->materials);
 }

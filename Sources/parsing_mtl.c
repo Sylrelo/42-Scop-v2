@@ -28,7 +28,7 @@ void    _realloc_mtl(size_t *count, size_t *alloc, void **materials)
 		die("Erreor realloc");
 }
 
-void    parser_mtl_start(t_scop *scop, t_parser *parser, char path[256], char *file)
+void    parser_mtl_start(t_scop *scop, char path[256], char *file)
 {
     char    filepath[256];
     FILE 	*fp;
@@ -39,10 +39,15 @@ void    parser_mtl_start(t_scop *scop, t_parser *parser, char path[256], char *f
     
     file[strlen(file) - 1] = 0;
     
+	memset(filepath, 0, 256);
     strcat(filepath, path);
     strcat(filepath, file);
     filepath[strlen(path) + strlen(file)] = 0;
-	fp = fopen(filepath, "r");
+    printf("%s %s %s\n", path, file, filepath);
+
+
+	if (!(fp = fopen(filepath, "r")))
+        die("Error reading mtl file");
     
     scop->nb_mats = 0;
     scop->materials = calloc(5, sizeof(t_mat));
@@ -67,6 +72,9 @@ void    parser_mtl_start(t_scop *scop, t_parser *parser, char path[256], char *f
             _realloc_mtl(&tmp_nb_mats, &scop->nb_mats, (void *) &scop->materials);
             line[strlen(line) - 1] = 0;
             strcpy(scop->materials[tmp_nb_mats].material_name, line + 7);
+            scop->materials->tmp_allocated = 0;
+            scop->materials->gl_buffer_size = 0;
+            scop->materials->gl_buffer = NULL;
             tmp_nb_mats++;
         }
         // printf("%s", line);

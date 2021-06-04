@@ -67,26 +67,7 @@ void	parser_realloc(size_t *count, size_t *alloc, size_t size, void **array)
 }
 
 
-size_t	strcountchr(char *line, char character)
-{
-	size_t	len = 0;
-	size_t	count = 0;
 
-	while (line[len] != NULL)
-	{
-		if (line[len] == character)
-			count++;
-		len++;
-	}
-	return (count);
-}
-
-void parse_face(t_parser *parser, char *last_mtl, char *line) 
-{
-
-	printf("[%s] %zu %s", last_mtl, strcountchr(line, '/'), line);
-	(void) line;
-}
 
 void parser_init(t_scop *scop, char *file)
 {
@@ -101,6 +82,7 @@ void parser_init(t_scop *scop, char *file)
 	size_t	len 		= 0;
 	t_stat	st;
 	
+
 	char	last_mtl[256];
 
 	fp = fopen(file, "r");
@@ -116,8 +98,10 @@ void parser_init(t_scop *scop, char *file)
 	size_t	path_len;
 
 	path_len = 0;
+	memset(path, 0, 256);
+	if (!(file_tmp = strdup(file)))
+		die ("Error strdup file_tmp");
 
-	file_tmp = strdup(file);
 	token = strtok(file, "/");
 	while (token != NULL) {
 		if (!strcmp(token, strrchr(file_tmp, '/') + 1)) 
@@ -146,7 +130,7 @@ void parser_init(t_scop *scop, char *file)
 	{
 		if (!strncmp(line, "mtllib ", 7)) 
 		{
-			parser_mtl_start(scop, &parser, path, line + 7);
+			parser_mtl_start(scop, path, line + 7);
 		}
 		else if (!strncmp(line, "v ", 2)) 
 		{
@@ -168,7 +152,7 @@ void parser_init(t_scop *scop, char *file)
 		}
 		else if (!strncmp(line, "f ", 2)) 
 		{
-			parse_face(&parser, last_mtl, line);
+			parse_face(&parser, scop->materials, scop->nb_mats, last_mtl, line + 2);
 			f_count++;
 			scop->nb_triangles++;
 		} 
@@ -178,6 +162,17 @@ void parser_init(t_scop *scop, char *file)
 			last_mtl[strlen(last_mtl) - 1] = 0;
 		}
 	}
+
+	for (size_t i = 0; i < scop->nb_mats; i++) {
+		printf("> %s\n", scop->materials[i].material_name);
+		printf("  gl_buffer_size: %zu\n", scop->materials[i].gl_buffer_size);
+
+		// for (size_t j = 0; j < scop->materials[i].gl_buffer_size; j++)
+		// {
+		// 	printf("%.2f ", scop->materials[i].gl_buffer[j]);
+		// }
+	}
+
 	parser_realloc_end(&parser, v_count, vn_count, vt_count);
 
 	printf("\033[0;32m\n[debug] %-5s %zu\n", "V", v_count);

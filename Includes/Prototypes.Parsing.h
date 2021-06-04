@@ -16,6 +16,8 @@
 #include "Scop.h"
 
 void    parser_init(t_scop *scop, char *argv);
-void    parser_mtl_start(t_scop *scop, t_parser *parser, char path[256], char *file);
+void    parser_mtl_start(t_scop *scop, char path[256], char *file);
+
+void parse_face(t_parser *parser, t_mat *materials, size_t material_count, char *last_mtl, char *line);
 
 #endif

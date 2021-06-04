@@ -2,6 +2,13 @@
 	"files.associations": {
 		"stat.h": "c",
 		"prototypes.parsing.h": "c",
-		"scop.h": "c"
+		"scop.h": "c",
+		"__bit_reference": "cpp",
+		"algorithm": "cpp",
+		"bitset": "cpp",
+		"chrono": "cpp",
+		"unordered_map": "cpp",
+		"libc_extends.h": "c",
+		"stdio.h": "c"
 	}
 }

@@ -13,10 +13,17 @@
 #ifndef SCOP_H
 # define SCOP_H
 
-
 #include <stdlib.h>
 #include "GL/gl3w.h"
 #include <GLFW/glfw3.h>
+#include "libc_extends.h"
+
+typedef enum e_parsing
+{
+	VERTICE	= 0x01,
+	TEXTURE = 0x02,
+	NORMAL	= 0x04,
+}			e_parsing;
 
 typedef struct s_vec3i
 {
@@ -57,6 +64,7 @@ typedef struct	s_mat
 	t_vec3f		tf;
 	float		*gl_buffer;
 	size_t		gl_buffer_size;
+	size_t		tmp_allocated;
 }				t_mat;
 
 typedef struct s_scop

@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
 	printf("- Materials count : %zu\n\n", scop.nb_mats);
 
 	printf("[Scop] Starting OpenGL initialization\n");
+	exit(1);
 	init_window(&scop.window);
 	//
 

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 14:49:04 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/04 15:13:58 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,10 @@ int main(int argc, char *argv[])
 	printf("[Scop] Starting parser\n");
 	parser_init(&scop, argv[1]);
 
+	printf("- Triangles count : %zu\n", scop.nb_triangles);
+	printf("- Materials count : %zu\n\n", scop.nb_mats);
+
+	printf("[Scop] Starting OpenGL initialization\n");
 	init_window(&scop.window);
 	//
 
@@ -77,7 +81,21 @@ int main(int argc, char *argv[])
 	glGenVertexArrays(1, &scop.vao);  
 	glBindVertexArray(scop.vao);
 
+	printf("%zu\n", (sizeof(float) * 8));
+	
+	glBufferData(GL_ARRAY_BUFFER, ((uint64_t)scop.nb_triangles) * (sizeof(float) * 8), NULL, GL_DYNAMIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(3 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(6 * sizeof(float)));
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+
+
 	scop.program = create_shader_program("Shaders/vertex.glsl", "Shaders/fragment.glsl");
+	glUseProgram(scop.program);
 	//
 
 	printf("[Scop] Ready\n");

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 14:48:34 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/04 14:56:10 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,8 @@ void parser_init(t_scop *scop, char *file)
 
 	stat(file, &st);
 
-
+	scop->nb_triangles = 0;
+	
 	// void get_file_relative_path()
 	char	*file_tmp;
 	char 	*token;
@@ -154,6 +155,7 @@ void parser_init(t_scop *scop, char *file)
 			//last_mtl
 			parse_face(line);
 			f_count++;
+			scop->nb_triangles++;
 		} 
 		else if (!strncmp(line, "usemtl ", 7))
 		{

@@ -13,6 +13,7 @@
 #include "Scop.h"
 #include "Prototypes.Parsing.h"
 #include <stdio.h>
+#include "matrices.h"
 
 void	die(char *string)
 {
@@ -31,7 +32,7 @@ void	init_window(GLFWwindow **window)
 	glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	*window = glfwCreateWindow(1600, 900, "Hello World", NULL, NULL);
+	*window = glfwCreateWindow(1280, 720, "Hello World", NULL, NULL);
 	printf("[OpenGL] Creating window\n");
 	if (!window)
 	{
@@ -52,13 +53,110 @@ void	init_window(GLFWwindow **window)
 
 void	display_loop(t_scop *scop)
 {
+	GLuint glMatTransform 	= glGetUniformLocation(scop->program, "Transform");
+	GLuint glMatPersp 		= glGetUniformLocation(scop->program, "Persp");
+	GLuint glMatModel 		= glGetUniformLocation(scop->program, "Model");
+
+	mat4f 	mat_persp;
+	mat4f 	mat_model;
+	mat4f 	mat_transform;
+	// mat4f	mat_scale;
+
+	// mat4_init(mat_model);
+	mat4_init(mat_transform);
+	mat4_perspective(mat_persp, 1.0472, 1280.0f / 720.0f, 0.00001f, 1000.0f);
+
+	glUniformMatrix4fv(glMatPersp, 1, GL_FALSE, mat_persp[0]);
+	glUniformMatrix4fv(glMatTransform, 1, GL_FALSE, mat_transform[0]);
+
+
+
+	glEnable(GL_CULL_FACE);
+	// glDisable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);  
+	// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+	float a = 0;
+		a += 0.15;
+
+	size_t	mat_i = 0;
+	size_t	offset = 0;
+
 	while (!glfwWindowShouldClose(scop->window))
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
+
+		// a += 0.015;
+		matmat(mat_model, (t_vec3f) {0, -0.5, -5}, (t_vec3f){-a, a, 0}, 1);
+    	glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model[0]);
+
+		mat_i 	= 0;
+		offset 	= 0;
+		while (mat_i < scop->nb_mats)
+		{
+			if (mat_i > 0)
+				offset += scop->materials[mat_i - 1].gl_buffer_size;
+			glDrawArrays(GL_TRIANGLES, 3 * offset, 3 * scop->materials[mat_i].gl_buffer_size);
+			mat_i++;
+		}
 		glfwSwapBuffers(scop->window);
 		glfwPollEvents();
 	}
+}
+
+void	init_opengl_buffer(t_scop *scop)
+{
+	size_t	i = 0;
+	size_t	buffer_size = 0;
+	float	*tmp_buffer;
+
+	glGenBuffers(1, &scop->vbo);  
+	glBindBuffer(GL_ARRAY_BUFFER, scop->vbo);
+
+	glGenVertexArrays(1, &scop->vao);  
+	glBindVertexArray(scop->vao);
+
+	while (i < scop->nb_mats)
+	{
+		buffer_size += scop->materials[i].gl_buffer_size;
+		i++;
+	}
+
+	if (!(tmp_buffer = calloc(buffer_size, sizeof(float))))
+		die ("Error calloc tmp_buffer");
+	_floatset(tmp_buffer, 0.0f, buffer_size);
+
+	i = 0;
+	buffer_size = 0;
+	while (i < scop->nb_mats)
+	{
+		_floatncat(tmp_buffer, scop->materials[i].gl_buffer, buffer_size, scop->materials[i].gl_buffer_size);
+		buffer_size += scop->materials[i].gl_buffer_size;
+		i++;
+	}
+
+	// printf("Bsize : %zu %zu\n", scop->materials[0].gl_buffer_size, scop->materials[0].gl_buffer_size / 8);
+	// _floatncat(tmp_buffer, scop->materials[0].gl_buffer, 0, scop->materials[0].gl_buffer_size);
+
+	// for (size_t o = 0; o < scop->materials[0].gl_buffer_size; o++)
+	// {
+
+	// 	if (tmp_buffer[o] == 99)
+	// 		printf(".");
+	// 	else
+    // 		printf("%.2f ", tmp_buffer[o]);
+	// }
+
+	glBufferData(GL_ARRAY_BUFFER, (buffer_size * sizeof(float)), tmp_buffer, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(3 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(6 * sizeof(float)));
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+
+	printf("Total mat_buffers : %zu\n", buffer_size);
 }
 
 int main(int argc, char *argv[])
@@ -70,36 +168,30 @@ int main(int argc, char *argv[])
 
 	printf("- Triangles count : %zu\n", scop.nb_triangles);
 	printf("- Materials count : %zu\n\n", scop.nb_mats);
+	
 
 	printf("[Scop] Starting OpenGL initialization\n");
-	exit(1);
 	init_window(&scop.window);
 	//
 
+	init_opengl_buffer(&scop);
 
-	glGenBuffers(1, &scop.vbo);  
-	glBindBuffer(GL_ARRAY_BUFFER, scop.vbo);
 
-	glGenVertexArrays(1, &scop.vao);  
-	glBindVertexArray(scop.vao);
+	// static const GLfloat g_vertex_buffer_data[] = {
+	// 	-1.0f, -1.0f, 0.0f,
+	// 	1.0f, -1.0f, 0.0f,
+	// 	0.0f,  1.0f, 0.0f,
+	// };
 
-	printf("%zu\n", (sizeof(float) * 8));
-
-	static const GLfloat g_vertex_buffer_data[] = {
-		-1.0f, -1.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,
-		0.0f,  1.0f, 0.0f,
-	};
-
-	glBufferData(GL_ARRAY_BUFFER, 3 * 3 * sizeof(float), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+	// glBufferData(GL_ARRAY_BUFFER, 3 * 3 * sizeof(float), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
 	//glBufferData(GL_ARRAY_BUFFER, ((uint64_t)scop.nb_triangles) * (8 * sizeof(float)), NULL, GL_DYNAMIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
     //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)0);
 	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(3 * sizeof(float)));
 	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(6 * sizeof(float)));
 
-    glEnableVertexAttribArray(0);
+    // glEnableVertexAttribArray(0);
     //glEnableVertexAttribArray(1);
     //glEnableVertexAttribArray(2);
 

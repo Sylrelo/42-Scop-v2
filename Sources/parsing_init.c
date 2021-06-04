@@ -152,9 +152,8 @@ void parser_init(t_scop *scop, char *file)
 		}
 		else if (!strncmp(line, "f ", 2)) 
 		{
-			parse_face(&parser, scop->materials, scop->nb_mats, last_mtl, line + 2);
+			scop->nb_triangles += parse_face(&parser, scop->materials, scop->nb_mats, last_mtl, line + 2);
 			f_count++;
-			scop->nb_triangles++;
 		} 
 		else if (!strncmp(line, "usemtl ", 7))
 		{
@@ -162,6 +161,7 @@ void parser_init(t_scop *scop, char *file)
 			last_mtl[strlen(last_mtl) - 1] = 0;
 		}
 	}
+
 
 	for (size_t i = 0; i < scop->nb_mats; i++) {
 		printf("> %s\n", scop->materials[i].material_name);

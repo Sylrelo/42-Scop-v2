@@ -18,6 +18,8 @@
 #include <GLFW/glfw3.h>
 #include "libc_extends.h"
 
+#define MAT_GL_BUFFER_REALLOC_VALUE 5000
+
 typedef enum e_parsing
 {
 	VERTICE	= 0x01,

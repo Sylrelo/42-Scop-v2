@@ -3,7 +3,10 @@
 #ifndef LIBC_EXTENDS
 # define LIBC_EXTENDS
 
-inline size_t	strcountchr(char *line, char character)
+#include <string.h>
+#include <ctype.h>
+
+inline size_t	_strcountchr(char *line, char character)
 {
 	size_t	count = 0;
 
@@ -35,6 +38,27 @@ inline void		_floatncat(float *dest, const float *values, const size_t start, co
 		i++;
 		j++;
 	}
+}
+
+
+inline char		*_ltrim(char *s)
+{
+    while(isspace(*s))
+		s++;
+    return (s);
+}
+
+inline char		*_rtrim(char *s)
+{
+    char *back = s + strlen(s);
+    while(isspace(*--back));
+    *(back + 1) = '\0';
+    return (s);
+}
+
+inline char		*_strtrim(char *s)
+{
+    return _rtrim (_ltrim (s)); 
 }
 
 #endif

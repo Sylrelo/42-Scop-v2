@@ -35,7 +35,7 @@ static void mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size)
     material->gl_buffer_size += buffer_size;
 }
 
-size_t      parse_triangle(t_parser *parser, t_mat *material, char *line)
+size_t      parse_vertex(t_parser *parser, t_mat *material, char *line)
 {
     uint16_t face_type = 0x0;
 	size_t	index_v = 0;
@@ -109,9 +109,9 @@ size_t      triangulate(t_parser *parser, t_mat *material, size_t sides_count, c
     i = 0;
     while (i < sides_count - 2)
     {
-        parse_triangle(parser, material, _strtrim(faces[0]));
-        parse_triangle(parser, material, _strtrim(faces[i + 1]));
-        parse_triangle(parser, material, _strtrim(faces[i + 2]));
+        parse_vertex(parser, material, _strtrim(faces[0]));
+        parse_vertex(parser, material, _strtrim(faces[i + 1]));
+        parse_vertex(parser, material, _strtrim(faces[i + 2]));
         i++;
     }
 
@@ -147,7 +147,7 @@ size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_cou
 
     token = strtok(line, " ");
 	while (token != NULL) {
-        parse_triangle(parser, &(*materials)[material_id], _strtrim(token));
+        parse_vertex(parser, &(*materials)[material_id], _strtrim(token));
 		token = strtok(NULL, " ");
 	}
     // print_matlist(*material_count, *materials);

@@ -10,7 +10,7 @@ static ssize_t get_material_id(t_mat *materials, size_t material_count, const ch
 
     while (i < material_count)
     {
-        if (sizeof(material_name) && !strncmp(material_name, materials[i].material_name, strlen(material_name)))
+        if (!strncmp(material_name, materials[i].material_name, strlen(materials[i].material_name)))
             return i;
         i++;
     }

@@ -111,6 +111,7 @@ void 		parser_init(t_scop *scop, char *file)
 		die("Cannot open file");
 
 	memset(last_mtl, 0, 256);
+	strcpy(last_mtl, "DEFAULT_NO_MATERIAL");
 	get_relative_path(path, file);
 	
 	parser.vn_count = (st.st_size / 200);

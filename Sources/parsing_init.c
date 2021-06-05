@@ -14,14 +14,11 @@
 #include "Prototypes.Parsing.h"
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <sys/stat.h>
-#include <string.h>
 
 typedef struct stat t_stat;
 
-void	parser_free(t_parser *parser)
+static void	free_obj_arrays(t_parser *parser)
 {
 	if (parser->v_count)
 		free(parser->v);
@@ -31,28 +28,7 @@ void	parser_free(t_parser *parser)
 		free(parser->vn);
 }
 
-void	_realloc_end(size_t count, size_t size, size_t *alloc_count, void **array)
-{
-	if (count) {
-		*alloc_count = count;
-		*array = realloc(*array, size * *alloc_count);
-		if (!*array)
-			die ("Error parser_realloc_end v");
-	} 
-	else {
-		*alloc_count = 0;
-		free(*array);
-	}
-}
-
-void	parser_realloc_end(t_parser *parser, size_t v_count, size_t vn_count, size_t vt_count)
-{
-	_realloc_end(v_count, sizeof(t_vec3f), &parser->v_count, (void *) &parser->v);
-	_realloc_end(vn_count, sizeof(t_vec3f), &parser->vn_count, (void *) &parser->vn);
-	_realloc_end(vt_count, sizeof(t_vec2f), &parser->vt_count, (void *) &parser->vt);
-}
-
-void	parser_realloc(size_t *count, size_t *alloc, size_t size, void **array)
+static void	realloc_obj_arrays(size_t *count, size_t *alloc, size_t size, void **array)
 {
 	if (*count < *alloc)
 		return ;
@@ -62,39 +38,39 @@ void	parser_realloc(size_t *count, size_t *alloc, size_t size, void **array)
 		die("Erreor realloc");
 }
 
-void parser_init(t_scop *scop, char *file)
+static void	_realloc_end(size_t count, size_t size, size_t *alloc_count, void **array)
 {
-	t_parser parser;
-	size_t	f_count 	= 0;
-	size_t	v_count 	= 0;
-	size_t	vn_count 	= 0;
-	size_t	vt_count 	= 0;
-	FILE 	*fp;
-	char	*line 		= 0;
-	ssize_t	read 		= 0;
-	size_t	len 		= 0;
-	t_stat	st;
-	
+	if (count)
+	{
+		*alloc_count = count;
+		if (!(*array = realloc(*array, size * *alloc_count)))
+			die ("Error parser_realloc_end v");
+	} 
+	else
+	{
+		*alloc_count = 0;
+		free(*array);
+	}
+}
 
-	char	last_mtl[256];
+static void	parser_realloc_end(t_parser *parser, size_t v_count, size_t vn_count, size_t vt_count)
+{
+	_realloc_end(v_count, sizeof(t_vec3f), &parser->v_count, (void *) &parser->v);
+	_realloc_end(vn_count, sizeof(t_vec3f), &parser->vn_count, (void *) &parser->vn);
+	_realloc_end(vt_count, sizeof(t_vec2f), &parser->vt_count, (void *) &parser->vt);
+}
 
-	memset(last_mtl, 0, 256);
-	fp = fopen(file, "r");
-
-	stat(file, &st);
-
-	scop->nb_triangles = 0;
-	
-	// void get_file_relative_path()
+static void get_relative_path(char path[256], char *file)
+{
 	char	*file_tmp;
 	char 	*token;
-	char 	path[256];
 	size_t	path_len;
 
-	path_len = 0;
-	memset(path, 0, 256);
 	if (!(file_tmp = strdup(file)))
 		die ("Error strdup file_tmp");
+
+	memset(path, 0, 256);
+	path_len = 0;
 
 	token = strtok(file, "/");
 	while (token != NULL) {
@@ -105,9 +81,35 @@ void parser_init(t_scop *scop, char *file)
 		path_len += strlen(token) + 1;
 		token = strtok(NULL, "/");
 	}
-	path[path_len] = 0;
-	//-------------------------
+	free(file_tmp);
+}
 
+void parser_init(t_scop *scop, char *file)
+{
+	t_parser	parser;
+	FILE 		*fp;
+	t_stat		st;
+	char		last_mtl[256];
+	char		path[256];
+	char		*line 		= NULL;
+	size_t		f_count 	= 0;
+	size_t		v_count 	= 0;
+	size_t		vn_count 	= 0;
+	size_t		vt_count 	= 0;
+	ssize_t		read 		= 0;
+	size_t		len 		= 0;
+
+	if (stat(file, &st))
+		die ("File not found.");
+	
+	if (st.st_mode & S_IFDIR)
+		die ("Can't open directory.");	
+
+	if (!(fp = fopen(file, "r")))
+		die("Cannot open file");
+
+	get_relative_path(path, file);
+	
 	parser.vn_count = (st.st_size / 200);
 	parser.v_count 	= (st.st_size / 200);
 	parser.vt_count = (st.st_size / 200);
@@ -122,28 +124,27 @@ void parser_init(t_scop *scop, char *file)
 	while ((read = getline(&line, &len, (FILE *) fp)) != -1)
 	{
 		if (!strncmp(line, "mtllib ", 7)) 
-		{
 			parser_mtl_start(scop, path, line + 7);
-		}
 		else if (!strncmp(line, "usemtl ", 7))
 		{
+			memset(last_mtl, 0, 256);
 			strcpy(last_mtl, _strtrim(line + 7));
 		}
 		else if (!strncmp(line, "v ", 2)) 
 		{
-			parser_realloc(&v_count, &parser.v_count, sizeof(t_vec3f), (void *) &parser.v);
+			realloc_obj_arrays(&v_count, &parser.v_count, sizeof(t_vec3f), (void *) &parser.v);
 			sscanf(line, "v %f %f %f", &parser.v[v_count].x, &parser.v[v_count].y, &parser.v[v_count].z);
 			v_count++;
 		} 
 		else if (!strncmp(line, "vn ", 3)) 
 		{
-			parser_realloc(&vn_count, &parser.vn_count, sizeof(t_vec3f), (void *) &parser.vn);
+			realloc_obj_arrays(&vn_count, &parser.vn_count, sizeof(t_vec3f), (void *) &parser.vn);
 			sscanf(line, "vn %f %f %f", &parser.vn[vn_count].x, &parser.vn[vn_count].y, &parser.vn[vn_count].z);
 			vn_count++;
 		}
 		else if (!strncmp(line, "vt ", 3)) 
 		{
-			parser_realloc(&vt_count, &parser.vt_count, sizeof(t_vec2f), (void *) &parser.vt);
+			realloc_obj_arrays(&vt_count, &parser.vt_count, sizeof(t_vec2f), (void *) &parser.vt);
 			sscanf(line, "vt %f %f", &parser.vt[vt_count].x, &parser.vt[vt_count].y);
 			vt_count++;
 		}
@@ -153,11 +154,8 @@ void parser_init(t_scop *scop, char *file)
 			f_count++;
 		} 
 	}
-
 	parser_realloc_end(&parser, v_count, vn_count, vt_count);
-
-	parser_free(&parser);
+	free_obj_arrays(&parser);
 	free(line);
-	free(file_tmp);
 	fclose(fp);
 }

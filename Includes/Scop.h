@@ -61,6 +61,7 @@ typedef struct	s_mat
 {
 	char		material_name[256];
 	uint16_t	tex_id;
+	t_vec3f		ka;
 	t_vec3f		kd;
 	t_vec3f		ks;
 	t_vec3f		tf;

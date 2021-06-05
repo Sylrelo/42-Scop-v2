@@ -73,7 +73,7 @@ void	display_loop(t_scop *scop)
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);  
-	// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	float a = 0;
 
@@ -85,7 +85,7 @@ void	display_loop(t_scop *scop)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 
 		a += 0.010;
-		matmat(mat_model, (t_vec3f) {0, -0.5, -5}, (t_vec3f){0, a, 0}, 1);
+		matmat(mat_model, (t_vec3f) {0, 0, -5}, (t_vec3f){0, a, 0}, 2);
     	glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model[0]);
 
 		mat_i 	= 0;
@@ -150,6 +150,9 @@ void	init_opengl_buffer(t_scop *scop)
 int main(int argc, char *argv[])
 {
 	t_scop	scop;
+
+	scop.nb_mats = 0;
+	scop.nb_triangles = 0;
 
 	printf("[Scop] Starting parser\n");
 	parser_init(&scop, argv[1]);

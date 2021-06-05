@@ -36,7 +36,7 @@ static void mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size)
     material->gl_buffer_size += buffer_size;
 }
 
-size_t    parse_triangle(t_parser *parser, t_mat *material, char *line)
+size_t      parse_triangle(t_parser *parser, t_mat *material, char *line)
 {
     uint16_t face_type = 0x0;
 	size_t	index_v = 0;
@@ -90,7 +90,7 @@ size_t    parse_triangle(t_parser *parser, t_mat *material, char *line)
     return (1);
 }
 
-size_t parse_face(t_parser *parser, t_mat *materials, size_t material_count, char *last_mtl, char *line) 
+size_t      parse_face(t_parser *parser, t_mat *materials, size_t material_count, char *last_mtl, char *line) 
 {
     const ssize_t material_id = get_material_id(materials, material_count, last_mtl);
 	const ssize_t sides_count = _strcountchr(line, ' ') + 1;

@@ -99,15 +99,18 @@ void 		parser_init(t_scop *scop, char *file)
 	ssize_t		read 		= 0;
 	size_t		len 		= 0;
 
+
+
 	if (stat(file, &st))
 		die ("File not found.");
 	
 	if (st.st_mode & S_IFDIR)
-		die ("Can't open directory.");	
+		die ("Cannot open directory.");	
 
 	if (!(fp = fopen(file, "r")))
 		die("Cannot open file");
 
+	memset(last_mtl, 0, 256);
 	get_relative_path(path, file);
 	
 	parser.vn_count = (st.st_size / 200);
@@ -150,7 +153,7 @@ void 		parser_init(t_scop *scop, char *file)
 		}
 		else if (!strncmp(line, "f ", 2)) 
 		{
-			scop->nb_triangles += parse_face(&parser, scop->materials, scop->nb_mats, last_mtl, _strtrim(line + 2));
+			scop->nb_triangles += parse_face(&parser, &scop->materials, &scop->nb_mats, last_mtl, _strtrim(line + 2));
 			f_count++;
 		} 
 	}

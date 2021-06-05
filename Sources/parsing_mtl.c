@@ -38,7 +38,7 @@ static void generate_filepath(char filepath[256], char path[256], char *file)
     filepath[strlen(path) + strlen(file)] = 0;
 }
 
-static void init_default_values(t_mat *material)
+void        init_mat_default_values(t_mat *material)
 {
     material->tmp_allocated = 0;
     material->gl_buffer_size = 0;
@@ -88,7 +88,7 @@ void        parser_mtl_start(t_scop *scop, char path[256], char *file)
         {
             realloc_mtl(&tmp_nb_mats, &scop->nb_mats, (void *) &scop->materials);
             strcpy(scop->materials[tmp_nb_mats].material_name, _strtrim(line + 7));
-            init_default_values(&scop->materials[tmp_nb_mats]);
+            init_mat_default_values(&scop->materials[tmp_nb_mats]);
             tmp_nb_mats++;
         }
 	}

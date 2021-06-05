@@ -10,7 +10,7 @@ static ssize_t get_material_id(t_mat *materials, size_t material_count, const ch
 
     while (i < material_count)
     {
-        if (!strncmp(material_name, materials[i].material_name, strlen(material_name)))
+        if (sizeof(material_name) && !strncmp(material_name, materials[i].material_name, strlen(material_name)))
             return i;
         i++;
     }
@@ -90,15 +90,24 @@ size_t      parse_triangle(t_parser *parser, t_mat *material, char *line)
     return (1);
 }
 
-size_t      parse_face(t_parser *parser, t_mat *materials, size_t material_count, char *last_mtl, char *line) 
+size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_count, char *last_mtl, char *line) 
 {
-    const ssize_t material_id = get_material_id(materials, material_count, last_mtl);
+    const ssize_t material_id = get_material_id(*materials, *material_count, last_mtl);
 	const ssize_t sides_count = _strcountchr(line, ' ') + 1;
     char *token = NULL;
 
+
     if (!last_mtl || material_id == -1)
     {
-		printf("Face does not have a material, skipping (for now)\n");
+		// printf("Face does not have a material, skipping (for now)\n");
+        if (material_id == -1 && *material_count == 0)
+        {
+            *material_count = 1;
+            *materials = calloc(1, sizeof(t_mat));
+            init_mat_default_values(&*materials[0]);
+            strcpy((*materials)[0].material_name, "DEFAULT_NO_MATERIAL");
+            // printf("Meh\n");
+        }
         return (0);
     }
 
@@ -110,8 +119,10 @@ size_t      parse_face(t_parser *parser, t_mat *materials, size_t material_count
 
     token = strtok(line, " ");
 	while (token != NULL) {
-        parse_triangle(parser, &materials[material_id], _strtrim(token));
+        parse_triangle(parser, &(*materials)[material_id], _strtrim(token));
 		token = strtok(NULL, " ");
 	}
+
+    // print_matlist(*material_count, *materials);
     return (1);
 }

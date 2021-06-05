@@ -89,6 +89,38 @@ size_t      parse_triangle(t_parser *parser, t_mat *material, char *line)
     return (1);
 }
 
+size_t      triangulate(t_parser *parser, t_mat *material, size_t sides_count, char *line)
+{
+    char    *token = NULL;
+    char    **faces = NULL;
+    size_t  i = 0;
+
+    if (!(faces = calloc(sides_count, sizeof(char **))))
+        die ("Error calloc triangulation");
+
+    token = strtok(line, " ");
+	while (token != NULL) {
+        if (!(faces[i] = strdup(token)))
+            die ("Error strdup triangulation");
+        i++;
+		token = strtok(NULL, " ");
+	}
+
+    i = 0;
+    while (i < sides_count - 2)
+    {
+        parse_triangle(parser, material, _strtrim(faces[0]));
+        parse_triangle(parser, material, _strtrim(faces[i + 1]));
+        parse_triangle(parser, material, _strtrim(faces[i + 2]));
+        i++;
+    }
+
+    while (i--)
+       free(faces[i]);
+    free(faces);
+    return (0);
+}
+
 size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_count, char *last_mtl, char *line) 
 {
 	const ssize_t sides_count   = _strcountchr(line, ' ') + 1;
@@ -111,17 +143,13 @@ size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_cou
     }
 
 	if (sides_count > 3)
-	{
-		printf("Face is not triangle, triangulation is not yet available, skipping\n");
-		return (0);
-	}
+        return (triangulate(parser, &(*materials)[material_id], sides_count, line));
 
     token = strtok(line, " ");
 	while (token != NULL) {
         parse_triangle(parser, &(*materials)[material_id], _strtrim(token));
 		token = strtok(NULL, " ");
 	}
-    // printf("Allo \n");
     // print_matlist(*material_count, *materials);
     return (1);
 }

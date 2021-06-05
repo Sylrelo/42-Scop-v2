@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "Scop.h"
+#include "Prototypes.Parsing.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -34,7 +36,6 @@ static void generate_filepath(char filepath[256], char path[256], char *file)
     strcat(filepath, path);
     strcat(filepath, file);
     filepath[strlen(path) + strlen(file)] = 0;
-
 }
 
 static void init_default_values(t_mat *material)
@@ -42,7 +43,7 @@ static void init_default_values(t_mat *material)
     material->tmp_allocated = 0;
     material->gl_buffer_size = 0;
     material->gl_buffer = NULL;
-    material->kd = (t_vec3f) {1.0, 1.0, 1.0};
+    material->kd = (t_vec3f) {0.7, 0.7, 0.7};
     material->ks = (t_vec3f) {1.0, 1.0, 1.0};
     material->ka = (t_vec3f) {0.1, 0.1, 0.1};
     material->tf = (t_vec3f) {1.0, 1.0, 1.0};
@@ -56,6 +57,7 @@ void        parser_mtl_start(t_scop *scop, char path[256], char *file)
 	ssize_t	read 		= 0;
 	size_t	len 		= 0;
     size_t  tmp_nb_mats = 0;
+    t_mat   *material;
 
     generate_filepath(filepath, path, file);
 
@@ -67,16 +69,19 @@ void        parser_mtl_start(t_scop *scop, char path[256], char *file)
 
 	while ((read = getline(&line, &len, (FILE *) fp)) != -1)
 	{
+        material = &scop->materials[tmp_nb_mats - 1];
+
         if (!strncmp(line, "Kd ", 3))
-            sscanf(line, "Kd %f %f %f", &scop->materials[tmp_nb_mats - 1].kd.x, &scop->materials[tmp_nb_mats - 1].kd.y, &scop->materials[tmp_nb_mats - 1].kd.z);
+            sscanf(line, "Kd %f %f %f", &material->kd.x, &material->kd.y, &material->kd.z);
         else if (!strncmp(line, "Ks ", 3))
-            sscanf(line, "Ks %f %f %f", &scop->materials[tmp_nb_mats - 1].ks.x, &scop->materials[tmp_nb_mats - 1].ks.y, &scop->materials[tmp_nb_mats - 1].ks.z);
+            sscanf(line, "Ks %f %f %f", &material->ks.x, &material->ks.y, &material->ks.z);
         else if (!strncmp(line, "Ka ", 3))
-            sscanf(line, "Ka %f %f %f", &scop->materials[tmp_nb_mats - 1].ka.x, &scop->materials[tmp_nb_mats - 1].ka.y, &scop->materials[tmp_nb_mats - 1].ka.z);
+            sscanf(line, "Ka %f %f %f", &material->ka.x, &material->ka.y, &material->ka.z);
         else if (!strncmp(line, "Tf ", 3))
-            sscanf(line, "Tf %f %f %f", &scop->materials[tmp_nb_mats - 1].tf.x, &scop->materials[tmp_nb_mats - 1].tf.y, &scop->materials[tmp_nb_mats - 1].tf.z);
+            sscanf(line, "Tf %f %f %f", &material->tf.x, &material->tf.y, &material->tf.z);
         else if (!strncmp(line, "map_Kd ", 7))
 		{
+            parse_texture(scop, material, path, _strtrim(line + 7));
 			printf("Texture file found !\n");
 		}
 		else if (!strncmp(line, "newmtl ", 7))
@@ -92,5 +97,6 @@ void        parser_mtl_start(t_scop *scop, char path[256], char *file)
         die ("Material final realloc failed");
     scop->nb_mats   = tmp_nb_mats;
     fclose(fp);
-   // free(scop->materials);
+
+    // print_matlist(scop->nb_mats, scop->materials);
 }

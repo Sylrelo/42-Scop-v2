@@ -84,7 +84,7 @@ static void get_relative_path(char path[256], char *file)
 	free(file_tmp);
 }
 
-void parser_init(t_scop *scop, char *file)
+void 		parser_init(t_scop *scop, char *file)
 {
 	t_parser	parser;
 	FILE 		*fp;

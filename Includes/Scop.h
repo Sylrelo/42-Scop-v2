@@ -57,6 +57,12 @@ typedef struct s_parser
 	t_vec2f		*vt;
 }				t_parser;
 
+typedef struct	s_textures
+{
+	char		filename[256];
+	float		*content;
+	uint32_t 	gl_location;
+}				t_textures;
 typedef struct	s_mat
 {
 	char		material_name[256];
@@ -77,6 +83,9 @@ typedef struct s_scop
 	GLuint			vbo;
 	GLint			program;
 	
+	t_textures		*textures;
+	size_t			textures_count;
+
 	size_t			nb_triangles;
 	size_t			nb_mats;
 	t_mat			*materials;
@@ -85,5 +94,8 @@ typedef struct s_scop
 
 void	die(char *string);
 int    create_shader_program(char *file_vertex, char *file_fragment);
+
+
+void    print_matlist(size_t nb_mat, t_mat *materials);
 
 #endif

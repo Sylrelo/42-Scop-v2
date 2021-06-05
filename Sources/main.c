@@ -53,6 +53,8 @@ void	init_window(GLFWwindow **window)
 
 void	display_loop(t_scop *scop)
 {
+	t_mat	material;
+
 	GLuint glMatTransform 	= glGetUniformLocation(scop->program, "Transform");
 	GLuint glMatPersp 		= glGetUniformLocation(scop->program, "Persp");
 	GLuint glMatModel 		= glGetUniformLocation(scop->program, "Model");
@@ -80,6 +82,12 @@ void	display_loop(t_scop *scop)
 	size_t	mat_i = 0;
 	size_t	offset = 0;
 
+
+	// A déplacer
+	uint32_t loc_kd = glGetUniformLocation(scop->program, "kd");
+
+	//
+
 	while (!glfwWindowShouldClose(scop->window))
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
@@ -92,9 +100,11 @@ void	display_loop(t_scop *scop)
 		offset 	= 0;
 		while (mat_i < scop->nb_mats)
 		{
+			material = scop->materials[mat_i];
 			if (mat_i > 0)
 				offset += scop->materials[mat_i - 1].gl_buffer_size;
-			glDrawArrays(GL_TRIANGLES, (offset / 8), (scop->materials[mat_i].gl_buffer_size / 8));
+			glUniform3f(loc_kd, material.kd.x, material.kd.y, material.kd.z);
+			glDrawArrays(GL_TRIANGLES, (offset / 8), (material.gl_buffer_size / 8));
 			mat_i++;
 		}
 		glfwSwapBuffers(scop->window);
@@ -153,12 +163,15 @@ int main(int argc, char *argv[])
 
 	scop.nb_mats = 0;
 	scop.nb_triangles = 0;
+	scop.textures_count = 0;
+	scop.textures = NULL;
 
 	printf("[Scop] Starting parser\n");
 	parser_init(&scop, argv[1]);
 
 	printf("- Triangles count : %zu\n", scop.nb_triangles);
 	printf("- Materials count : %zu\n\n", scop.nb_mats);
+	
 	
 	printf("[Scop] Starting OpenGL initialization\n");
 	init_window(&scop.window);
@@ -172,5 +185,7 @@ int main(int argc, char *argv[])
 	printf("[Scop] Ready\n");
 	display_loop(&scop);
 
+	if(scop.nb_mats)
+		free(scop.materials);
 	(void)argc;
 }

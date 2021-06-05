@@ -62,6 +62,7 @@ typedef struct	s_textures
 	char		filename[256];
 	float		*content;
 	uint32_t 	gl_location;
+	uint32_t	gl_texture;
 }				t_textures;
 typedef struct	s_mat
 {

@@ -96,19 +96,18 @@ size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_cou
 	const ssize_t sides_count = _strcountchr(line, ' ') + 1;
     char *token = NULL;
 
-
     if (!last_mtl || material_id == -1)
     {
-		// printf("Face does not have a material, skipping (for now)\n");
         if (material_id == -1 && *material_count == 0)
         {
             *material_count = 1;
-            *materials = calloc(1, sizeof(t_mat));
-            init_mat_default_values(&*materials[0]);
+            if (!(*materials = calloc(1, sizeof(t_mat))))
+                die ("Error creating default material");
+            init_mat_default_values(&(*materials)[0]);
             strcpy((*materials)[0].material_name, "DEFAULT_NO_MATERIAL");
-            // printf("Meh\n");
         }
-        return (0);
+        else 
+            return (0);
     }
 
 	if (sides_count > 3)

@@ -33,13 +33,13 @@ void	init_window(GLFWwindow **window)
 	glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	*window = glfwCreateWindow(1280, 720, "Hello World", NULL, NULL);
-	printf("[OpenGL] Creating window\n");
+	glfwHideWindow(*window);
+	printf("[OpenGL] Creating window and context\n");
 	if (!window)
 	{
 		glfwTerminate();
 		die("glfwCreateWindow failed.");
 	}
-	
 	glfwMakeContextCurrent(*window);
 	if (gl3wInit())
 	{
@@ -157,7 +157,7 @@ void	init_opengl_buffer(t_scop *scop)
 	free(tmp_buffer);
 }
 
-int main(int argc, char *argv[])
+int 	main(int argc, char *argv[])
 {
 	t_scop	scop;
 
@@ -166,18 +166,22 @@ int main(int argc, char *argv[])
 	scop.textures_count = 0;
 	scop.textures = NULL;
 
+
+	printf("[Scop] Starting OpenGL initialization\n");
+	init_window(&scop.window);
+
 	printf("[Scop] Starting parser\n");
 	parser_init(&scop, argv[1]);
+
 
 	printf("- Triangles count : %zu\n", scop.nb_triangles);
 	printf("- Materials count : %zu\n\n", scop.nb_mats);
 	
 	
-	printf("[Scop] Starting OpenGL initialization\n");
-	init_window(&scop.window);
-
 	printf("[Scop] Starting OpenGL Buffer initialization\n");
 	init_opengl_buffer(&scop);
+	printf("[Scop] Opening Window\n");
+	glfwShowWindow(scop.window);
 
 	scop.program = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl");
 	glUseProgram(scop.program);

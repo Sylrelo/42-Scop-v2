@@ -99,8 +99,6 @@ void 		parser_init(t_scop *scop, char *file)
 	ssize_t		read 		= 0;
 	size_t		len 		= 0;
 
-
-
 	if (stat(file, &st))
 		die ("File not found.");
 	

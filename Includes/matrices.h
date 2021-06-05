@@ -39,7 +39,6 @@ void 	    mat4_mult(mat4f res, mat4f a, mat4f b)
     } 
 }
 
-
 void		mat4_rotate(mat4f result, t_vec3f rot)
 {
 	mat4f	rot_x;
@@ -125,8 +124,7 @@ void		mat4_empty(mat4f mat)
 	}
 }
 
-
-void	matmat(mat4f res, t_vec3f t, t_vec3f r, int scale)
+void		matmat(mat4f res, t_vec3f t, t_vec3f r, int scale)
 {
 	mat4f	tt;
 	mat4f	tr;

@@ -40,6 +40,7 @@ static void generate_filepath(char filepath[256], char path[256], char *file)
 
 void        init_mat_default_values(t_mat *material)
 {
+    material->tex_id = -1;
     material->tmp_allocated = 0;
     material->gl_buffer_size = 0;
     material->gl_buffer = NULL;
@@ -80,10 +81,7 @@ void        parser_mtl_start(t_scop *scop, char path[256], char *file)
         else if (!strncmp(line, "Tf ", 3))
             sscanf(line, "Tf %f %f %f", &material->tf.x, &material->tf.y, &material->tf.z);
         else if (!strncmp(line, "map_Kd ", 7))
-		{
             parse_texture(scop, material, path, _strtrim(line + 7));
-			printf("Texture file found !\n");
-		}
 		else if (!strncmp(line, "newmtl ", 7))
         {
             realloc_mtl(&tmp_nb_mats, &scop->nb_mats, (void *) &scop->materials);
@@ -98,5 +96,6 @@ void        parser_mtl_start(t_scop *scop, char path[256], char *file)
     scop->nb_mats   = tmp_nb_mats;
     fclose(fp);
 
+    // exit (1);
     // print_matlist(scop->nb_mats, scop->materials);
 }

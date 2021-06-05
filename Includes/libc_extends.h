@@ -40,7 +40,6 @@ inline void		_floatncat(float *dest, const float *values, const size_t start, co
 	}
 }
 
-
 inline char		*_ltrim(char *s)
 {
     while(isspace(*s))

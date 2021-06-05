@@ -61,13 +61,12 @@ typedef struct	s_textures
 {
 	char		filename[256];
 	float		*content;
-	uint32_t 	gl_location;
 	uint32_t	gl_texture;
 }				t_textures;
 typedef struct	s_mat
 {
 	char		material_name[256];
-	uint16_t	tex_id;
+	int			tex_id;
 	t_vec3f		ka;
 	t_vec3f		kd;
 	t_vec3f		ks;

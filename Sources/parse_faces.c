@@ -31,7 +31,6 @@ static void mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size)
     }
     if (!material->gl_buffer) 
         die("Realloc failed for mat_push_buffer");
-
     _floatncat(material->gl_buffer, buffer, material->gl_buffer_size, buffer_size);
     material->gl_buffer_size += buffer_size;
 }
@@ -92,8 +91,8 @@ size_t      parse_triangle(t_parser *parser, t_mat *material, char *line)
 
 size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_count, char *last_mtl, char *line) 
 {
-    const ssize_t material_id = get_material_id(*materials, *material_count, last_mtl);
-	const ssize_t sides_count = _strcountchr(line, ' ') + 1;
+	const ssize_t sides_count   = _strcountchr(line, ' ') + 1;
+    ssize_t material_id         = get_material_id(*materials, *material_count, last_mtl);
     char *token = NULL;
 
     if (!last_mtl || material_id == -1)
@@ -105,6 +104,7 @@ size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_cou
                 die ("Error creating default material");
             init_mat_default_values(&(*materials)[0]);
             strcpy((*materials)[0].material_name, "DEFAULT_NO_MATERIAL");
+            material_id = 0;
         }
         else 
             return (0);
@@ -121,7 +121,7 @@ size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_cou
         parse_triangle(parser, &(*materials)[material_id], _strtrim(token));
 		token = strtok(NULL, " ");
 	}
-
+    // printf("Allo \n");
     // print_matlist(*material_count, *materials);
     return (1);
 }

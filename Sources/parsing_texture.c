@@ -13,7 +13,7 @@ static void generate_filepath(char filepath[256], char path[256], char *file)
     filepath[strlen(path) + strlen(file)] = 0;
 }
 
-int    find_already_loaded(t_textures *textures, size_t texture_count, char *file)
+static int  find_already_loaded(t_textures *textures, size_t texture_count, char *file)
 {
     size_t  i = 0;
 
@@ -46,7 +46,7 @@ static void realloc_textures(size_t count, void **textures)
     }
 }
 
-void    parse_texture(t_scop *scop, t_mat *material, char path[256], char *file)
+void        parse_texture(t_scop *scop, t_mat *material, char path[256], char *file)
 {
     const int texture_id = find_already_loaded(scop->textures, scop->textures_count, file);
     int             width;
@@ -81,6 +81,7 @@ void    parse_texture(t_scop *scop, t_mat *material, char path[256], char *file)
     printf("Texture loaded.\n");
 
     material->tex_id = scop->textures_count;
+    strcpy(scop->textures[scop->textures_count].filename, file);
     stbi_image_free(image);
     scop->textures_count++;
 }

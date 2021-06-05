@@ -156,6 +156,7 @@ void 		parser_init(t_scop *scop, char *file)
 			f_count++;
 		} 
 	}
+	// printf("Parser 1 finish\n");
 	parser_realloc_end(&parser, v_count, vn_count, vt_count);
 	free_obj_arrays(&parser);
 	free(line);

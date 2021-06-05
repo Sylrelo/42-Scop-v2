@@ -75,7 +75,7 @@ void	display_loop(t_scop *scop)
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);  
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	float a = 0;
 
@@ -84,7 +84,8 @@ void	display_loop(t_scop *scop)
 
 
 	// A déplacer
-	uint32_t loc_kd = glGetUniformLocation(scop->program, "kd");
+	uint32_t loc_kd			= glGetUniformLocation(scop->program, "kd");
+	uint32_t loc_textured 	= glGetUniformLocation(scop->program, "textured");
 
 	//
 
@@ -93,7 +94,7 @@ void	display_loop(t_scop *scop)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 
 		a += 0.010;
-		matmat(mat_model, (t_vec3f) {0, 0, -5}, (t_vec3f){0, a, 0}, 2);
+		matmat(mat_model, (t_vec3f) {0, 0, -10}, (t_vec3f){0, a, 0}, 2);
     	glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model[0]);
 
 		mat_i 	= 0;
@@ -104,6 +105,18 @@ void	display_loop(t_scop *scop)
 			if (mat_i > 0)
 				offset += scop->materials[mat_i - 1].gl_buffer_size;
 			glUniform3f(loc_kd, material.kd.x, material.kd.y, material.kd.z);
+
+			if (material.tex_id != -1)
+			{
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, scop->textures[material.tex_id].gl_texture);
+				glUniform1i(loc_textured, 1);
+			}
+			else
+				glUniform1i(loc_textured, 0);
+
+			// printf("%d %d\n", mat_i, material.tex_id);
+
 			glDrawArrays(GL_TRIANGLES, (offset / 8), (material.gl_buffer_size / 8));
 			mat_i++;
 		}
@@ -172,7 +185,6 @@ int 	main(int argc, char *argv[])
 
 	printf("[Scop] Starting parser\n");
 	parser_init(&scop, argv[1]);
-
 
 	printf("- Triangles count : %zu\n", scop.nb_triangles);
 	printf("- Materials count : %zu\n\n", scop.nb_mats);

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <strings.h>
 
-static ssize_t get_material_id(t_mat *materials, size_t material_count, const char *material_name)
+static ssize_t  get_material_id(t_mat *materials, size_t material_count, const char *material_name)
 {
     size_t i = 0;
 
@@ -17,7 +17,7 @@ static ssize_t get_material_id(t_mat *materials, size_t material_count, const ch
     return -1;
 }
 
-static void mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size)
+static void     mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size)
 {
     if (material->tmp_allocated == 0)
     {
@@ -35,10 +35,10 @@ static void mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size)
     material->gl_buffer_size += buffer_size;
 }
 
-void        calculate_missing_normal(t_mat *material)
+static void     calculate_missing_normal(t_mat *material)
 {
-    ssize_t i = 0;
-    ssize_t j = 0;
+    size_t i = 0;
+    size_t j = 0;
     float   *cbuffer;
     t_vec3f	pt[3];
     t_vec3f normal;
@@ -66,7 +66,7 @@ void        calculate_missing_normal(t_mat *material)
     }
 }
 
-size_t      parse_vertex(t_parser *parser, t_mat *material, char *line)
+static size_t   parse_vertex(t_parser *parser, t_mat *material, char *line)
 {
     uint16_t face_type = 0x0;
 	size_t	index_v = 0;
@@ -122,7 +122,7 @@ size_t      parse_vertex(t_parser *parser, t_mat *material, char *line)
     return (1);
 }
 
-size_t      triangulate(t_parser *parser, t_mat *material, size_t sides_count, char *line)
+static size_t   triangulate(t_parser *parser, t_mat *material, size_t sides_count, char *line)
 {
     char    *token = NULL;
     char    **faces = NULL;
@@ -154,7 +154,7 @@ size_t      triangulate(t_parser *parser, t_mat *material, size_t sides_count, c
     return (0);
 }
 
-size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_count, char *last_mtl, char *line) 
+size_t          parse_face(t_parser *parser, t_mat **materials, size_t *material_count, char *last_mtl, char *line) 
 {
 	const ssize_t sides_count   = _strcountchr(line, ' ') + 1;
     ssize_t material_id         = get_material_id(*materials, *material_count, last_mtl);

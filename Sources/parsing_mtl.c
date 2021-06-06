@@ -45,8 +45,8 @@ void        init_mat_default_values(t_mat *material)
     material->gl_buffer_size = 0;
     material->gl_buffer = NULL;
     material->kd = (t_vec3f) {0.7, 0.7, 0.7};
-    material->ks = (t_vec3f) {1.0, 1.0, 1.0};
     material->ka = (t_vec3f) {0.1, 0.1, 0.1};
+    material->ks = (t_vec3f) {1.0, 1.0, 1.0};
     material->tf = (t_vec3f) {1.0, 1.0, 1.0};
 }
 

@@ -97,5 +97,10 @@ int    create_shader_program(char *file_vertex, char *file_fragment);
 
 
 void    print_matlist(size_t nb_mat, t_mat *materials);
+//
+t_vec3f		vec_add(t_vec3f u, t_vec3f v);
+t_vec3f		vec_sub(t_vec3f u, t_vec3f v);
+t_vec3f		vec_cross(t_vec3f u, t_vec3f v);
+//
 
 #endif

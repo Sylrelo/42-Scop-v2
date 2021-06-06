@@ -1,26 +1,40 @@
 #version 400 core
-out vec4 FragColor;
   
+out vec4    FragColor;
 
 
-flat in int outTextured;
+//  
+in vec3      oNormal;
+in vec3      fragmentPosition;
+in vec3      oLightPos;
+in vec3      oLightColor;
+//
+
+flat in int     outTextured;
 flat in vec4     vertexColor;
-in vec2     TexCoord;
+in vec2             TexCoord;
 
 uniform sampler2D ourTexture;
 
 void main()
 {
 
+   vec3 norm      = normalize(oNormal);
+   vec3 lightDir  = normalize(oLightPos - fragmentPosition);  
+   float d        = max(dot(norm, lightDir), 0.0);
+
+    vec3 diffuse  = d * oLightColor;
+
+
     float r, g, b;
     r = (gl_PrimitiveID % 256) / 255.0f;
     g = ((gl_PrimitiveID / 256) % 256) / 255.0f;
     b = ((gl_PrimitiveID / (256 * 256)) % 256) / 255.0f;
 
-    FragColor = vertexColor;
+    // FragColor = vertexColor;
 
-    // if (outTextured == 0)
-    //     FragColor = vertexColor;
-    // if (outTextured == 1)
-    //     FragColor = texture(ourTexture, TexCoord);
+    if (outTextured == 0)
+        FragColor = vec4(vertexColor.xyz * diffuse, 1);
+    if (outTextured == 1)
+        FragColor = texture(ourTexture, TexCoord);
 } 

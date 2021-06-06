@@ -35,6 +35,37 @@ static void mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size)
     material->gl_buffer_size += buffer_size;
 }
 
+void        calculate_missing_normal(t_mat *material)
+{
+    ssize_t i = 0;
+    ssize_t j = 0;
+    float   *cbuffer;
+    t_vec3f	pt[3];
+    t_vec3f normal;
+
+    if (material->gl_buffer_size % (8 * 3) == 0)
+    {
+        while (i < 8 * 3)
+        {
+            j = 0;
+            cbuffer = &material->gl_buffer[material->gl_buffer_size - (8 * 3) + i];
+            pt[j] = (t_vec3f){*cbuffer, *(cbuffer + 1), *(cbuffer + 2)};
+            i += 8;
+            j++;
+        }
+        normal = vec_cross(vec_sub(pt[1], pt[0]), vec_sub(pt[2], pt[0]));
+        i = 0;
+        while (i < 8 * 3)
+        {
+            cbuffer = &material->gl_buffer[material->gl_buffer_size - (8 * 3) + i];
+            *(cbuffer + 3) = normal.x;
+            *(cbuffer + 4) = normal.y;
+            *(cbuffer + 5) = normal.z;
+            i += 8;
+        }
+    }
+}
+
 size_t      parse_vertex(t_parser *parser, t_mat *material, char *line)
 {
     uint16_t face_type = 0x0;
@@ -86,6 +117,8 @@ size_t      parse_vertex(t_parser *parser, t_mat *material, char *line)
     }
 
     mat_push_buffer(material, buffer, 8);
+    if ((face_type & NORMAL) != NORMAL)
+        calculate_missing_normal(material);
     return (1);
 }
 

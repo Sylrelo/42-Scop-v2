@@ -81,11 +81,14 @@ void	display_loop(t_scop *scop)
 
 	size_t	mat_i = 0;
 	size_t	offset = 0;
-
-
+	
 	// A déplacer
 	uint32_t loc_kd			= glGetUniformLocation(scop->program, "kd");
+	uint32_t loc_ka			= glGetUniformLocation(scop->program, "ka");
 	uint32_t loc_textured 	= glGetUniformLocation(scop->program, "textured");
+
+	uint32_t loc_lightpos 	= glGetUniformLocation(scop->program, "lightPos");
+	uint32_t loc_lightcol 	= glGetUniformLocation(scop->program, "lightColor");
 
 	//
 
@@ -93,10 +96,14 @@ void	display_loop(t_scop *scop)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 
+
 		a += 0.010;
-		matmat(mat_model, (t_vec3f) {0, 0, -10}, (t_vec3f){0, a, 0}, 2);
+		matmat(mat_model, (t_vec3f) {0, 0, -8}, (t_vec3f){0, a, 0}, 2);
     	glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model[0]);
 
+		glUniform3f(loc_lightpos, 5, 0, 0);
+		glUniform3f(loc_lightcol, 1, 1, 1);
+		
 		mat_i 	= 0;
 		offset 	= 0;
 		while (mat_i < scop->nb_mats)
@@ -105,6 +112,7 @@ void	display_loop(t_scop *scop)
 			if (mat_i > 0)
 				offset += scop->materials[mat_i - 1].gl_buffer_size;
 			glUniform3f(loc_kd, material.kd.x, material.kd.y, material.kd.z);
+			glUniform3f(loc_ka, material.ka.x, material.ka.y, material.ka.z);
 
 			if (material.tex_id != -1)
 			{
@@ -178,7 +186,6 @@ int 	main(int argc, char *argv[])
 	scop.nb_triangles = 0;
 	scop.textures_count = 0;
 	scop.textures = NULL;
-
 
 	printf("[Scop] Starting OpenGL initialization\n");
 	init_window(&scop.window);

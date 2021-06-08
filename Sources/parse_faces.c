@@ -66,6 +66,22 @@ static void     calculate_missing_normal(t_mat *material)
     }
 }
 
+static void     update_minmax(t_vec3f *min, t_vec3f *max, float buffer[8])
+{
+    if (buffer[0] > max->x)
+        max->x = buffer[0];
+    if (buffer[0] < min->x)
+        min->x = buffer[0];
+    if (buffer[1] > max->y)
+        max->y = buffer[1];
+    if (buffer[1] < min->y)
+        min->y = buffer[1];
+    if (buffer[2] > max->z)
+        max->z = buffer[2];
+    if (buffer[2] < min->z)
+        min->z = buffer[2];
+}
+
 static size_t   parse_vertex(t_parser *parser, t_mat *material, char *line)
 {
     uint16_t face_type = 0x0;
@@ -103,6 +119,7 @@ static size_t   parse_vertex(t_parser *parser, t_mat *material, char *line)
         buffer[0] = parser->v[index_v - 1].x;
         buffer[1] = parser->v[index_v - 1].y;
         buffer[2] = parser->v[index_v - 1].z;
+        update_minmax(&parser->min, &parser->max, buffer);
     }
     if (face_type & NORMAL)
     {

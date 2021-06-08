@@ -4,147 +4,157 @@
 #include <math.h>
 
 typedef float mat4f[4][4];
-
-void 		mat4_init(mat4f out)
+typedef struct 	s_mat4
 {
-	out[0][0] = 1.f;
-	out[0][1] = 0.f;
-	out[0][2] = 0.f;
-	out[0][3] = 0.f;
-	out[1][0] = 0.f;
-	out[1][1] = 1.f;
-	out[1][2] = 0.f;
-	out[1][3] = 0.f;
-	out[2][0] = 0.f;
-	out[2][1] = 0.f;
-	out[2][2] = 1.f;
-	out[2][3] = 0.f;
-	out[3][0] = 0.f;
-	out[3][1] = 0.f;
-	out[3][2] = 0.f;
-	out[3][3] = 1.f;
+	float		value[4][4];
+}				t_mat4;
+
+t_mat4		m4_init(void)
+{
+	t_mat4 out;
+
+	out.value[0][0] = 1.f;
+	out.value[0][1] = 0.f;
+	out.value[0][2] = 0.f;
+	out.value[0][3] = 0.f;
+	out.value[1][0] = 0.f;
+	out.value[1][1] = 1.f;
+	out.value[1][2] = 0.f;
+	out.value[1][3] = 0.f;
+	out.value[2][0] = 0.f;
+	out.value[2][1] = 0.f;
+	out.value[2][2] = 1.f;
+	out.value[2][3] = 0.f;
+	out.value[3][0] = 0.f;
+	out.value[3][1] = 0.f;
+	out.value[3][2] = 0.f;
+	out.value[3][3] = 1.f;
+
+	return (out);
 }
 
-void 	    mat4_mult(mat4f res, mat4f a, mat4f b)
+t_mat4 	    m4_mult(t_mat4 a, t_mat4 b)
 {
-	int i, j, k; 
+	t_mat4 	res;
+	int		i;
+	int		j;
+	int		k; 
+	
     for (i = 0; i < 4; i++) 
     { 
         for (j = 0; j < 4; j++) 
         { 
-            res[i][j] = 0; 
+            res.value[i][j] = 0; 
             for (k = 0; k < 4; k++) 
-                res[i][j] += a[i][k] * b[k][j]; 
+                res.value[i][j] += a.value[i][k] * b.value[k][j]; 
         } 
-    } 
+    }
+
+	return (res);
 }
 
-void		mat4_rotate(mat4f result, t_vec3f rot)
+t_mat4		m4_rotation(float x, float y, float z)
 {
-	mat4f	rot_x;
-	mat4f	rot_y;
-	mat4f	rot_z;
-	mat4f	rot_xy;
+	const float cosx	= cos(x);
+	const float cosy	= cos(y);
+	const float cosz	= cos(z);
+	const float sinx	= sin(x);
+	const float siny	= sin(y);
+	const float sinz	= sin(z);
+	t_mat4	rot_x		= m4_init();
+	t_mat4	rot_y		= m4_init();
+	t_mat4	rot_z		= m4_init();
+	t_mat4	rot_xy;
 
-	mat4_init(rot_x);
-	mat4_init(rot_y);
-	mat4_init(rot_z);
-	rot_x[1][1] = cos(rot.x);
-	rot_x[1][2] = -sin(rot.x);
-	rot_x[2][1] = sin(rot.x);
-	rot_x[2][2] = cos(rot.x);
-	rot_y[0][0] = cos(rot.y);
-	rot_y[0][2] = sin(rot.y);
-	rot_y[2][0] = -sin(rot.y);
-	rot_y[2][2] = cos(rot.y);
-	rot_z[0][0] = cos(rot.z);
-	rot_z[1][0] = -sin(rot.z);
-	rot_z[0][1] = sin(rot.z);
-	rot_z[1][1] = cos(rot.z);
-	mat4_mult(rot_xy, rot_x, rot_y);
-	mat4_mult(result, rot_xy, rot_z);
+
+	rot_x.value[1][1] = cosx;
+	rot_x.value[1][2] = -sinx;
+	rot_x.value[2][1] = sinx;
+	rot_x.value[2][2] = cosx;
+
+	rot_y.value[0][0] = cosy;
+	rot_y.value[0][2] = siny;
+	rot_y.value[2][0] = -siny;
+	rot_y.value[2][2] = cosy;
+
+	rot_z.value[0][0] = cosz;
+	rot_z.value[1][0] = -sinz;
+	rot_z.value[0][1] = sinz;
+	rot_z.value[1][1] = cosz;
+
+	rot_xy = m4_mult(rot_x, rot_y);
+	return m4_mult(rot_xy, rot_z);
 }
 
-void		mat4_scale(mat4f result, t_vec3f scale)
+t_mat4		m4_scale(float x, float y, float z)
 {
-	mat4_init(result);
-	result[0][0] = scale.x;
-	result[1][1] = scale.y;
-	result[2][2] = scale.z;
+	t_mat4 result = m4_init();
+
+	result.value[0][0] = x;
+	result.value[1][1] = y;
+	result.value[2][2] = z;
+
+	return (result);
 }
 
-void		mat4_translate(mat4f result, t_vec3f pos)
+t_mat4		m4_translate(float x, float y, float z)
 {
-	mat4_init(result);
-	result[3][0] = pos.x;
-	result[3][1] = pos.y;
-	result[3][2] = pos.z;
+	t_mat4 result = m4_init();
+
+	result.value[3][0] = x;
+	result.value[3][1] = y;
+	result.value[3][2] = z;
+
+	return (result);
 }
 
-void		mat4_perspective(mat4f result, float fov, float aspect, float near_plane, float far_plane)
+t_mat4		m4_perspective(float fov, float aspect, float near, float far)
 {
-	float	tan_half_fov;
+	t_mat4 result 		= m4_init();
+	float tan_half_fov 	= tanf(fov / 2.0f);;
 	
-	mat4_init(result);
-	tan_half_fov = tanf(fov / 2.0f);
-	result[0][0] = 1.0f / (aspect * tan_half_fov);
-	result[1][1] = 1.0f / (tan_half_fov);
-	result[2][2] = (far_plane + near_plane) / (far_plane - near_plane) * -1;
-	result[2][3] = -1.0f;
-	result[3][2] = (2.0f * far_plane * near_plane) / (far_plane - near_plane) * -1;
+	result.value[0][0] = 1.0f / (aspect * tan_half_fov);
+	result.value[1][1] = 1.0f / (tan_half_fov);
+	result.value[2][2] = (far + near) / (far - near) * -1;
+	result.value[2][3] = -1.0f;
+	result.value[3][2] = (2.0f * far * near) / (far - near) * -1;
+
+	return (result);
 }
 
-void		mat4_cpy(mat4f dest, mat4f src)
+t_mat4		m4_rotation_around_center(t_vec3f center, float x, float y, float z)
 {
-	int	i;
-	int	j;
+	const t_vec3f	inverse_center 	= vec_multf(center, -1);
+	const t_mat4	trans_center 	= m4_translate(inverse_center.x, inverse_center.y, inverse_center.z);
+	const t_mat4	trans_origin	= m4_translate(center.x, center.y, center.z);
+	const t_mat4	rotation		= m4_rotation(x, y, z);
+	t_mat4			result;
 
-	if (!dest || !src)
-		return ;
-	i = -1;
-	while (++i < 4)
-	{
-		j = -1;
-		while (++j < 4)
-			dest[i][j] = src[i][j];
-	}
+
+	result = m4_mult(trans_center, rotation);
+	result = m4_mult(result, trans_origin);
+
+	return (result);
 }
 
-void		mat4_empty(mat4f mat)
+t_mat4		m4_mat(t_mat4 rotation, t_mat4 scale, t_mat4 translate)
 {
-	int		i;
-	int		j;
+	t_mat4 result = m4_init();
+	
+	result = m4_mult(scale, rotation);
+	result = m4_mult(result, translate);
 
-	i = -1;
-	while (++i < 4)
-	{
-		j = -1;
-		while (++j < 4)
-			mat[i][j] = 0.0;
-	}
+	return (result);
 }
 
-void		matmat(mat4f res, t_vec3f t, t_vec3f r, int scale)
-{
-	mat4f	tt;
-	mat4f	tr;
-	mat4f	ts;
-	mat4f	tmp;
-
-	mat4_rotate(tr, r);
-	mat4_scale(ts, (t_vec3f){scale, scale, scale});
-	mat4_translate(tt, t);
-	mat4_mult(tmp, ts, tr);
-	mat4_mult(res, tmp, tt);
-}
-
-void	printmat(mat4f mat)
+void		m4_print(t_mat4 mat)
 {
 	int			i;
+
 	i = -1;
 	while (++i < 4)
 	{
-		printf("%.2f %.2f %.2f %.2f\n", mat[i][0], mat[i][1], mat[i][2], mat[i][3]);
+		printf("%.2f %.2f %.2f %.2f\n", mat.value[i][0], mat.value[i][1], mat.value[i][2], mat.value[i][3]);
 	}
 	printf("\n");
 

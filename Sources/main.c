@@ -55,23 +55,22 @@ void	display_loop(t_scop *scop)
 {
 	t_mat	material;
 
-	GLuint glMatTransform 	= glGetUniformLocation(scop->program, "Transform");
+	GLuint glMatView 		= glGetUniformLocation(scop->program, "View");
 	GLuint glMatPersp 		= glGetUniformLocation(scop->program, "Persp");
 	GLuint glMatModel 		= glGetUniformLocation(scop->program, "Model");
 
-	mat4f 	mat_persp;
-	mat4f 	mat_model;
-	mat4f 	mat_transform;
-	// mat4f	mat_scale;
+	uint32_t loc_kd			= glGetUniformLocation(scop->program, "kd");
+	uint32_t loc_ka			= glGetUniformLocation(scop->program, "ka");
+	uint32_t loc_textured 	= glGetUniformLocation(scop->program, "textured");
+	uint32_t loc_lightpos 	= glGetUniformLocation(scop->program, "lightPos");
+	uint32_t loc_lightcol 	= glGetUniformLocation(scop->program, "lightColor");
 
-	// mat4_init(mat_model);
-	mat4_init(mat_transform);
-	mat4_perspective(mat_persp, 1.0472, 1280.0f / 720.0f, 0.00001f, 1000.0f);
+	t_mat4	mat_perspective = m4_perspective(1.0472, 1280.0f / 720.0f, 0.00001f, 1000.0f);
+	t_mat4	mat_view 		= m4_init();
+	t_mat4	mat_model 		= m4_init();
 
-	glUniformMatrix4fv(glMatPersp, 1, GL_FALSE, mat_persp[0]);
-	glUniformMatrix4fv(glMatTransform, 1, GL_FALSE, mat_transform[0]);
-
-
+	glUniformMatrix4fv(glMatPersp, 1, GL_FALSE, mat_perspective.value[0]);
+	glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model.value[0]);
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);  
@@ -81,16 +80,6 @@ void	display_loop(t_scop *scop)
 
 	size_t	mat_i = 0;
 	size_t	offset = 0;
-	
-	// A déplacer
-	uint32_t loc_kd			= glGetUniformLocation(scop->program, "kd");
-	uint32_t loc_ka			= glGetUniformLocation(scop->program, "ka");
-	uint32_t loc_textured 	= glGetUniformLocation(scop->program, "textured");
-
-	uint32_t loc_lightpos 	= glGetUniformLocation(scop->program, "lightPos");
-	uint32_t loc_lightcol 	= glGetUniformLocation(scop->program, "lightColor");
-
-	//
 
 	while (!glfwWindowShouldClose(scop->window))
 	{
@@ -98,10 +87,15 @@ void	display_loop(t_scop *scop)
 
 
 		a += 0.010;
-		matmat(mat_model, (t_vec3f) {0, 0, -8}, (t_vec3f){0, a, 0}, 2);
-    	glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model[0]);
 
-		glUniform3f(loc_lightpos, 5, 0, 0);
+
+		mat_view 	= m4_mat(m4_rotation(0, a / 2, 0), m4_scale(1, 1, 1), m4_translate(0, 0, -4));
+		mat_model 	= m4_mat(m4_rotation_around_center(scop->center, 0, a, 0), m4_scale(1, 1, 1), m4_translate(3, 0, -3));
+
+		glUniformMatrix4fv(glMatView, 1, GL_FALSE, mat_view.value[0]);
+		glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model.value[0]);
+
+		glUniform3f(loc_lightpos, 0, 0, 0);
 		glUniform3f(loc_lightcol, 1, 1, 1);
 		
 		mat_i 	= 0;

@@ -12,7 +12,7 @@ uniform vec3    lightPos;
 uniform vec3    lightColor;  
 
 // Matrices uniforms
-uniform mat4	Transform;
+uniform mat4	View;
 uniform mat4	Persp;
 uniform mat4	Model;
 uniform int     textured;
@@ -35,7 +35,7 @@ void main()
 
     fragmentPosition = vec3(Model * vec4(aPos, 1.0));
 
-    gl_Position     = (Persp * Transform * Model) * vec4(aPos, 1.0f);
+    gl_Position     = (Persp * View * Model) * vec4(aPos, 1.0f);
     TexCoord        = aTexCoord;
     outTextured     = textured;
     vertexColor = vec4(kd, 1.0);

@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 #include <sys/stat.h>
+#include <float.h>
 
 typedef struct stat t_stat;
 
@@ -108,6 +109,9 @@ void 		parser_init(t_scop *scop, char *file)
 	if (!(fp = fopen(file, "r")))
 		die("Cannot open file");
 
+	parser.max = (t_vec3f){ -FLT_MAX, -FLT_MAX, -FLT_MAX };
+	parser.min = (t_vec3f){ FLT_MAX, FLT_MAX, FLT_MAX };
+
 	memset(last_mtl, 0, 256);
 	strcpy(last_mtl, "DEFAULT_NO_MATERIAL");
 	get_relative_path(path, file);
@@ -161,4 +165,12 @@ void 		parser_init(t_scop *scop, char *file)
 	free_obj_arrays(&parser);
 	free(line);
 	fclose(fp);
+
+
+	scop->center = vec_multf(vec_add(parser.min, parser.max), .5);
+
+	// printf("%f %f %f\n", scop->center.x, scop->center.y, scop->center.z);
+	// printf("%f %f %f\n", parser.max.x, parser.max.y, parser.max.z);
+	// printf("%f %f %f\n", parser.min.x, parser.min.y, parser.min.z);
+
 }

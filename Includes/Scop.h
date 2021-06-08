@@ -49,12 +49,14 @@ typedef struct s_vec2f
 
 typedef struct s_parser
 {
-	size_t		v_count;
-	size_t		vn_count;
-	size_t		vt_count;
+	t_vec3f		min;
+	t_vec3f		max;
 	t_vec3f		*v;
 	t_vec3f		*vn;
 	t_vec2f		*vt;
+	size_t		v_count;
+	size_t		vn_count;
+	size_t		vt_count;
 }				t_parser;
 
 typedef struct	s_textures
@@ -83,6 +85,8 @@ typedef struct s_scop
 	GLuint			vbo;
 	GLint			program;
 	
+	t_vec3f			center;
+
 	t_textures		*textures;
 	size_t			textures_count;
 
@@ -92,15 +96,15 @@ typedef struct s_scop
 }				t_scop;
 
 
-void	die(char *string);
-int    create_shader_program(char *file_vertex, char *file_fragment);
+void		die(char *string);
+int    		create_shader_program(char *file_vertex, char *file_fragment);
+void   		print_matlist(size_t nb_mat, t_mat *materials);
 
-
-void    print_matlist(size_t nb_mat, t_mat *materials);
 //
 t_vec3f		vec_add(t_vec3f u, t_vec3f v);
 t_vec3f		vec_sub(t_vec3f u, t_vec3f v);
 t_vec3f		vec_cross(t_vec3f u, t_vec3f v);
+t_vec3f		vec_multf(t_vec3f u, float f);
 //
 
 #endif

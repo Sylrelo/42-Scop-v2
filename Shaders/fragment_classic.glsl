@@ -34,7 +34,8 @@ void main()
     // FragColor = vertexColor;
 
     if (outTextured == 0)
-        FragColor = vec4(vertexColor.xyz * diffuse, 1);
+        FragColor = vec4(vertexColor.xyz , 1);
+        // FragColor = vec4(vertexColor.xyz * diffuse, 1);
     if (outTextured == 1)
         FragColor = texture(ourTexture, TexCoord);
 } 

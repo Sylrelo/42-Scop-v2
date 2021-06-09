@@ -89,8 +89,8 @@ void	display_loop(t_scop *scop)
 		a += 0.010;
 
 
-		mat_view 	= m4_mat(m4_rotation(0, a / 2, 0), m4_scale(1, 1, 1), m4_translate(0, 0, -4));
-		mat_model 	= m4_mat(m4_rotation_around_center(scop->center, 0, a, 0), m4_scale(1, 1, 1), m4_translate(3, 0, -3));
+		mat_view 	= m4_mat(m4_rotation(0, a, 0), m4_scale(1, 1, 1), m4_translate(0, 0, -6));
+		mat_model 	= m4_mat(m4_rotation_around_center(scop->center, 0, a / 2, 0), m4_scale(1, 1, 1), m4_translate(0, 0, -3));
 
 		glUniformMatrix4fv(glMatView, 1, GL_FALSE, mat_view.value[0]);
 		glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model.value[0]);

@@ -29,7 +29,7 @@ out vec3        oLightColor;
 
 void main()
 {
-    oNormal     = normalize(vec3((Persp * View * Model) * vec4(aNormals, 1)));
+    oNormal     = aNormals; //normalize(vec3((Model) * vec4(aNormals, 1)));
     oLightColor = lightColor;
     oLightPos   = lightPos;
 

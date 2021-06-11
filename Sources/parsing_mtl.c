@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/04 11:18:58 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 16:08:23 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/11 18:31:15 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,4 @@ void        parser_mtl_start(t_scop *scop, char path[256], char *file)
         die ("Material final realloc failed");
     scop->nb_mats   = tmp_nb_mats;
     fclose(fp);
-
-    // exit (1);
-    // print_matlist(scop->nb_mats, scop->materials);
 }

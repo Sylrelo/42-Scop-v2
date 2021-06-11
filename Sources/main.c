@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/11 18:06:19 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/11 18:28:50 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,6 @@ void	init_window(GLFWwindow **window, uint32_t width, uint32_t height)
 	glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
 	glfwWindowHint (GLFW_SAMPLES, 4);
 
 	*window = glfwCreateWindow(width, height, "Scop", NULL, NULL);
@@ -321,7 +320,6 @@ int 	main(int argc, char *argv[])
 	glUseProgram(scop->program);
 
 	printf("[Scop] Ready\n");
-
 
 	scop->camera_position.x -= scop->center.x * .5;
 	scop->camera_position.y -= scop->center.y * .5;

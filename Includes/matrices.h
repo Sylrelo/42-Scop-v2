@@ -63,8 +63,6 @@ t_mat4		m4_rotation(float x, float y, float z)
 	t_mat4	rot_x		= m4_init();
 	t_mat4	rot_y		= m4_init();
 	t_mat4	rot_z		= m4_init();
-	t_mat4	rot_xy;
-
 
 	rot_x.value[1][1] = cosx;
 	rot_x.value[1][2] = -sinx;
@@ -81,8 +79,7 @@ t_mat4		m4_rotation(float x, float y, float z)
 	rot_z.value[0][1] = sinz;
 	rot_z.value[1][1] = cosz;
 
-	rot_xy = m4_mult(rot_x, rot_y);
-	return m4_mult(rot_xy, rot_z);
+	return m4_mult(m4_mult(rot_x, rot_y), rot_z);
 }
 
 t_mat4		m4_scale(float x, float y, float z)

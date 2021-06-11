@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/11 13:27:51 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/11 14:41:05 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,6 @@ void	glfwHandleKeysPress(GLFWwindow *window, uint32_t *keys)
 	else if (*keys & RIGHT)
 		*keys ^= RIGHT;
 
-
-
-	if (glfwGetKey(window, GLFW_KEY_LEFT))
-		*keys |= 0x10;
-	else if (*keys & 0x10)
-		*keys ^= 0x10;
 }
 
 t_vec3f	m4_mult_vec3f(t_mat4 mat, t_vec3f vec)
@@ -80,8 +74,25 @@ void 	handle_transformation(uint32_t keys, t_vec3f *camera_position, t_vec3f *ca
 	if ((keys & 0x10) == 0x10)
 		camera_rotation->y -= 0.1;
 
-	move = m4_mult_vec3f(m4_rotation(camera_rotation->x, camera_rotation->y, camera_rotation->z), move);
+	move = m4_mult_vec3f(m4_rotation(0, camera_rotation->y, camera_rotation->z), move);
 	*camera_position = vec_add(*camera_position, move);
+}
+
+void	handle_mouse(GLFWwindow *window, t_vec3f *camera_rotation)
+{
+	double pos_x;
+	double pos_y;
+	static double pos_x_old = 0;
+	static double pos_y_old = 0;
+
+
+	glfwGetCursorPos(window, &pos_x, &pos_y);
+
+	camera_rotation->x += ((pos_y_old - pos_y) * 0.001);
+	camera_rotation->y += ((pos_x_old - pos_x) * 0.001);
+
+	pos_x_old = pos_x;
+	pos_y_old = pos_y;
 }
 
 
@@ -113,6 +124,14 @@ void	init_window(GLFWwindow **window)
 	printf("[OpenGL] Initializing GL3W\n");
 	glfwSetInputMode(*window, GLFW_STICKY_KEYS, 1);
 	glfwSwapInterval(1);
+
+
+	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	// glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
+	// if (glfwRawMouseMotionSupported())
+    // 	glfwSetInputMode(*window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
 }
 
 // t_mat4		m4_look_at(t_vec3f from, t_vec3f to)
@@ -167,23 +186,27 @@ void	display_loop(t_scop *scop)
 
 	size_t	mat_i = 0;
 	size_t	offset = 0;
+	
+	glfwSetCursorPos(scop->window, 1280 / 2, 720 / 2); 
 
 	while (!glfwWindowShouldClose(scop->window))
 	{
 		glfwHandleKeysPress(scop->window, &scop->keys);
+		handle_mouse(scop->window,  &scop->camera_rotation);
 		handle_transformation(scop->keys, &scop->camera_position, &scop->camera_rotation);
-
 
 		// printf("%u %f %f %f\n", scop->keys, scop->camera_position.x, scop->camera_position.y, scop->camera_position.z);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 		a += 0.010;
 		
-		mat_view 	= m4_mult3(
-			m4_rotation(scop->camera_rotation.x, scop->camera_rotation.y, scop->camera_rotation.z), 
-			m4_scale(1, 1, 1), 
-			m4_translate(scop->camera_position.x, scop->camera_position.y, scop->camera_position.z - 8)
-			);
+		// mat_view 	= m4_mult3(
+		// 	m4_rotation(scop->camera_rotation.x, scop->camera_rotation.y, scop->camera_rotation.z), 
+		// 	m4_scale(1, 1, 1), 
+		// 	m4_translate(scop->camera_position.x, scop->camera_position.y, scop->camera_position.z - 8)
+		// 	);
 
+		mat_view = m4_viewmat(scop->camera_rotation.x, scop->camera_rotation.y, scop->camera_rotation.z, 
+								m4_translate(scop->camera_position.x, scop->camera_position.y, scop->camera_position.z - 8) );
 
 		mat_model = (m4_mult(
 			m4_mult( m4_scale(1, 1, 1), m4_rotation_around_center(scop->center, 0, a, 0)), 
@@ -222,7 +245,10 @@ void	display_loop(t_scop *scop)
 
 			glDrawArrays(GL_TRIANGLES, (offset / 8), (material.gl_buffer_size / 8));
 			mat_i++;
+
+
 		}
+
 		glfwSwapBuffers(scop->window);
 		glfwPollEvents();
 	}

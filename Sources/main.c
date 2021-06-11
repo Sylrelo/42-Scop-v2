@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/11 14:58:54 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/11 15:01:13 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,11 +86,10 @@ void	handle_mouse(GLFWwindow *window, t_vec3f *camera_rotation)
 
 	glfwGetCursorPos(window, &pos_x, &pos_y);
 
-	if (pos_x_old == 0) pos_x_old = pos_x;
-	if (pos_y_old == 0) pos_y_old = pos_y;
-
-	printf("%f %f\n", pos_x_old, pos_y_old);
-	printf("%f %f\n", pos_x, pos_y);
+	if (pos_x_old == 0)
+		pos_x_old = pos_x;
+	if (pos_y_old == 0)
+		pos_y_old = pos_y;
 
 	camera_rotation->x += ((pos_y_old - pos_y) * 0.001);
 	camera_rotation->y += ((pos_x_old - pos_x) * 0.001);
@@ -190,7 +189,7 @@ void	display_loop(t_scop *scop)
 		a += 0.010;
 
 		mat_view = m4_viewmat(scop->camera_rotation.x, scop->camera_rotation.y, scop->camera_rotation.z, 
-							m4_translate(scop->camera_position.x, scop->camera_position.y, scop->camera_position.z - 8) );
+							m4_translate(scop->camera_position.x, scop->camera_position.y, scop->camera_position.z) );
 
 		mat_model = (m4_mult(
 			m4_mult( m4_scale(1, 1, 1), m4_rotation_around_center(scop->center, 0, cos(a), 0)), 
@@ -324,7 +323,7 @@ int 	main(int argc, char *argv[])
 
 	scop->camera_position.x -= scop->center.x * .5;
 	scop->camera_position.y -= scop->center.y * .5;
-	scop->camera_position.z -= scop->center.z * .5;
+	scop->camera_position.z -= scop->center.z + 8;
 
 	display_loop(scop);
 

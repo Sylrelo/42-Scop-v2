@@ -17,7 +17,7 @@ CREATE_OBJDIR:
 		#@clear
 		@mkdir -p $(OBJ_DIR)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) 
 		@gcc ${CFLAGS} ${INC_LIB} $^ -o ${NAME}
 		@printf "\033[1m[ SCOP ]\033[1m\t\tcompilation complete.\t\033[0m\n"
 

@@ -9,6 +9,20 @@
 		"chrono": "cpp",
 		"unordered_map": "cpp",
 		"libc_extends.h": "c",
-		"stdio.h": "c"
+		"stdio.h": "c",
+		"__functional_base": "c",
+		"__node_handle": "c",
+		"atomic": "c",
+		"__memory": "c",
+		"functional": "c",
+		"iterator": "c",
+		"limits": "c",
+		"memory": "c",
+		"optional": "c",
+		"ratio": "c",
+		"system_error": "c",
+		"tuple": "c",
+		"type_traits": "c",
+		"vector": "c"
 	}
 }

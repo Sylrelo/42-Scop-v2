@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 14:55:43 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/11 12:01:39 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ typedef struct	s_textures
 	float		*content;
 	uint32_t	gl_texture;
 }				t_textures;
+
 typedef struct	s_mat
 {
 	char		material_name[256];
@@ -78,14 +79,24 @@ typedef struct	s_mat
 	size_t		tmp_allocated;
 }				t_mat;
 
+typedef enum	s_actions
+{
+	NONE		= 0x00,
+	FORWARD 	= 0x01,
+	BACKWARD 	= 0x02,
+	LEFT 		= 0x04,
+	RIGHT 		= 0x08,
+}				t_actions;
+
 typedef struct s_scop
 {
 	GLFWwindow		*window;
 	GLuint			vao;
 	GLuint			vbo;
 	GLint			program;
-	
 	t_vec3f			center;
+
+	uint32_t		keys;
 
 	t_textures		*textures;
 	size_t			textures_count;
@@ -93,6 +104,9 @@ typedef struct s_scop
 	size_t			nb_triangles;
 	size_t			nb_mats;
 	t_mat			*materials;
+
+	t_vec3f			camera_position;
+	t_vec3f			camera_rotation;
 }				t_scop;
 
 
@@ -105,6 +119,9 @@ t_vec3f		vec_add(t_vec3f u, t_vec3f v);
 t_vec3f		vec_sub(t_vec3f u, t_vec3f v);
 t_vec3f		vec_cross(t_vec3f u, t_vec3f v);
 t_vec3f		vec_multf(t_vec3f u, float f);
+float		vec_length(t_vec3f u);
+t_vec3f		vec_normalize(t_vec3f u);
+
 //
 
 #endif

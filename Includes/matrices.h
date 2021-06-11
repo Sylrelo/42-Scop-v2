@@ -3,8 +3,6 @@
 
 #include <math.h>
 
-typedef float mat4f[4][4];
-
 typedef struct 	s_mat4
 {
 	float		value[4][4];
@@ -140,8 +138,10 @@ t_mat4		m4_rotation_around_center(t_vec3f center, float x, float y, float z)
 
 t_mat4		m4_mult3(t_mat4 rotation, t_mat4 scale, t_mat4 translate)
 {
-	return (m4_mult(m4_mult(scale, rotation), translate));
+	return (m4_mult(m4_mult(scale, translate), rotation));
 }
+
+
 
 void		m4_print(t_mat4 mat)
 {

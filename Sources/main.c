@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 16:25:09 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/11 13:27:51 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,70 @@ void	die(char *string)
 	printf("%s\n", string);
 	exit (1);
 }
+
+void	glfwHandleKeysPress(GLFWwindow *window, uint32_t *keys)
+{
+
+	if (glfwGetKey(window, GLFW_KEY_W))
+		*keys |= FORWARD;
+	else if (*keys & FORWARD)
+		*keys ^= FORWARD;
+
+	if (glfwGetKey(window, GLFW_KEY_S))
+		*keys |= BACKWARD;
+	else if (*keys & BACKWARD)
+		*keys ^= BACKWARD;
+
+	if (glfwGetKey(window, GLFW_KEY_A))
+		*keys |= LEFT;
+	else if (*keys & LEFT)
+		*keys ^= LEFT;
+
+	if (glfwGetKey(window, GLFW_KEY_D))
+		*keys |= RIGHT;
+	else if (*keys & RIGHT)
+		*keys ^= RIGHT;
+
+
+
+	if (glfwGetKey(window, GLFW_KEY_LEFT))
+		*keys |= 0x10;
+	else if (*keys & 0x10)
+		*keys ^= 0x10;
+}
+
+t_vec3f	m4_mult_vec3f(t_mat4 mat, t_vec3f vec)
+{
+	t_vec3f result = (t_vec3f) {0, 0, 0};
+
+	result.x = vec.x * mat.value[0][0] + vec.y * mat.value[0][1] + vec.z * mat.value[0][2];
+	result.y = vec.x * mat.value[1][0] + vec.y * mat.value[1][1] + vec.z * mat.value[1][2];
+	result.z = vec.x * mat.value[2][0] + vec.y * mat.value[2][1] + vec.z * mat.value[2][2];
+
+	return (result);
+}
+
+void 	handle_transformation(uint32_t keys, t_vec3f *camera_position, t_vec3f *camera_rotation)
+{
+	t_vec3f	move 		= (t_vec3f) {0, 0, 0};
+
+	if ((keys & FORWARD) == FORWARD)
+		move.z += 0.1;
+	if ((keys & BACKWARD) == BACKWARD)
+		move.z -= 0.1;
+	if ((keys & LEFT) == LEFT)
+		move.x += 0.1;
+	if ((keys & RIGHT) == RIGHT)
+		move.x -= 0.1;
+	
+
+	if ((keys & 0x10) == 0x10)
+		camera_rotation->y -= 0.1;
+
+	move = m4_mult_vec3f(m4_rotation(camera_rotation->x, camera_rotation->y, camera_rotation->z), move);
+	*camera_position = vec_add(*camera_position, move);
+}
+
 
 void	init_window(GLFWwindow **window)
 {
@@ -51,6 +115,30 @@ void	init_window(GLFWwindow **window)
 	glfwSwapInterval(1);
 }
 
+// t_mat4		m4_look_at(t_vec3f from, t_vec3f to)
+// {
+// 	t_vec3f tmp = (t_vec3f){0, 1, 0};
+// 	t_vec3f forward = vec_normalize(vec_sub(from, to));
+// 	t_vec3f right = vec_cross(vec_normalize(tmp), forward);
+// 	t_vec3f up = vec_cross(forward, right);
+// 	t_mat4	result;
+	
+// 	result.value[0][0] = right.x;
+//     result.value[0][1] = right.y;
+//     result.value[0][2] = right.z;
+//     result.value[1][0] = up.x;
+//     result.value[1][1] = up.y;
+//     result.value[1][2] = up.z;
+//     result.value[2][0] = forward.x;
+//     result.value[2][1] = forward.y;
+//     result.value[2][2] = forward.z;
+//     result.value[3][0] = from.x;
+//     result.value[3][1] = from.y;
+//     result.value[3][2] = from.z;
+	
+// 	return (result);
+// }
+
 void	display_loop(t_scop *scop)
 {
 	t_mat	material;
@@ -66,8 +154,8 @@ void	display_loop(t_scop *scop)
 	uint32_t loc_lightcol 	= glGetUniformLocation(scop->program, "lightColor");
 
 	t_mat4	mat_perspective = m4_perspective(1.0472, 1280.0f / 720.0f, 0.00001f, 1000.0f);
-	t_mat4	mat_view;
-	t_mat4	mat_model;
+	t_mat4	mat_view = m4_init();
+	t_mat4	mat_model = m4_init();
 
 	glUniformMatrix4fv(glMatPersp, 1, GL_FALSE, mat_perspective.value[0]);
 
@@ -82,20 +170,28 @@ void	display_loop(t_scop *scop)
 
 	while (!glfwWindowShouldClose(scop->window))
 	{
+		glfwHandleKeysPress(scop->window, &scop->keys);
+		handle_transformation(scop->keys, &scop->camera_position, &scop->camera_rotation);
+
+
+		// printf("%u %f %f %f\n", scop->keys, scop->camera_position.x, scop->camera_position.y, scop->camera_position.z);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 		a += 0.010;
 		
 		mat_view 	= m4_mult3(
-			m4_rotation(0, 0, 0), 
+			m4_rotation(scop->camera_rotation.x, scop->camera_rotation.y, scop->camera_rotation.z), 
 			m4_scale(1, 1, 1), 
-			m4_translate(0, 0, -6)
+			m4_translate(scop->camera_position.x, scop->camera_position.y, scop->camera_position.z - 8)
 			);
 
-		mat_model 	= m4_mult3(
-			m4_rotation_around_center(scop->center, 0, a / 2, 0), 
-			m4_scale(1, 1, 1), 
-			m4_translate(0, 0, -3)
+
+		mat_model = (m4_mult(
+			m4_mult( m4_scale(1, 1, 1), m4_rotation_around_center(scop->center, 0, a, 0)), 
+			m4_translate(3, 0, 0))
 			);
+
+
+		// m4_print(m4_rotation(scop->camera_rotation.x, scop->camera_rotation.y, scop->camera_rotation.z));
 
 		glUniformMatrix4fv(glMatView, 1, GL_FALSE, mat_view.value[0]);
 		glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model.value[0]);
@@ -103,7 +199,7 @@ void	display_loop(t_scop *scop)
 		glUniform3f(loc_lightpos, 0, 0, 0);
 		glUniform3f(loc_lightcol, 1, 1, 1);
 		
-\		mat_i 	= 0;
+		mat_i 	= 0;
 		offset 	= 0;
 		while (mat_i < scop->nb_mats)
 		{
@@ -179,35 +275,41 @@ void	init_opengl_buffer(t_scop *scop)
 
 int 	main(int argc, char *argv[])
 {
-	t_scop	scop;
+	t_scop	*scop;
 
-	scop.nb_mats = 0;
-	scop.nb_triangles = 0;
-	scop.textures_count = 0;
-	scop.textures = NULL;
+	scop = calloc(1, sizeof(t_scop));
 
+	scop->nb_mats = 0;
+	scop->nb_triangles = 0;
+	scop->textures_count = 0;
+	scop->textures = NULL;
+
+	scop->keys = 0x0;
+	scop->camera_position = (t_vec3f) {0, 0, 0};
+	scop->camera_rotation = (t_vec3f) {0, 0, 0};
+	
 	printf("[Scop] Starting OpenGL initialization\n");
-	init_window(&scop.window);
+	init_window(&scop->window);
 
 	printf("[Scop] Starting parser\n");
-	parser_init(&scop, argv[1]);
+	parser_init(scop, argv[1]);
 
-	printf("- Triangles count : %zu\n", scop.nb_triangles);
-	printf("- Materials count : %zu\n\n", scop.nb_mats);
+	printf("- Triangles count : %zu\n", scop->nb_triangles);
+	printf("- Materials count : %zu\n\n", scop->nb_mats);
 	
 	
 	printf("[Scop] Starting OpenGL Buffer initialization\n");
-	init_opengl_buffer(&scop);
+	init_opengl_buffer(scop);
 	printf("[Scop] Opening Window\n");
-	glfwShowWindow(scop.window);
+	glfwShowWindow(scop->window);
 
-	scop.program = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl");
-	glUseProgram(scop.program);
+	scop->program = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl");
+	glUseProgram(scop->program);
 
 	printf("[Scop] Ready\n");
-	display_loop(&scop);
+	display_loop(scop);
 
-	if(scop.nb_mats)
-		free(scop.materials);
+	if(scop->nb_mats)
+		free(scop->materials);
 	(void)argc;
 }

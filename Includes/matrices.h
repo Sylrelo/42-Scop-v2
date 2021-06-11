@@ -4,6 +4,7 @@
 #include <math.h>
 
 typedef float mat4f[4][4];
+
 typedef struct 	s_mat4
 {
 	float		value[4][4];
@@ -111,7 +112,7 @@ t_mat4		m4_translate(float x, float y, float z)
 t_mat4		m4_perspective(float fov, float aspect, float near, float far)
 {
 	t_mat4 result 		= m4_init();
-	float tan_half_fov 	= tanf(fov / 2.0f);;
+	float tan_half_fov 	= tanf(fov * .5f);;
 	
 	result.value[0][0] = 1.0f / (aspect * tan_half_fov);
 	result.value[1][1] = 1.0f / (tan_half_fov);
@@ -137,14 +138,9 @@ t_mat4		m4_rotation_around_center(t_vec3f center, float x, float y, float z)
 	return (result);
 }
 
-t_mat4		m4_mat(t_mat4 rotation, t_mat4 scale, t_mat4 translate)
+t_mat4		m4_mult3(t_mat4 rotation, t_mat4 scale, t_mat4 translate)
 {
-	t_mat4 result = m4_init();
-	
-	result = m4_mult(scale, rotation);
-	result = m4_mult(result, translate);
-
-	return (result);
+	return (m4_mult(m4_mult(scale, rotation), translate));
 }
 
 void		m4_print(t_mat4 mat)

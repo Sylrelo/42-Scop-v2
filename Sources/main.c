@@ -66,11 +66,10 @@ void	display_loop(t_scop *scop)
 	uint32_t loc_lightcol 	= glGetUniformLocation(scop->program, "lightColor");
 
 	t_mat4	mat_perspective = m4_perspective(1.0472, 1280.0f / 720.0f, 0.00001f, 1000.0f);
-	t_mat4	mat_view 		= m4_init();
-	t_mat4	mat_model 		= m4_init();
+	t_mat4	mat_view;
+	t_mat4	mat_model;
 
 	glUniformMatrix4fv(glMatPersp, 1, GL_FALSE, mat_perspective.value[0]);
-	glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model.value[0]);
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);  
@@ -84,13 +83,19 @@ void	display_loop(t_scop *scop)
 	while (!glfwWindowShouldClose(scop->window))
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
-
-
 		a += 0.010;
+		
+		mat_view 	= m4_mult3(
+			m4_rotation(0, 0, 0), 
+			m4_scale(1, 1, 1), 
+			m4_translate(0, 0, -6)
+			);
 
-
-		mat_view 	= m4_mat(m4_rotation(0, a, 0), m4_scale(1, 1, 1), m4_translate(0, 0, -6));
-		mat_model 	= m4_mat(m4_rotation_around_center(scop->center, 0, a / 2, 0), m4_scale(1, 1, 1), m4_translate(0, 0, -3));
+		mat_model 	= m4_mult3(
+			m4_rotation_around_center(scop->center, 0, a / 2, 0), 
+			m4_scale(1, 1, 1), 
+			m4_translate(0, 0, -3)
+			);
 
 		glUniformMatrix4fv(glMatView, 1, GL_FALSE, mat_view.value[0]);
 		glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model.value[0]);
@@ -98,7 +103,7 @@ void	display_loop(t_scop *scop)
 		glUniform3f(loc_lightpos, 0, 0, 0);
 		glUniform3f(loc_lightcol, 1, 1, 1);
 		
-		mat_i 	= 0;
+\		mat_i 	= 0;
 		offset 	= 0;
 		while (mat_i < scop->nb_mats)
 		{

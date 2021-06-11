@@ -43,3 +43,25 @@ void main()
 
     vertexColor     =  vec4(aPos.y * 0.4f + 0.4f, aPos.z * 0.1 + aPos.y * 0.4f + 0.1f, 0.2f, 1.0f);
 }
+
+
+
+vec2	cylinder_mapping()
+{
+	float	u;
+	float	v;
+
+
+    // u : atan : calcul de l'angle entre z, et x
+    // 2pi = 360 deg
+	u = 0.5 + atan(z - center.z, x - center.x) / PI * 0.5;
+
+    // v : y / taille totale objet y
+	v = y / 10.0 ;
+
+
+    //u *= taille texture x;
+    //u *= taille texture y;
+	return (vec2(u, v));
+}
+

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/11 15:01:13 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/11 17:00:19 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,8 @@ void	init_window(GLFWwindow **window, uint32_t width, uint32_t height)
 	glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	glfwWindowHint (GLFW_SAMPLES, 4);
 
 	*window = glfwCreateWindow(width, height, "Scop", NULL, NULL);
 	glfwHideWindow(*window);

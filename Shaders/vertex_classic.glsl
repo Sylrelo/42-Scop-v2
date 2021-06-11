@@ -46,22 +46,22 @@ void main()
 
 
 
-vec2	cylinder_mapping()
-{
-	float	u;
-	float	v;
+// vec2	cylinder_mapping()
+// {
+// 	float	u;
+// 	float	v;
 
 
-    // u : atan : calcul de l'angle entre z, et x
-    // 2pi = 360 deg
-	u = 0.5 + atan(z - center.z, x - center.x) / PI * 0.5;
+//     // u : atan : calcul de l'angle entre z, et x
+//     // 2pi = 360 deg
+// 	u = 0.5 + atan(z - center.z, x - center.x) / PI * 0.5;
 
-    // v : y / taille totale objet y
-	v = y / 10.0 ;
+//     // v : y / taille totale objet y
+// 	v = y / 10.0 ;
 
 
-    //u *= taille texture x;
-    //u *= taille texture y;
-	return (vec2(u, v));
-}
+//     //u *= taille texture x;
+//     //u *= taille texture y;
+// 	return (vec2(u, v));
+// }
 

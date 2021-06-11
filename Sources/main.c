@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/11 14:41:05 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/11 14:58:54 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,6 @@ void 	handle_transformation(uint32_t keys, t_vec3f *camera_position, t_vec3f *ca
 		move.x += 0.1;
 	if ((keys & RIGHT) == RIGHT)
 		move.x -= 0.1;
-	
 
 	if ((keys & 0x10) == 0x10)
 		camera_rotation->y -= 0.1;
@@ -80,23 +79,26 @@ void 	handle_transformation(uint32_t keys, t_vec3f *camera_position, t_vec3f *ca
 
 void	handle_mouse(GLFWwindow *window, t_vec3f *camera_rotation)
 {
-	double pos_x;
-	double pos_y;
 	static double pos_x_old = 0;
 	static double pos_y_old = 0;
-
+	double pos_x;
+	double pos_y;
 
 	glfwGetCursorPos(window, &pos_x, &pos_y);
 
+	if (pos_x_old == 0) pos_x_old = pos_x;
+	if (pos_y_old == 0) pos_y_old = pos_y;
+
+	printf("%f %f\n", pos_x_old, pos_y_old);
+	printf("%f %f\n", pos_x, pos_y);
+
 	camera_rotation->x += ((pos_y_old - pos_y) * 0.001);
 	camera_rotation->y += ((pos_x_old - pos_x) * 0.001);
-
 	pos_x_old = pos_x;
 	pos_y_old = pos_y;
 }
 
-
-void	init_window(GLFWwindow **window)
+void	init_window(GLFWwindow **window, uint32_t width, uint32_t height)
 {
 	if (!glfwInit())
 		die("glfwInit failed.");
@@ -107,7 +109,7 @@ void	init_window(GLFWwindow **window)
 	glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	*window = glfwCreateWindow(1280, 720, "Hello World", NULL, NULL);
+	*window = glfwCreateWindow(width, height, "Scop", NULL, NULL);
 	glfwHideWindow(*window);
 	printf("[OpenGL] Creating window and context\n");
 	if (!window)
@@ -124,14 +126,7 @@ void	init_window(GLFWwindow **window)
 	printf("[OpenGL] Initializing GL3W\n");
 	glfwSetInputMode(*window, GLFW_STICKY_KEYS, 1);
 	glfwSwapInterval(1);
-
-
 	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	// glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
-	// if (glfwRawMouseMotionSupported())
-    // 	glfwSetInputMode(*window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-
 }
 
 // t_mat4		m4_look_at(t_vec3f from, t_vec3f to)
@@ -165,19 +160,17 @@ void	display_loop(t_scop *scop)
 	GLuint glMatView 		= glGetUniformLocation(scop->program, "View");
 	GLuint glMatPersp 		= glGetUniformLocation(scop->program, "Persp");
 	GLuint glMatModel 		= glGetUniformLocation(scop->program, "Model");
-
 	uint32_t loc_kd			= glGetUniformLocation(scop->program, "kd");
 	uint32_t loc_ka			= glGetUniformLocation(scop->program, "ka");
 	uint32_t loc_textured 	= glGetUniformLocation(scop->program, "textured");
 	uint32_t loc_lightpos 	= glGetUniformLocation(scop->program, "lightPos");
 	uint32_t loc_lightcol 	= glGetUniformLocation(scop->program, "lightColor");
 
-	t_mat4	mat_perspective = m4_perspective(1.0472, 1280.0f / 720.0f, 0.00001f, 1000.0f);
-	t_mat4	mat_view = m4_init();
-	t_mat4	mat_model = m4_init();
+	t_mat4	mat_perspective = m4_perspective(1.0472, (float) scop->width / (float) scop->height, 0.00001f, 1000.0f);
+	t_mat4	mat_view 		= m4_init();
+	t_mat4	mat_model 		= m4_init();
 
 	glUniformMatrix4fv(glMatPersp, 1, GL_FALSE, mat_perspective.value[0]);
-
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);  
 	// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -187,30 +180,21 @@ void	display_loop(t_scop *scop)
 	size_t	mat_i = 0;
 	size_t	offset = 0;
 	
-	glfwSetCursorPos(scop->window, 1280 / 2, 720 / 2); 
-
 	while (!glfwWindowShouldClose(scop->window))
 	{
 		glfwHandleKeysPress(scop->window, &scop->keys);
 		handle_mouse(scop->window,  &scop->camera_rotation);
 		handle_transformation(scop->keys, &scop->camera_position, &scop->camera_rotation);
 
-		// printf("%u %f %f %f\n", scop->keys, scop->camera_position.x, scop->camera_position.y, scop->camera_position.z);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 		a += 0.010;
-		
-		// mat_view 	= m4_mult3(
-		// 	m4_rotation(scop->camera_rotation.x, scop->camera_rotation.y, scop->camera_rotation.z), 
-		// 	m4_scale(1, 1, 1), 
-		// 	m4_translate(scop->camera_position.x, scop->camera_position.y, scop->camera_position.z - 8)
-		// 	);
 
 		mat_view = m4_viewmat(scop->camera_rotation.x, scop->camera_rotation.y, scop->camera_rotation.z, 
-								m4_translate(scop->camera_position.x, scop->camera_position.y, scop->camera_position.z - 8) );
+							m4_translate(scop->camera_position.x, scop->camera_position.y, scop->camera_position.z - 8) );
 
 		mat_model = (m4_mult(
-			m4_mult( m4_scale(1, 1, 1), m4_rotation_around_center(scop->center, 0, a, 0)), 
-			m4_translate(3, 0, 0))
+			m4_mult( m4_scale(1, 1, 1), m4_rotation_around_center(scop->center, 0, cos(a), 0)), 
+			m4_translate(0, 0, 0))
 			);
 
 
@@ -314,8 +298,11 @@ int 	main(int argc, char *argv[])
 	scop->camera_position = (t_vec3f) {0, 0, 0};
 	scop->camera_rotation = (t_vec3f) {0, 0, 0};
 	
+	scop->width = 1920;
+	scop->height = 1080;
+
 	printf("[Scop] Starting OpenGL initialization\n");
-	init_window(&scop->window);
+	init_window(&scop->window, scop->width, scop->height);
 
 	printf("[Scop] Starting parser\n");
 	parser_init(scop, argv[1]);
@@ -333,6 +320,12 @@ int 	main(int argc, char *argv[])
 	glUseProgram(scop->program);
 
 	printf("[Scop] Ready\n");
+
+
+	scop->camera_position.x -= scop->center.x * .5;
+	scop->camera_position.y -= scop->center.y * .5;
+	scop->camera_position.z -= scop->center.z * .5;
+
 	display_loop(scop);
 
 	if(scop->nb_mats)

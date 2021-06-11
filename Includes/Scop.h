@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/11 12:01:39 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/11 14:43:07 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,9 @@ typedef struct s_scop
 	GLint			program;
 	t_vec3f			center;
 
+	uint32_t		width;
+	uint32_t		height;
+	
 	uint32_t		keys;
 
 	t_textures		*textures;

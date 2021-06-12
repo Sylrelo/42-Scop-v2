@@ -6,12 +6,11 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/11 18:28:50 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/13 00:07:42 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Scop.h"
-#include "Prototypes.Parsing.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -19,114 +18,6 @@ void	die(char *string)
 {
 	printf("%s\n", string);
 	exit (1);
-}
-
-void	glfwHandleKeysPress(GLFWwindow *window, uint32_t *keys)
-{
-
-	if (glfwGetKey(window, GLFW_KEY_W))
-		*keys |= FORWARD;
-	else if (*keys & FORWARD)
-		*keys ^= FORWARD;
-
-	if (glfwGetKey(window, GLFW_KEY_S))
-		*keys |= BACKWARD;
-	else if (*keys & BACKWARD)
-		*keys ^= BACKWARD;
-
-	if (glfwGetKey(window, GLFW_KEY_A))
-		*keys |= LEFT;
-	else if (*keys & LEFT)
-		*keys ^= LEFT;
-
-	if (glfwGetKey(window, GLFW_KEY_D))
-		*keys |= RIGHT;
-	else if (*keys & RIGHT)
-		*keys ^= RIGHT;
-
-}
-
-// t_vec3f	m4_mult_vec3f(t_mat4 mat, t_vec3f vec)
-// {
-// 	t_vec3f result = (t_vec3f) {0, 0, 0};
-
-// 	result.x = vec.x * mat.value[0][0] + vec.y * mat.value[0][1] + vec.z * mat.value[0][2];
-// 	result.y = vec.x * mat.value[1][0] + vec.y * mat.value[1][1] + vec.z * mat.value[1][2];
-// 	result.z = vec.x * mat.value[2][0] + vec.y * mat.value[2][1] + vec.z * mat.value[2][2];
-
-// 	return (result);
-// }
-
-void 	handle_transformation(uint32_t keys, t_vec3f *camera_position, t_vec3f *camera_rotation)
-{
-	t_vec3f	move 		= (t_vec3f) {0, 0, 0};
-
-	if ((keys & FORWARD) == FORWARD)
-		move.z += 0.1;
-	if ((keys & BACKWARD) == BACKWARD)
-		move.z -= 0.1;
-	if ((keys & LEFT) == LEFT)
-		move.x += 0.1;
-	if ((keys & RIGHT) == RIGHT)
-		move.x -= 0.1;
-
-	if ((keys & 0x10) == 0x10)
-		camera_rotation->y -= 0.1;
-
-	move = m4_mult_vec3f(m4_rotation(0, camera_rotation->y, camera_rotation->z), move);
-	*camera_position = vec_add(*camera_position, move);
-}
-
-void	handle_mouse(GLFWwindow *window, t_vec3f *camera_rotation)
-{
-	static double pos_x_old = 0;
-	static double pos_y_old = 0;
-	double pos_x;
-	double pos_y;
-
-	glfwGetCursorPos(window, &pos_x, &pos_y);
-
-	if (pos_x_old == 0)
-		pos_x_old = pos_x;
-	if (pos_y_old == 0)
-		pos_y_old = pos_y;
-
-	camera_rotation->x += ((pos_y_old - pos_y) * 0.001);
-	camera_rotation->y += ((pos_x_old - pos_x) * 0.001);
-	pos_x_old = pos_x;
-	pos_y_old = pos_y;
-}
-
-void	init_window(GLFWwindow **window, uint32_t width, uint32_t height)
-{
-	if (!glfwInit())
-		die("glfwInit failed.");
-	printf("[OpenGL] Initializing GLFW\n");
-
-	glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint (GLFW_SAMPLES, 4);
-
-	*window = glfwCreateWindow(width, height, "Scop", NULL, NULL);
-	glfwHideWindow(*window);
-	printf("[OpenGL] Creating window and context\n");
-	if (!window)
-	{
-		glfwTerminate();
-		die("glfwCreateWindow failed.");
-	}
-	glfwMakeContextCurrent(*window);
-	if (gl3wInit())
-	{
-		glfwTerminate();
-		die("gl3wInit failed.");
-	}
-	printf("[OpenGL] Initializing GL3W\n");
-	glfwSetInputMode(*window, GLFW_STICKY_KEYS, 1);
-	glfwSwapInterval(1);
-	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void	display_loop(t_scop *scop)
@@ -214,51 +105,6 @@ void	display_loop(t_scop *scop)
 	}
 }
 
-void	init_opengl_buffer(t_scop *scop)
-{
-	size_t	i = 0;
-	size_t	buffer_size = 0;
-	float	*tmp_buffer;
-
-	glGenBuffers(1, &scop->vbo);  
-	glBindBuffer(GL_ARRAY_BUFFER, scop->vbo);
-
-	glGenVertexArrays(1, &scop->vao);  
-	glBindVertexArray(scop->vao);
-
-	printf("[Scop] Merging all materials buffers\n");
-	while (i < scop->nb_mats)
-	{
-		buffer_size += scop->materials[i].gl_buffer_size;
-		i++;
-	}
-
-	if (!(tmp_buffer = calloc(buffer_size, sizeof(float))))
-		die ("Error calloc tmp_buffer");
-	_floatset(tmp_buffer, 0.0f, buffer_size);
-
-	i = 0;
-	buffer_size = 0;
-	while (i < scop->nb_mats)
-	{
-		_floatncat(tmp_buffer, scop->materials[i].gl_buffer, buffer_size, scop->materials[i].gl_buffer_size);
-		buffer_size += scop->materials[i].gl_buffer_size;
-		i++;
-	}
-
-	printf("[OpenGL] Binding bufffer and attribPointer\n");
-	glBufferData(GL_ARRAY_BUFFER, (buffer_size * sizeof(float)), (void *) tmp_buffer, GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(3 * sizeof(float)));
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(6 * sizeof(float)));
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-
-	free(tmp_buffer);
-}
-
 int 	main(int argc, char *argv[])
 {
 	t_scop	*scop;
@@ -266,7 +112,6 @@ int 	main(int argc, char *argv[])
 	scop = calloc(1, sizeof(t_scop));
 
 	scop->nb_mats = 0;
-	scop->nb_triangles = 0;
 	scop->textures_count = 0;
 	scop->textures = NULL;
 
@@ -283,9 +128,7 @@ int 	main(int argc, char *argv[])
 	printf("[Scop] Starting parser\n");
 	parser_init(scop, argv[1]);
 
-	printf("- Triangles count : %zu\n", scop->nb_triangles);
 	printf("- Materials count : %zu\n\n", scop->nb_mats);
-	
 	
 	printf("[Scop] Starting OpenGL Buffer initialization\n");
 	init_opengl_buffer(scop);

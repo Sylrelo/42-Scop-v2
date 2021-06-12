@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "Scop.h"
-#include "Prototypes.Parsing.h"
 
 #include <stdio.h>
 #include <stdlib.h>

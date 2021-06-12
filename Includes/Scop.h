@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/11 14:43:07 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/13 00:07:20 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,19 +43,18 @@ typedef struct s_parser
 typedef struct	s_textures
 {
 	char		filename[256];
-	float		*content;
 	uint32_t	gl_texture;
 }				t_textures;
 
 typedef struct	s_mat
 {
-	char		material_name[256];
-	int			tex_id;
 	t_vec3f		ka;
 	t_vec3f		kd;
 	t_vec3f		ks;
 	t_vec3f		tf;
 	float		*gl_buffer;
+	int			tex_id;
+	char		material_name[256];
 	size_t		gl_buffer_size;
 	size_t		tmp_allocated;
 }				t_mat;
@@ -68,26 +67,25 @@ typedef enum	s_actions
 	LEFT 		= 0x04,
 	RIGHT 		= 0x08,
 }				t_actions;
-
 typedef struct s_scop
 {
+	// OpenGL & GLFW
 	GLFWwindow		*window;
 	GLuint			vao;
 	GLuint			vbo;
 	GLint			program;
+
 	t_vec3f			center;
 
 	uint32_t		width;
 	uint32_t		height;
-	
 	uint32_t		keys;
 
 	t_textures		*textures;
 	size_t			textures_count;
 
-	size_t			nb_triangles;
-	size_t			nb_mats;
 	t_mat			*materials;
+	size_t			nb_mats;
 
 	t_vec3f			camera_position;
 	t_vec3f			camera_rotation;
@@ -98,14 +96,24 @@ void		die(char *string);
 int    		create_shader_program(char *file_vertex, char *file_fragment);
 void   		print_matlist(size_t nb_mat, t_mat *materials);
 
-//
-t_vec3f		vec_add(t_vec3f u, t_vec3f v);
-t_vec3f		vec_sub(t_vec3f u, t_vec3f v);
-t_vec3f		vec_cross(t_vec3f u, t_vec3f v);
-t_vec3f		vec_multf(t_vec3f u, float f);
-float		vec_length(t_vec3f u);
-t_vec3f		vec_normalize(t_vec3f u);
 
-//
+// glfw_events.c
+void	glfwHandleKeysPress(GLFWwindow *window, uint32_t *keys);
+void 	handle_transformation(uint32_t keys, t_vec3f *camera_position, t_vec3f *camera_rotation);
+void	handle_mouse(GLFWwindow *window, t_vec3f *camera_rotation);
+
+// glx_init.c
+void	init_window(GLFWwindow **window, uint32_t width, uint32_t height);
+void	init_opengl_buffer(t_scop *scop);
+
+
+// Parsing
+void        parser_init(t_scop *scop, char *argv);
+void        parser_mtl_start(t_scop *scop, char path[256], char *file);
+
+size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_count, char *last_mtl, char *line);
+void        parse_texture(t_scop *scop, t_mat *material, char path[256], char *file);
+
+void        init_mat_default_values(t_mat *material);
 
 #endif

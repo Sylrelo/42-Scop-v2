@@ -6,12 +6,11 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 16:12:06 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/13 00:07:11 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Scop.h"
-#include "Prototypes.Parsing.h"
 
 #include <stdio.h>
 #include <sys/stat.h>
@@ -156,7 +155,7 @@ void 		parser_init(t_scop *scop, char *file)
 		}
 		else if (!strncmp(line, "f ", 2)) 
 		{
-			scop->nb_triangles += parse_face(&parser, &scop->materials, &scop->nb_mats, last_mtl, _strtrim(line + 2));
+			parse_face(&parser, &scop->materials, &scop->nb_mats, last_mtl, _strtrim(line + 2));
 			f_count++;
 		} 
 	}

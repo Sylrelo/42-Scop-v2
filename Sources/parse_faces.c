@@ -1,6 +1,5 @@
 
 #include "Scop.h"
-#include "Prototypes.Parsing.h"
 #include <stdio.h>
 #include <strings.h>
 

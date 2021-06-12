@@ -1,5 +1,5 @@
 NAME	= scop
-SRCS 	= main.c parsing_init.c parsing_mtl.c parsing_texture.c gl3w.c init_shader.c parse_faces.c print_debug.c vec_utils.c
+SRCS 	= main.c parsing_init.c parsing_mtl.c parsing_texture.c gl3w.c init_shader.c parse_faces.c print_debug.c glfw_events.c glx_init.c
 
 OBJ_DIR = ./.Objects
 SRC_DIR = ./Sources
@@ -24,7 +24,7 @@ $(NAME): $(OBJS)
 		@gcc ${CFLAGS} ${INC_LIB} $^ -o ${NAME}
 		@printf "\033[1m[ SCOP ]\033[1m\t\tcompilation complete.\t\033[0m\n"
 
-$(OBJ_DIR)/%.o : $(SRC_DIR)/%.c Includes/Libmatvec/libmatvec.a Includes/Scop.h Includes/Prototypes.Parsing.h
+$(OBJ_DIR)/%.o : $(SRC_DIR)/%.c Includes/Libmatvec/libmatvec.a Includes/Scop.h
 		@gcc $(CFLAGS) $(INC_HDR) -o $@ -c $<
 
 mk: 

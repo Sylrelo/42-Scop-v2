@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:13:45 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 01:23:52 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,8 @@ static void get_relative_path(char path[256], char *file)
 	path_len = 0;
 
 	token = strtok(file, "/");
-	while (token != NULL) {
+	while (token != NULL)
+	{
 		if (!strcmp(token, strrchr(file_tmp, '/') + 1)) 
 			break ;
 		strcat(path, token);

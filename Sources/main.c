@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:12:52 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 01:28:00 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,10 @@ int 	main(int argc, char *argv[])
 	init_window(&scop->window, scop->width, scop->height);
 
 	printf("[Scop] Starting parser\n");
-	parser_init(scop, argv[1]);
+	if (strstr(argv[1], ".fdf"))
+		parser_init_fdf(scop, argv[1]);
+	else
+		parser_init(scop, argv[1]);
 
 	printf("- Materials count : %zu\n\n", scop->nb_mats);
 	

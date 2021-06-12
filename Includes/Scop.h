@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:14:36 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 01:25:51 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,14 +94,16 @@ void   		print_matlist(size_t nb_mat, t_mat *materials);
 
 
 // glfw_events.c
-void	handle_keyboard(GLFWwindow *window, uint32_t keys[349]);
-void 	handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot);
-void	handle_mouse(GLFWwindow *window, t_vec3f *cam_rot);
+void		handle_keyboard(GLFWwindow *window, uint32_t keys[349]);
+void 		handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot);
+void		handle_mouse(GLFWwindow *window, t_vec3f *cam_rot);
 
 // glx_init.c
-void	init_window(GLFWwindow **window, uint32_t width, uint32_t height);
-void	init_opengl_buffer(t_scop *scop);
+void		init_window(GLFWwindow **window, uint32_t width, uint32_t height);
+void		init_opengl_buffer(t_scop *scop);
 
+// parse_fdf.c
+void 		parser_init_fdf(t_scop *scop, char *file);
 
 // Parsing
 void        parser_init(t_scop *scop, char *argv);

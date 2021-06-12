@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 00:07:20 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 00:24:40 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,8 @@ typedef struct s_scop
 
 	uint32_t		width;
 	uint32_t		height;
-	uint32_t		keys;
+	// uint32_t		keys;
+	uint32_t		keys[349];
 
 	t_textures		*textures;
 	size_t			textures_count;
@@ -87,20 +88,23 @@ typedef struct s_scop
 	t_mat			*materials;
 	size_t			nb_mats;
 
-	t_vec3f			camera_position;
-	t_vec3f			camera_rotation;
+	t_vec3f			cam_pos;
+	t_vec3f			cam_rot;
 }				t_scop;
 
 
-void		die(char *string);
+// parse_shader.c
 int    		create_shader_program(char *file_vertex, char *file_fragment);
+
+// scop_utils.c
+void		die(char *string);
 void   		print_matlist(size_t nb_mat, t_mat *materials);
 
 
 // glfw_events.c
-void	glfwHandleKeysPress(GLFWwindow *window, uint32_t *keys);
-void 	handle_transformation(uint32_t keys, t_vec3f *camera_position, t_vec3f *camera_rotation);
-void	handle_mouse(GLFWwindow *window, t_vec3f *camera_rotation);
+void	handle_keyboard(GLFWwindow *window, uint32_t keys[349]);
+void 	handle_transformation(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot);
+void	handle_mouse(GLFWwindow *window, t_vec3f *cam_rot);
 
 // glx_init.c
 void	init_window(GLFWwindow **window, uint32_t width, uint32_t height);

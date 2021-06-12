@@ -6,58 +6,82 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:02:39 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 00:03:07 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 00:51:32 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Scop.h"
+#include <stdio.h>
 
-void	glfwHandleKeysPress(GLFWwindow *window, uint32_t *keys)
+void	handle_keyboard(GLFWwindow *window, uint32_t keys[349])
 {
+    const float     glfw_time       = glfwGetTime();
+    static float    key_timeout     = 0;
+    const float     time_diff       = key_timeout == 0 || glfw_time - key_timeout > 0.3f;
 
-	if (glfwGetKey(window, GLFW_KEY_W))
-		*keys |= FORWARD;
-	else if (*keys & FORWARD)
-		*keys ^= FORWARD;
+    static uint32_t render_option   = GL_FILL;
+    static uint8_t  gl_cull_face    = 1;
+    static uint8_t  gl_depth_test   = 1;
+    
+    keys[GLFW_KEY_W] = glfwGetKey(window, GLFW_KEY_W);
+    keys[GLFW_KEY_A] = glfwGetKey(window, GLFW_KEY_A);
+    keys[GLFW_KEY_S] = glfwGetKey(window, GLFW_KEY_S);
+    keys[GLFW_KEY_D] = glfwGetKey(window, GLFW_KEY_D);
+    keys[GLFW_KEY_R] = glfwGetKey(window, GLFW_KEY_R);
+    keys[GLFW_KEY_F] = glfwGetKey(window, GLFW_KEY_F);
 
-	if (glfwGetKey(window, GLFW_KEY_S))
-		*keys |= BACKWARD;
-	else if (*keys & BACKWARD)
-		*keys ^= BACKWARD;
+    if (glfwGetKey(window, GLFW_KEY_2))
+        render_option = GL_LINE;
+    if (glfwGetKey(window, GLFW_KEY_3))
+        render_option = GL_POINT;
+    if (glfwGetKey(window, GLFW_KEY_1))
+        render_option = GL_FILL;
 
-	if (glfwGetKey(window, GLFW_KEY_A))
-		*keys |= LEFT;
-	else if (*keys & LEFT)
-		*keys ^= LEFT;
+    if (glfwGetKey(window, GLFW_KEY_4) && time_diff)
+    {
+        if (!gl_cull_face)
+            glEnable(GL_CULL_FACE);
+        else
+            glDisable(GL_CULL_FACE);
+        gl_cull_face = !gl_cull_face;
+        key_timeout = glfw_time;
+    }
+    if (glfwGetKey(window, GLFW_KEY_5) && time_diff)
+    {
+        if (!gl_depth_test)
+            glEnable(GL_DEPTH_TEST);
+        else
+            glDisable(GL_DEPTH_TEST);
+        gl_depth_test = !gl_depth_test;
+        key_timeout = glfw_time;
+    }
 
-	if (glfwGetKey(window, GLFW_KEY_D))
-		*keys |= RIGHT;
-	else if (*keys & RIGHT)
-		*keys ^= RIGHT;
 
+    glPolygonMode(GL_FRONT_AND_BACK, render_option);
 }
 
-void 	handle_transformation(uint32_t keys, t_vec3f *camera_position, t_vec3f *camera_rotation)
+void 	handle_transformation(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot)
 {
 	t_vec3f	move 		= (t_vec3f) {0, 0, 0};
 
-	if ((keys & FORWARD) == FORWARD)
-		move.z += 0.1;
-	if ((keys & BACKWARD) == BACKWARD)
-		move.z -= 0.1;
-	if ((keys & LEFT) == LEFT)
-		move.x += 0.1;
-	if ((keys & RIGHT) == RIGHT)
-		move.x -= 0.1;
+    if (keys[GLFW_KEY_W])
+	    move.z += 0.1;
+    if (keys[GLFW_KEY_S])
+	    move.z -= 0.1;
+    if (keys[GLFW_KEY_R])
+	    move.y += 0.1;
+    if (keys[GLFW_KEY_F])
+	    move.y -= 0.1;
+    if (keys[GLFW_KEY_A])
+	    move.x += 0.1;
+    if (keys[GLFW_KEY_D])
+	    move.x -= 0.1;
 
-	if ((keys & 0x10) == 0x10)
-		camera_rotation->y -= 0.1;
-
-	move = m4_mult_vec3f(m4_rotation(0, camera_rotation->y, camera_rotation->z), move);
-	*camera_position = vec_add(*camera_position, move);
+	move = m4_mult_vec3f(m4_rotation(0, cam_rot->y, cam_rot->z), move);
+	*cam_pos = vec_add(*cam_pos, move);
 }
 
-void	handle_mouse(GLFWwindow *window, t_vec3f *camera_rotation)
+void	handle_mouse(GLFWwindow *window, t_vec3f *cam_rot)
 {
 	static double pos_x_old = 0;
 	static double pos_y_old = 0;
@@ -71,8 +95,8 @@ void	handle_mouse(GLFWwindow *window, t_vec3f *camera_rotation)
 	if (pos_y_old == 0)
 		pos_y_old = pos_y;
 
-	camera_rotation->x += ((pos_y_old - pos_y) * 0.001);
-	camera_rotation->y += ((pos_x_old - pos_x) * 0.001);
+	cam_rot->x += ((pos_y_old - pos_y) * 0.001);
+	cam_rot->y += ((pos_x_old - pos_x) * 0.001);
 	pos_x_old = pos_x;
 	pos_y_old = pos_y;
 }

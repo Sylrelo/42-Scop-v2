@@ -15,3 +15,9 @@ void    print_matlist(size_t nb_mat, t_mat *materials)
         printf("  Tf: %.2f %.2f %.2f\n", material->tf.x, material->tf.y, material->tf.z);
     }
 }
+
+void	die(char *string)
+{
+	printf("%s\n", string);
+	exit (1);
+}

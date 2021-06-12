@@ -13,7 +13,7 @@
 #include "Scop.h"
 #include "Prototypes.Parsing.h"
 #include <stdio.h>
-#include "matrices.h"
+#include <math.h>
 
 void	die(char *string)
 {
@@ -46,16 +46,16 @@ void	glfwHandleKeysPress(GLFWwindow *window, uint32_t *keys)
 
 }
 
-t_vec3f	m4_mult_vec3f(t_mat4 mat, t_vec3f vec)
-{
-	t_vec3f result = (t_vec3f) {0, 0, 0};
+// t_vec3f	m4_mult_vec3f(t_mat4 mat, t_vec3f vec)
+// {
+// 	t_vec3f result = (t_vec3f) {0, 0, 0};
 
-	result.x = vec.x * mat.value[0][0] + vec.y * mat.value[0][1] + vec.z * mat.value[0][2];
-	result.y = vec.x * mat.value[1][0] + vec.y * mat.value[1][1] + vec.z * mat.value[1][2];
-	result.z = vec.x * mat.value[2][0] + vec.y * mat.value[2][1] + vec.z * mat.value[2][2];
+// 	result.x = vec.x * mat.value[0][0] + vec.y * mat.value[0][1] + vec.z * mat.value[0][2];
+// 	result.y = vec.x * mat.value[1][0] + vec.y * mat.value[1][1] + vec.z * mat.value[1][2];
+// 	result.z = vec.x * mat.value[2][0] + vec.y * mat.value[2][1] + vec.z * mat.value[2][2];
 
-	return (result);
-}
+// 	return (result);
+// }
 
 void 	handle_transformation(uint32_t keys, t_vec3f *camera_position, t_vec3f *camera_rotation)
 {
@@ -128,30 +128,6 @@ void	init_window(GLFWwindow **window, uint32_t width, uint32_t height)
 	glfwSwapInterval(1);
 	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
-
-// t_mat4		m4_look_at(t_vec3f from, t_vec3f to)
-// {
-// 	t_vec3f tmp = (t_vec3f){0, 1, 0};
-// 	t_vec3f forward = vec_normalize(vec_sub(from, to));
-// 	t_vec3f right = vec_cross(vec_normalize(tmp), forward);
-// 	t_vec3f up = vec_cross(forward, right);
-// 	t_mat4	result;
-	
-// 	result.value[0][0] = right.x;
-//     result.value[0][1] = right.y;
-//     result.value[0][2] = right.z;
-//     result.value[1][0] = up.x;
-//     result.value[1][1] = up.y;
-//     result.value[1][2] = up.z;
-//     result.value[2][0] = forward.x;
-//     result.value[2][1] = forward.y;
-//     result.value[2][2] = forward.z;
-//     result.value[3][0] = from.x;
-//     result.value[3][1] = from.y;
-//     result.value[3][2] = from.z;
-	
-// 	return (result);
-// }
 
 void	display_loop(t_scop *scop)
 {
@@ -298,8 +274,8 @@ int 	main(int argc, char *argv[])
 	scop->camera_position = (t_vec3f) {0, 0, 0};
 	scop->camera_rotation = (t_vec3f) {0, 0, 0};
 	
-	scop->width = 1920;
-	scop->height = 1080;
+	scop->width = 1280;
+	scop->height = 720;
 
 	printf("[Scop] Starting OpenGL initialization\n");
 	init_window(&scop->window, scop->width, scop->height);

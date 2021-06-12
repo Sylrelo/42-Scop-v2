@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include "GL/gl3w.h"
 #include <GLFW/glfw3.h>
+#include "Libmatvec.h"
 #include "libc_extends.h"
 
 #define MAT_GL_BUFFER_REALLOC_VALUE 5000
@@ -26,26 +27,6 @@ typedef enum e_parsing
 	TEXTURE = 0x02,
 	NORMAL	= 0x04,
 }			e_parsing;
-
-typedef struct s_vec3i
-{
-	int		x;
-	int		y;
-	int		z;
-}				t_vec3i;
-
-typedef struct s_vec3f
-{
-	float	x;
-	float	y;
-	float	z;
-}				t_vec3f;
-
-typedef struct s_vec2f
-{
-	float	x;
-	float	y;
-}				t_vec2f;
 
 typedef struct s_parser
 {

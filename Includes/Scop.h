@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 00:24:40 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 01:14:36 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,14 +59,6 @@ typedef struct	s_mat
 	size_t		tmp_allocated;
 }				t_mat;
 
-typedef enum	s_actions
-{
-	NONE		= 0x00,
-	FORWARD 	= 0x01,
-	BACKWARD 	= 0x02,
-	LEFT 		= 0x04,
-	RIGHT 		= 0x08,
-}				t_actions;
 typedef struct s_scop
 {
 	// OpenGL & GLFW
@@ -103,7 +95,7 @@ void   		print_matlist(size_t nb_mat, t_mat *materials);
 
 // glfw_events.c
 void	handle_keyboard(GLFWwindow *window, uint32_t keys[349]);
-void 	handle_transformation(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot);
+void 	handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot);
 void	handle_mouse(GLFWwindow *window, t_vec3f *cam_rot);
 
 // glx_init.c

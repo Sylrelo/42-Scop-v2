@@ -2,6 +2,7 @@
   
 out vec4    FragColor;
 
+uniform int     textured;
 
 //  
 in vec3      oNormal;
@@ -10,7 +11,7 @@ in vec3      oLightPos;
 in vec3      oLightColor;
 //
 
-flat in int     outTextured;
+//flat in int     outTextured;
 flat in vec4     vertexColor;
 in vec2             TexCoord;
 
@@ -33,9 +34,9 @@ void main()
 
     // FragColor = vertexColor;
 
-    if (outTextured == 0)
+    if (textured == 0)
         FragColor = vec4(vertexColor.xyz , 1);
         // FragColor = vec4(vertexColor.xyz * diffuse, 1);
-    if (outTextured == 1)
+    if (textured == 1)
         FragColor = texture(ourTexture, TexCoord);
 } 

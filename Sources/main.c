@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 00:39:44 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 01:12:52 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,6 @@ void	display_loop(t_scop *scop)
 	t_mat4	mat_model 		= m4_init();
 
 	glUniformMatrix4fv(glMatPersp, 1, GL_FALSE, mat_perspective.value[0]);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);  
 
 	float a = 0;
 
@@ -52,7 +50,7 @@ void	display_loop(t_scop *scop)
 
 		handle_keyboard(scop->window, scop->keys);
 		handle_mouse(scop->window,  &scop->cam_rot);
-		handle_transformation(scop->keys, &scop->cam_pos, &scop->cam_rot);
+		handle_transformations(scop->keys, &scop->cam_pos, &scop->cam_rot);
 
 		mat_view = m4_viewmat(scop->cam_rot.x, scop->cam_rot.y, scop->cam_rot.z, 
 							m4_translate(scop->cam_pos.x, scop->cam_pos.y, scop->cam_pos.z));
@@ -85,7 +83,7 @@ void	display_loop(t_scop *scop)
 			else
 				glUniform1i(loc_textured, 0);
 
-			glDrawArrays(GL_TRIANGLES, (offset / 8), (material.gl_buffer_size / 8));
+			glDrawArrays(GL_TRIANGLES, offset / 8, material.gl_buffer_size / 8);
 			mat_i++;
 		}
 		glfwSwapBuffers(scop->window);

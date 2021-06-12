@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:04:12 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 00:05:21 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 01:10:23 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,28 +41,22 @@ void	init_window(GLFWwindow **window, uint32_t width, uint32_t height)
 	}
 	printf("[OpenGL] Initializing GL3W\n");
 	glfwSetInputMode(*window, GLFW_STICKY_KEYS, 1);
-	glfwSwapInterval(1);
 	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSwapInterval(1);
+
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);  
 }
 
 void	init_opengl_buffer(t_scop *scop)
 {
-	size_t	i = 0;
+	size_t	i           = 0;
 	size_t	buffer_size = 0;
 	float	*tmp_buffer;
 
-	glGenBuffers(1, &scop->vbo);  
-	glBindBuffer(GL_ARRAY_BUFFER, scop->vbo);
-
-	glGenVertexArrays(1, &scop->vao);  
-	glBindVertexArray(scop->vao);
-
 	printf("[Scop] Merging all materials buffers\n");
 	while (i < scop->nb_mats)
-	{
-		buffer_size += scop->materials[i].gl_buffer_size;
-		i++;
-	}
+		buffer_size += scop->materials[i++].gl_buffer_size;
 
 	if (!(tmp_buffer = calloc(buffer_size, sizeof(float))))
 		die ("Error calloc tmp_buffer");
@@ -78,6 +72,12 @@ void	init_opengl_buffer(t_scop *scop)
 	}
 
 	printf("[OpenGL] Binding bufffer and attribPointer\n");
+	glGenBuffers(1, &scop->vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, scop->vbo);
+
+	glGenVertexArrays(1, &scop->vao);  
+	glBindVertexArray(scop->vao);
+
 	glBufferData(GL_ARRAY_BUFFER, (buffer_size * sizeof(float)), (void *) tmp_buffer, GL_DYNAMIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(3 * sizeof(float)));

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:02:39 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 00:51:32 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 01:04:44 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,30 +55,7 @@ void	handle_keyboard(GLFWwindow *window, uint32_t keys[349])
         gl_depth_test = !gl_depth_test;
         key_timeout = glfw_time;
     }
-
-
     glPolygonMode(GL_FRONT_AND_BACK, render_option);
-}
-
-void 	handle_transformation(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot)
-{
-	t_vec3f	move 		= (t_vec3f) {0, 0, 0};
-
-    if (keys[GLFW_KEY_W])
-	    move.z += 0.1;
-    if (keys[GLFW_KEY_S])
-	    move.z -= 0.1;
-    if (keys[GLFW_KEY_R])
-	    move.y += 0.1;
-    if (keys[GLFW_KEY_F])
-	    move.y -= 0.1;
-    if (keys[GLFW_KEY_A])
-	    move.x += 0.1;
-    if (keys[GLFW_KEY_D])
-	    move.x -= 0.1;
-
-	move = m4_mult_vec3f(m4_rotation(0, cam_rot->y, cam_rot->z), move);
-	*cam_pos = vec_add(*cam_pos, move);
 }
 
 void	handle_mouse(GLFWwindow *window, t_vec3f *cam_rot)
@@ -99,4 +76,25 @@ void	handle_mouse(GLFWwindow *window, t_vec3f *cam_rot)
 	cam_rot->y += ((pos_x_old - pos_x) * 0.001);
 	pos_x_old = pos_x;
 	pos_y_old = pos_y;
+}
+
+void 	handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot)
+{
+	t_vec3f	move 		= (t_vec3f) {0, 0, 0};
+
+    if (keys[GLFW_KEY_W])
+	    move.z += 0.1;
+    if (keys[GLFW_KEY_S])
+	    move.z -= 0.1;
+    if (keys[GLFW_KEY_R])
+	    move.y += 0.1;
+    if (keys[GLFW_KEY_F])
+	    move.y -= 0.1;
+    if (keys[GLFW_KEY_A])
+	    move.x += 0.1;
+    if (keys[GLFW_KEY_D])
+	    move.x -= 0.1;
+
+	move = m4_mult_vec3f(m4_rotation(0, cam_rot->y, 0), move);
+	*cam_pos = vec_add(*cam_pos, move);
 }

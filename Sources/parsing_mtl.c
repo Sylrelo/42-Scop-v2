@@ -6,12 +6,11 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/04 11:18:58 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/11 18:31:15 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/13 01:13:49 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Scop.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

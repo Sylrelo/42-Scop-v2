@@ -42,6 +42,8 @@ void main()
 
 
     vertexColor     =  vec4(aPos.y * 0.4f + 0.4f, aPos.z * 0.1 + aPos.y * 0.4f + 0.1f, 0.2f, 1.0f);
+
+ //   vertexColor = vec4(0.2, 0.2, 0.2, 1);
 }
 
 

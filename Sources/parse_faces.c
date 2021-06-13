@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:13:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:13:34 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 12:09:37 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static ssize_t  get_material_id(t_mat *materials, size_t material_count, const c
     return -1;
 }
 
-static void     mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size)
+void        mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size)
 {
     if (material->tmp_allocated == 0)
     {
@@ -45,7 +45,7 @@ static void     mat_push_buffer(t_mat *material, float *buffer, size_t buffer_si
     material->gl_buffer_size += buffer_size;
 }
 
-static void     calculate_missing_normal(t_mat *material)
+void            calculate_missing_normal(t_mat *material)
 {
     size_t i = 0;
     size_t j = 0;
@@ -76,7 +76,7 @@ static void     calculate_missing_normal(t_mat *material)
     }
 }
 
-static void     update_minmax(t_vec3f *min, t_vec3f *max, float buffer[8])
+void            update_minmax(t_vec3f *min, t_vec3f *max, float buffer[8])
 {
     if (buffer[0] > max->x)
         max->x = buffer[0];

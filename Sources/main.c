@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:28:00 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 11:44:09 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	display_loop(t_scop *scop)
 		mat_model = m4_mult(
 						m4_mult(
 							m4_scale(1, 1, 1), 
-							m4_rotation_around_center(scop->center, 0, cos(a * 2), 0)), 
+							m4_rotation_around_center(scop->center, 0, 0, 0)), 
 						m4_translate(0, 0, 0)
 					);
 

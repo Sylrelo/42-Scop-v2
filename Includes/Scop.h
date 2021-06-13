@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:25:51 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 12:09:09 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,11 +105,17 @@ void		init_opengl_buffer(t_scop *scop);
 // parse_fdf.c
 void 		parser_init_fdf(t_scop *scop, char *file);
 
+
+// parse_face.c
+void        mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size);
+size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_count, char *last_mtl, char *line);
+void        update_minmax(t_vec3f *min, t_vec3f *max, float buffer[8]);
+void        calculate_missing_normal(t_mat *material);
+
 // Parsing
 void        parser_init(t_scop *scop, char *argv);
 void        parser_mtl_start(t_scop *scop, char path[256], char *file);
 
-size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_count, char *last_mtl, char *line);
 void        parse_texture(t_scop *scop, t_mat *material, char path[256], char *file);
 
 void        init_mat_default_values(t_mat *material);

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:13:02 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:50:08 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/13 12:09:33 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,32 @@
 #include <math.h>
 
 typedef struct stat t_stat;
+
+void        create_triangle(int **data, int i, int j, t_mat *material, t_vec3f *min, t_vec3f *max, int dir)
+{
+    float       buffer[8];
+
+    _floatset(buffer, 0.00f, 8);
+
+    buffer[0] = i;
+    buffer[1] = data[i][j] * .2;
+    buffer[2] = j;
+    update_minmax(min, max, buffer);
+    mat_push_buffer(material, buffer, 8);
+    calculate_missing_normal(material);
+    buffer[0] = i;
+    buffer[1] = data[i][j + dir] * .2;
+    buffer[2] = j + dir;
+    update_minmax(min, max, buffer);
+    mat_push_buffer(material, buffer, 8);
+    calculate_missing_normal(material);
+    buffer[0] = i + dir;
+    buffer[1] = data[i + dir][j] * .2;
+    buffer[2] = j;
+    update_minmax(min, max, buffer);
+    mat_push_buffer(material, buffer, 8);
+    calculate_missing_normal(material);
+}
 
 void 		parser_init_fdf(t_scop *scop, char *file)
 {
@@ -32,6 +58,15 @@ void 		parser_init_fdf(t_scop *scop, char *file)
     size_t      row_max     = 0;
     int         **fdf_data  = NULL;
     size_t      i           = 0;
+    float       buffer[8];
+    t_vec3f     min;
+    t_vec3f     max;
+
+    _floatset(buffer, 0.00f, 8);
+    
+	max = (t_vec3f){ -FLT_MAX, -FLT_MAX, -FLT_MAX };
+	min = (t_vec3f){ FLT_MAX, FLT_MAX, FLT_MAX };
+
 
 	if (stat(file, &st))
 		die ("File not found.");
@@ -42,11 +77,19 @@ void 		parser_init_fdf(t_scop *scop, char *file)
 	if (!(fp = fopen(file, "r")))
 		die("Cannot open file");
 
-    if (!(fdf_data = calloc(1, sizeof(int *) * 256)))
+    if (!(fdf_data = calloc(1, sizeof(int *) * 2048)))
         die ("Calloc error");
-    while (i < 256)
+
+    
+    if (!(scop->materials = calloc(1, sizeof(t_mat))))
+        die ("Error creating default material");
+    scop->nb_mats = 1;
+    init_mat_default_values(&(scop->materials)[0]);
+    strcpy((scop->materials)[0].material_name, "DEFAULT_NO_MATERIAL");
+
+    while (i < 2048)
     {
-        if (!(fdf_data[i] = calloc(1, sizeof(int) * 256)))
+        if (!(fdf_data[i] = calloc(1, sizeof(int) * 2048)))
             die ("Calloc[i] error");
         i++;
     }
@@ -70,7 +113,6 @@ void 		parser_init_fdf(t_scop *scop, char *file)
         row_max = fmax(row_curr, row_max);
     }
 
-
     for (size_t i = 0; i < row_max; i++)
     {
         if (i == row_max - 1)
@@ -79,14 +121,21 @@ void 		parser_init_fdf(t_scop *scop, char *file)
         {
             if (j == col_max - 1)
                 continue ;
-            printf("tri (%d, %d, %d) ", fdf_data[i][j], fdf_data[i][j + 1], fdf_data[i + 1][j]);
+            create_triangle(fdf_data, i, j, &scop->materials[0], &min, &max, +1);
         }
-
-        // printf("tri (%d %d %d) ", fdf_data[i][0], fdf_data[i][1], fdf_data[i + 1][0]);
-
-        printf("\n");
     }
-    
-    exit (1);
+    for (size_t i = row_max - 1; i > 0; i--)
+    {
+        if (i == 0)
+            break ;
+        for (size_t j = col_max - 1; j > 0; j--)
+        {
+            if (j == 0)
+                continue ;
+            create_triangle(fdf_data, i, j, &scop->materials[0], &min, &max, -1);
+        }
+    }
+	scop->center = vec_multf(vec_add(min, max), .5);
+    // exit (1);
     (void)scop;
 }

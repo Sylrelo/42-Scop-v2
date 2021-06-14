@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:14:21 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/14 22:13:28 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 00:23:47 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,23 @@ void    print_matlist(size_t nb_mat, t_mat *materials)
 
 void    clean_exit(t_scop *scop)
 {
-    if(scop->nb_mats)
-	{
-		free(scop->materials);
-		scop->materials = NULL;
-	}
+	size_t i = 0;
+
 	if (scop->textures_count)
 	{
 		free(scop->textures);
 		scop->textures = NULL;
+	}
+	if (scop->objects_count)
+	{
+		while ( i < scop->objects_count )
+		{
+			free(scop->objects[i].materials);
+			scop->objects[i].materials = NULL;
+			i++;
+		}
+		free(scop->objects);
+		scop->objects = NULL;
 	}
 	free(scop);
 	scop = NULL;

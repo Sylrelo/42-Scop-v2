@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:04:12 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/14 22:04:03 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 00:24:27 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,29 +48,51 @@ void	init_window(GLFWwindow **window, uint32_t width, uint32_t height)
 	glEnable(GL_DEPTH_TEST);  
 }
 
-void	init_opengl_buffer(t_scop *scop)
+void	init_opengl_buffer_multi(t_scop *scop)
 {
 	size_t	i           = 0;
+	size_t	j           = 0;
 	size_t	buffer_size = 0;
+	size_t	obj_offset	= 0;
 	float	*tmp_buffer;
 
 	printf("[Scop] Merging all materials buffers\n");
-	while (i < scop->nb_mats)
-		buffer_size += scop->materials[i++].gl_buffer_size;
 
+	while (i < scop->objects_count)
+	{
+		printf("affaf %zu\n",  scop->objects[i].nb_mats);
+		j = 0;
+		while (j < scop->objects[i].nb_mats)
+		{
+			printf("%zu - %zu\n", i, j);
+			buffer_size += scop->objects[i].materials[j].gl_buffer_size;
+			j++;
+		}
+		i++;
+	}
+	
 	if (!(tmp_buffer = calloc(buffer_size, sizeof(float))))
 		die ("Error calloc tmp_buffer");
 	_floatset(tmp_buffer, 0.0f, buffer_size);
 
 	i = 0;
 	buffer_size = 0;
-	while (i < scop->nb_mats)
+	while (i < scop->objects_count)
 	{
-		_floatncat(tmp_buffer, scop->materials[i].gl_buffer, buffer_size, scop->materials[i].gl_buffer_size);
-		buffer_size += scop->materials[i].gl_buffer_size;
+		j = 0;
+		obj_offset = 0;
+		scop->objects[i].offset = 0;
+		while (j < scop->objects[i].nb_mats)
+		{
+			_floatncat(tmp_buffer, scop->objects[i].materials[j].gl_buffer, buffer_size, scop->objects[i].materials[j].gl_buffer_size);
+			buffer_size += scop->objects[i].materials[j].gl_buffer_size;
+			j++;
+		}
+		scop->objects[i].offset += buffer_size;
 		i++;
 	}
 
+	printf("[[[1]]]\n");
 	printf("[OpenGL] Binding bufffer and attribPointer\n");
 	glGenBuffers(1, &scop->vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, scop->vbo);
@@ -88,13 +110,16 @@ void	init_opengl_buffer(t_scop *scop)
     glEnableVertexAttribArray(2);
 
 
-	printf("%lu\n", (buffer_size / 8) / 3);
-
 	i = 0;
-	while (i < scop->nb_mats)
+	while (i < scop->objects_count)
 	{
-		free(scop->materials[i].gl_buffer);
-		scop->materials[i].gl_buffer = NULL;
+		j = 0;
+		while (j < scop->objects[i].nb_mats)
+		{
+			free(scop->objects[i].materials[j].gl_buffer);
+			scop->objects[i].materials[j].gl_buffer = NULL;
+			j++;
+		}
 		i++;
 	}
 	free(tmp_buffer);

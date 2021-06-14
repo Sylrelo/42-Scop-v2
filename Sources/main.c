@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/14 23:20:04 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 00:24:34 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,12 @@
 
 void	display_loop(t_scop *scop)
 {
-	t_mat	material;
+	t_mat		material;
+	t_objects	*object;
 	size_t	mat_i 	= 0;
+	size_t	obj_i 	= 0;
 	size_t	offset 	= 0;
+	size_t offset_obj = 0;
 
 	GLuint glMatView 		= glGetUniformLocation(scop->program, "View");
 	GLuint glMatPersp 		= glGetUniformLocation(scop->program, "Persp");
@@ -44,9 +47,10 @@ void	display_loop(t_scop *scop)
 
 	while (!glfwWindowShouldClose(scop->window))
 	{
-		mat_i 	= 0;
+		obj_i 	= 0;
 		offset 	= 0;
 		a 		+= 0.010;
+		offset_obj = 0;
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -67,29 +71,39 @@ void	display_loop(t_scop *scop)
 		glUniformMatrix4fv(glMatView, 1, GL_FALSE, mat_view.value[0]);
 		glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model.value[0]);
 		
-		while (mat_i < scop->nb_mats)
+		obj_i = 0;
+
+		while (obj_i < scop->objects_count)
 		{
-			material = scop->materials[mat_i];
-			if (mat_i > 0)
-				offset += scop->materials[mat_i - 1].gl_buffer_size;
-
-			glUniform3f(loc_kd, material.kd.x, material.kd.y, material.kd.z);
-			glUniform3f(loc_ka, material.ka.x, material.ka.y, material.ka.z);
-
-			if (material.tex_id != -1)
+			mat_i = 0;
+			offset = 0;
+			if (obj_i > 0)
+				offset_obj = scop->objects[obj_i - 1].offset;
+			while (mat_i < scop->objects[obj_i].nb_mats)
 			{
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, scop->textures[material.tex_id].gl_texture);
-				glUniform1i(loc_textured, 1);
-			}
-			else
-				glUniform1i(loc_textured, 0);
+				material = scop->objects[obj_i].materials[mat_i];
+				if (mat_i > 0)
+					offset += scop->objects[obj_i].materials[mat_i - 1].gl_buffer_size;
 
-			glDrawArrays(GL_TRIANGLES, offset / 8, material.gl_buffer_size / 8);
-			mat_i++;
+				glUniform3f(loc_kd, material.kd.x, material.kd.y, material.kd.z);
+				glUniform3f(loc_ka, material.ka.x, material.ka.y, material.ka.z);
+				if (material.tex_id != -1)
+				{
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, scop->textures[material.tex_id].gl_texture);
+					glUniform1i(loc_textured, 1);
+				}
+				else
+					glUniform1i(loc_textured, 0);
+				glDrawArrays(GL_TRIANGLES, (offset_obj + offset) / 8, (material.gl_buffer_size) / 8);
+				mat_i++;
+			}
+			obj_i++;
 		}
+
 		glfwSwapBuffers(scop->window);
 		glfwPollEvents();
+		// exit (1);
 	}
 }
 
@@ -99,7 +113,6 @@ int 	main(int argc, char *argv[])
 
 	scop = calloc(1, sizeof(t_scop));
 
-	scop->nb_mats = 0;
 	scop->textures_count = 0;
 	scop->textures = NULL;
 
@@ -118,17 +131,19 @@ int 	main(int argc, char *argv[])
 
 	// test
 	//tester existence des fichiers avant calloc
-	scop->objects_count = argc - 1;
-	scop->objects = calloc(scop->objects_count, sizeof(t_objects));
+	scop->objects_count = 0;
+	scop->objects = calloc(argc, sizeof(t_objects));
 
 	//fin test
 	printf("[Scop] Starting parser\n");
-	parser_init(scop, argv[1]);
+	while (--argc > 0)
+	{
+		printf("%d %s\n", argc, argv[argc]);
+		parser_init(scop, argv[argc]);
+	}
 
-	printf("- Materials count : %zu\n\n", scop->nb_mats);
-	
 	printf("[Scop] Starting OpenGL Buffer initialization\n");
-	init_opengl_buffer(scop);
+	init_opengl_buffer_multi(scop);
 	printf("[Scop] Opening Window\n");
 	glfwShowWindow(scop->window);
 
@@ -140,6 +155,7 @@ int 	main(int argc, char *argv[])
 	scop->cam_pos.x -= scop->center.x * .5;
 	scop->cam_pos.y -= scop->center.y * .5;
 	scop->cam_pos.z -= scop->center.z + 8;
+
 
 	display_loop(scop);
 

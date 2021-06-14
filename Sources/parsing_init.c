@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/14 22:04:21 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 00:21:15 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,10 @@ void 		parser_init(t_scop *scop, char *file)
 	ssize_t		read 		= 0;
 	size_t		len 		= 0;
 
+
+	printf("%zu\n", scop->objects_count);
+	scop->objects[scop->objects_count].nb_mats = 0;
+	
 	if (stat(file, &st))
 		die ("File not found.");
 	
@@ -156,7 +160,7 @@ void 		parser_init(t_scop *scop, char *file)
 		}
 		else if (!strncmp(line, "f ", 2)) 
 		{
-			parse_face(&parser, &scop->materials, &scop->nb_mats, last_mtl, _strtrim(line + 2));
+			parse_face(&parser, &scop->objects[scop->objects_count].materials, &scop->objects[scop->objects_count].nb_mats, last_mtl, _strtrim(line + 2));
 			f_count++;
 		}
 	}
@@ -166,7 +170,12 @@ void 		parser_init(t_scop *scop, char *file)
 	line = NULL;
 	fclose(fp);
 
+	// printf("OBJECT %zu\n", scop->objects[scop->objects_count].nb_mats);
+	// print_matlist(scop->objects[scop->objects_count].nb_mats, scop->objects[scop->objects_count].materials);
+
 	scop->center = vec_multf(vec_add(parser.min, parser.max), .5);
+	scop->objects_count++;
+
 	// printf("%f %f %f\n", scop->center.x, scop->center.y, scop->center.z);
 	// printf("%f %f %f\n", parser.max.x, parser.max.y, parser.max.z);
 	// printf("%f %f %f\n", parser.min.x, parser.min.y, parser.min.z);

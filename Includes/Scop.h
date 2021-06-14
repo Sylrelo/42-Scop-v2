@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/14 23:18:30 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 00:23:58 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ typedef struct	s_objects
 	size_t			nb_mats;
 	t_vec3f			pos;
 	t_vec3f			rot;
+	size_t			offset;
 }				t_objects;
 typedef struct s_scop
 {
@@ -77,19 +78,13 @@ typedef struct s_scop
 
 	uint32_t		width;
 	uint32_t		height;
-	// uint32_t		keys;
 	uint32_t		keys[349];
 
 	t_textures		*textures;
 	size_t			textures_count;
 
-	t_mat			*materials;
-	size_t			nb_mats;
-
-	// test
 	t_objects		*objects;
 	size_t			objects_count;
-	//fin test
 
 	t_vec3f			cam_pos;
 	t_vec3f			cam_rot;
@@ -113,6 +108,7 @@ void		handle_mouse(GLFWwindow *window, t_vec3f *cam_rot);
 // glx_init.c
 void		init_window(GLFWwindow **window, uint32_t width, uint32_t height);
 void		init_opengl_buffer(t_scop *scop);
+void	init_opengl_buffer_multi(t_scop *scop);
 
 // parse_fdf.c
 void 		parser_init_fdf(t_scop *scop, char *file);

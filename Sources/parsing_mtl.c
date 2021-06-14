@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/04 11:18:58 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:13:49 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 00:05:45 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,13 @@ void        parser_mtl_start(t_scop *scop, char path[256], char *file)
 	if (!(fp = fopen(filepath, "r")))
         die("Error reading mtl file");
     
-    scop->nb_mats   = 0;
-    scop->materials = calloc(5, sizeof(t_mat));
+    scop->objects[scop->objects_count].nb_mats   = 0;
+    // scop->materials = calloc(5, sizeof(t_mat));
+    scop->objects[scop->objects_count].materials = calloc(5, sizeof(t_mat));
 
 	while ((read = getline(&line, &len, (FILE *) fp)) != -1)
 	{
-        material = &scop->materials[tmp_nb_mats - 1];
+        material = &scop->objects[scop->objects_count].materials[tmp_nb_mats - 1];
 
         if (!strncmp(line, "Kd ", 3))
             sscanf(line, "Kd %f %f %f", &material->kd.x, &material->kd.y, &material->kd.z);
@@ -82,15 +83,15 @@ void        parser_mtl_start(t_scop *scop, char path[256], char *file)
             parse_texture(scop, material, path, _strtrim(line + 7));
 		else if (!strncmp(line, "newmtl ", 7))
         {
-            realloc_mtl(&tmp_nb_mats, &scop->nb_mats, (void *) &scop->materials);
-            strcpy(scop->materials[tmp_nb_mats].material_name, _strtrim(line + 7));
-            init_mat_default_values(&scop->materials[tmp_nb_mats]);
+            realloc_mtl(&tmp_nb_mats, &scop->objects[scop->objects_count].nb_mats, (void *) &scop->objects[scop->objects_count].materials);
+            strcpy(scop->objects[scop->objects_count].materials[tmp_nb_mats].material_name, _strtrim(line + 7));
+            init_mat_default_values(&scop->objects[scop->objects_count].materials[tmp_nb_mats]);
             tmp_nb_mats++;
         }
 	}
 	free(line);
-    if (!(scop->materials = realloc(scop->materials, sizeof(t_mat) * tmp_nb_mats)))
+    if (!(scop->objects[scop->objects_count].materials = realloc(scop->objects[scop->objects_count].materials, sizeof(t_mat) * tmp_nb_mats)))
         die ("Material final realloc failed");
-    scop->nb_mats   = tmp_nb_mats;
+    scop->objects[scop->objects_count].nb_mats = tmp_nb_mats;
     fclose(fp);
 }

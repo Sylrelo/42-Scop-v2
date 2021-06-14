@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/14 12:13:16 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/14 22:13:47 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,7 @@ int    		create_shader_program(char *file_vertex, char *file_fragment);
 // scop_utils.c
 void		die(char *string);
 void   		print_matlist(size_t nb_mat, t_mat *materials);
+void    	clean_exit(t_scop *scop);
 
 
 // glfw_events.c

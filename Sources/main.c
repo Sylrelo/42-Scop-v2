@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/14 22:11:20 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/14 23:16:15 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,10 +115,7 @@ int 	main(int argc, char *argv[])
 	init_window(&scop->window, scop->width, scop->height);
 
 	printf("[Scop] Starting parser\n");
-	if (strstr(argv[1], ".fdf"))
-		parser_init_fdf(scop, argv[1]);
-	else
-		parser_init(scop, argv[1]);
+	parser_init(scop, argv[1]);
 
 	printf("- Materials count : %zu\n\n", scop->nb_mats);
 	
@@ -136,19 +133,8 @@ int 	main(int argc, char *argv[])
 	scop->cam_pos.y -= scop->center.y * .5;
 	scop->cam_pos.z -= scop->center.z + 8;
 
-	//display_loop(scop);
+	display_loop(scop);
 
-	if(scop->nb_mats)
-	{
-		free(scop->materials);
-		scop->materials = NULL;
-	}
-	if (scop->textures_count)
-	{
-		free(scop->textures);
-		scop->textures = NULL;
-	}
-	free(scop);
-	scop = NULL;
+	clean_exit(scop);
 	(void)argc;
 }

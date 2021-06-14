@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/14 23:16:15 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/14 23:20:04 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,14 @@ int 	main(int argc, char *argv[])
 	printf("[Scop] Starting OpenGL initialization\n");
 	init_window(&scop->window, scop->width, scop->height);
 
+
+
+	// test
+	//tester existence des fichiers avant calloc
+	scop->objects_count = argc - 1;
+	scop->objects = calloc(scop->objects_count, sizeof(t_objects));
+
+	//fin test
 	printf("[Scop] Starting parser\n");
 	parser_init(scop, argv[1]);
 

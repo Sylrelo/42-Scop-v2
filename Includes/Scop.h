@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/14 22:13:47 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/14 23:18:30 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,13 @@ typedef struct	s_mat
 	size_t		tmp_allocated;
 }				t_mat;
 
+typedef struct	s_objects
+{
+	t_mat			*materials;
+	size_t			nb_mats;
+	t_vec3f			pos;
+	t_vec3f			rot;
+}				t_objects;
 typedef struct s_scop
 {
 	// OpenGL & GLFW
@@ -78,6 +85,11 @@ typedef struct s_scop
 
 	t_mat			*materials;
 	size_t			nb_mats;
+
+	// test
+	t_objects		*objects;
+	size_t			objects_count;
+	//fin test
 
 	t_vec3f			cam_pos;
 	t_vec3f			cam_rot;
@@ -104,7 +116,6 @@ void		init_opengl_buffer(t_scop *scop);
 
 // parse_fdf.c
 void 		parser_init_fdf(t_scop *scop, char *file);
-
 
 // parse_face.c
 void        mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size);

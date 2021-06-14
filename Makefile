@@ -1,5 +1,5 @@
 NAME	= scop
-SRCS 	= main.c parsing_init.c parsing_mtl.c parsing_texture.c gl3w.c parse_shader.c parse_faces.c scop_utils.c glfw_events.c glx_init.c parse_fdf.c
+SRCS 	= main.c parsing_init.c parsing_mtl.c parsing_texture.c gl3w.c parse_shader.c parse_faces.c scop_utils.c glfw_events.c glx_init.c
 
 OBJ_DIR = ./.Objects
 SRC_DIR = ./Sources

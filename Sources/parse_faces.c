@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:13:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/14 22:06:12 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/14 22:10:15 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,9 +151,9 @@ static size_t   parse_vertex(t_parser *parser, t_mat *material, char *line)
 
 static size_t   triangulate(t_parser *parser, t_mat *material, size_t sides_count, char *line)
 {
-    char    *token = NULL;
+    char    *token  = NULL;
     char    **faces = NULL;
-    size_t  i = 0;
+    size_t  i       = 0;
 
     if (!(faces = calloc(sides_count, sizeof(char **))))
         die ("Error calloc triangulation");
@@ -175,10 +175,12 @@ static size_t   triangulate(t_parser *parser, t_mat *material, size_t sides_coun
         i++;
     }
 
-    while (i--)
+    i = 0;
+    while (i < sides_count)
     {
         free(faces[i]);
         faces[i] = NULL;
+        i++;
     }
     free(faces);
     faces = NULL;
@@ -214,6 +216,6 @@ size_t          parse_face(t_parser *parser, t_mat **materials, size_t *material
         parse_vertex(parser, &(*materials)[material_id], _strtrim(token));
 		token = strtok(NULL, " ");
 	}
-    print_matlist(*material_count, *materials);
+    // print_matlist(*material_count, *materials);
     return (1);
 }

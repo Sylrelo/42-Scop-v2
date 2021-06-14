@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/14 22:02:37 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/14 22:11:20 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,11 @@ int 	main(int argc, char *argv[])
 	{
 		free(scop->materials);
 		scop->materials = NULL;
+	}
+	if (scop->textures_count)
+	{
+		free(scop->textures);
+		scop->textures = NULL;
 	}
 	free(scop);
 	scop = NULL;

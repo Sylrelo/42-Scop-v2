@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 00:24:34 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 00:26:27 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 void	display_loop(t_scop *scop)
 {
 	t_mat		material;
-	t_objects	*object;
+	t_objects		object;
 	size_t	mat_i 	= 0;
 	size_t	obj_i 	= 0;
 	size_t	offset 	= 0;
@@ -77,13 +77,15 @@ void	display_loop(t_scop *scop)
 		{
 			mat_i = 0;
 			offset = 0;
+			object = scop->objects[obj_i];
+			
 			if (obj_i > 0)
 				offset_obj = scop->objects[obj_i - 1].offset;
-			while (mat_i < scop->objects[obj_i].nb_mats)
+			while (mat_i < object.nb_mats)
 			{
-				material = scop->objects[obj_i].materials[mat_i];
+				material = object.materials[mat_i];
 				if (mat_i > 0)
-					offset += scop->objects[obj_i].materials[mat_i - 1].gl_buffer_size;
+					offset += object.materials[mat_i - 1].gl_buffer_size;
 
 				glUniform3f(loc_kd, material.kd.x, material.kd.y, material.kd.z);
 				glUniform3f(loc_ka, material.ka.x, material.ka.y, material.ka.z);
@@ -100,10 +102,8 @@ void	display_loop(t_scop *scop)
 			}
 			obj_i++;
 		}
-
 		glfwSwapBuffers(scop->window);
 		glfwPollEvents();
-		// exit (1);
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 00:23:58 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 00:30:52 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,9 @@ typedef struct	s_objects
 	size_t			nb_mats;
 	t_vec3f			pos;
 	t_vec3f			rot;
+	t_vec3f			center;
+	t_vec3f			max;
+	t_vec3f			min;
 	size_t			offset;
 }				t_objects;
 typedef struct s_scop

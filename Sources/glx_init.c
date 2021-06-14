@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:04:12 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:10:23 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/14 22:04:03 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,5 +87,16 @@ void	init_opengl_buffer(t_scop *scop)
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
 
+
+	printf("%lu\n", (buffer_size / 8) / 3);
+
+	i = 0;
+	while (i < scop->nb_mats)
+	{
+		free(scop->materials[i].gl_buffer);
+		scop->materials[i].gl_buffer = NULL;
+		i++;
+	}
 	free(tmp_buffer);
+	tmp_buffer = NULL;
 }

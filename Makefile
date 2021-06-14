@@ -9,7 +9,7 @@ LIBS_DIR = -L./Includes/Libmatvec
 
 INC_LIB = ${LIBS_DIR} -framework OpenGL -lglfw -lmatvec
 
-CFLAGS	:= -Wall -Wextra -Werror -O3 -I$(INC_DIR)
+CFLAGS	:= -Wall -Wextra -O3 -I$(INC_DIR)
 OBJS	:= $(patsubst %.c,$(OBJ_DIR)/%.o, $(SRCS))
 
 all: CREATE_OBJDIR COMPILE_EXTERN_LIBS $(NAME)

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:23:52 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/14 22:04:21 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,27 +38,27 @@ static void	realloc_obj_arrays(size_t *count, size_t *alloc, size_t size, void *
 		die("Erreor realloc");
 }
 
-static void	_realloc_end(size_t count, size_t size, size_t *alloc_count, void **array)
-{
-	if (count)
-	{
-		*alloc_count = count;
-		if (!(*array = realloc(*array, size * *alloc_count)))
-			die ("Error parser_realloc_end v");
-	} 
-	else
-	{
-		*alloc_count = 0;
-		free(*array);
-	}
-}
+// static void	_realloc_end(size_t count, size_t size, size_t *alloc_count, void **array)
+// {
+// 	if (count)
+// 	{
+// 		*alloc_count = count;
+// 		if (!(*array = realloc(*array, size * *alloc_count)))
+// 			die ("Error parser_realloc_end v");
+// 	} 
+// 	else
+// 	{
+// 		*alloc_count = 0;
+// 		free(*array);
+// 	}
+// }
 
-static void	parser_realloc_end(t_parser *parser, size_t v_count, size_t vn_count, size_t vt_count)
-{
-	_realloc_end(v_count, sizeof(t_vec3f), &parser->v_count, (void *) &parser->v);
-	_realloc_end(vn_count, sizeof(t_vec3f), &parser->vn_count, (void *) &parser->vn);
-	_realloc_end(vt_count, sizeof(t_vec2f), &parser->vt_count, (void *) &parser->vt);
-}
+// static void	parser_realloc_end(t_parser *parser, size_t v_count, size_t vn_count, size_t vt_count)
+// {
+// 	_realloc_end(v_count, sizeof(t_vec3f), &parser->v_count, (void *) &parser->v);
+// 	_realloc_end(vn_count, sizeof(t_vec3f), &parser->vn_count, (void *) &parser->vn);
+// 	_realloc_end(vt_count, sizeof(t_vec2f), &parser->vt_count, (void *) &parser->vt);
+// }
 
 static void get_relative_path(char path[256], char *file)
 {
@@ -158,17 +158,15 @@ void 		parser_init(t_scop *scop, char *file)
 		{
 			parse_face(&parser, &scop->materials, &scop->nb_mats, last_mtl, _strtrim(line + 2));
 			f_count++;
-		} 
+		}
 	}
-	// printf("Parser 1 finish\n");
-	parser_realloc_end(&parser, v_count, vn_count, vt_count);
+
 	free_obj_arrays(&parser);
 	free(line);
+	line = NULL;
 	fclose(fp);
 
-
 	scop->center = vec_multf(vec_add(parser.min, parser.max), .5);
-
 	// printf("%f %f %f\n", scop->center.x, scop->center.y, scop->center.z);
 	// printf("%f %f %f\n", parser.max.x, parser.max.y, parser.max.z);
 	// printf("%f %f %f\n", parser.min.x, parser.min.y, parser.min.z);

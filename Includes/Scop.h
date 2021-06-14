@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 12:09:09 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/14 12:13:16 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@
 #include "libc_extends.h"
 
 #define MAT_GL_BUFFER_REALLOC_VALUE 5000
-
 typedef enum e_parsing
 {
 	VERTICE	= 0x01,
@@ -112,12 +111,14 @@ size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_cou
 void        update_minmax(t_vec3f *min, t_vec3f *max, float buffer[8]);
 void        calculate_missing_normal(t_mat *material);
 
-// Parsing
+// parsing_init.c
 void        parser_init(t_scop *scop, char *argv);
+
+// parsing_mtl.c
 void        parser_mtl_start(t_scop *scop, char path[256], char *file);
-
-void        parse_texture(t_scop *scop, t_mat *material, char path[256], char *file);
-
 void        init_mat_default_values(t_mat *material);
+
+// parsing_texture.c
+void        parse_texture(t_scop *scop, t_mat *material, char path[256], char *file);
 
 #endif

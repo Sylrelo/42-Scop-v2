@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:13:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 12:09:37 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/14 22:06:12 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,8 +176,12 @@ static size_t   triangulate(t_parser *parser, t_mat *material, size_t sides_coun
     }
 
     while (i--)
-       free(faces[i]);
+    {
+        free(faces[i]);
+        faces[i] = NULL;
+    }
     free(faces);
+    faces = NULL;
     return (0);
 }
 
@@ -185,7 +189,7 @@ size_t          parse_face(t_parser *parser, t_mat **materials, size_t *material
 {
 	const ssize_t sides_count   = _strcountchr(line, ' ') + 1;
     ssize_t material_id         = get_material_id(*materials, *material_count, last_mtl);
-    char *token = NULL;
+    char *token                 = NULL;
 
     if (!last_mtl || material_id == -1)
     {
@@ -210,6 +214,6 @@ size_t          parse_face(t_parser *parser, t_mat **materials, size_t *material
         parse_vertex(parser, &(*materials)[material_id], _strtrim(token));
 		token = strtok(NULL, " ");
 	}
-    // print_matlist(*material_count, *materials);
+    print_matlist(*material_count, *materials);
     return (1);
 }

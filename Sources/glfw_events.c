@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:02:39 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 11:49:05 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/14 21:59:25 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@ void	handle_keyboard(GLFWwindow *window, uint32_t keys[349])
     keys[GLFW_KEY_D] = glfwGetKey(window, GLFW_KEY_D);
     keys[GLFW_KEY_R] = glfwGetKey(window, GLFW_KEY_R);
     keys[GLFW_KEY_F] = glfwGetKey(window, GLFW_KEY_F);
+
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE))
+        exit (1);
 
     if (glfwGetKey(window, GLFW_KEY_2))
         render_option = GL_LINE;

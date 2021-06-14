@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 11:44:09 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/14 22:02:37 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ void	display_loop(t_scop *scop)
 	glUniformMatrix4fv(glMatPersp, 1, GL_FALSE, mat_perspective.value[0]);
 
 	float a = 0;
+
+	// glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
 	glUniform3f(loc_lightpos, 0, 0, 0);
 	glUniform3f(loc_lightcol, 1, 1, 1);
@@ -134,9 +136,14 @@ int 	main(int argc, char *argv[])
 	scop->cam_pos.y -= scop->center.y * .5;
 	scop->cam_pos.z -= scop->center.z + 8;
 
-	display_loop(scop);
+	//display_loop(scop);
 
 	if(scop->nb_mats)
+	{
 		free(scop->materials);
+		scop->materials = NULL;
+	}
+	free(scop);
+	scop = NULL;
 	(void)argc;
 }

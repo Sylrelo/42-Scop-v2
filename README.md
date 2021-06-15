@@ -12,7 +12,6 @@ key, and the same key allows to go back to the different colors. A soft transiti
 - Modern OpenGL (min v4)
 - Shaders
 - No external library other than libc and libm, except for Window and Events handling
-- School norm
 
 ------------
 Here's the list of whats working and what not.

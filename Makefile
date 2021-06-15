@@ -7,7 +7,13 @@ INC_DIR = ./Includes
 INC_HDR =  -I${INC_DIR} -I./Includes/Libmatvec/Includes 
 LIBS_DIR = -L./Includes/Libmatvec
 
-INC_LIB = ${LIBS_DIR} -framework OpenGL -lglfw -lmatvec
+INC_LIB := ${LIBS_DIR} -lmatvec 
+
+ifeq ($(OS),Windows_NT)
+INC_LIB += -lopengl32 -lglfw3 -lglfw3dll -lopengl32 -lgdi32 -Wl,-u,___mingw_vsnprintf -Wl,--defsym,___ms_vsnprintf=___mingw_vsnprintf
+else
+INC_LIB += -framework OpenGL -lglfw
+endif
 
 CFLAGS	:= -Wall -Wextra -O3 -I$(INC_DIR)
 OBJS	:= $(patsubst %.c,$(OBJ_DIR)/%.o, $(SRCS))
@@ -21,7 +27,7 @@ CREATE_OBJDIR:
 		@mkdir -p $(OBJ_DIR)
 
 $(NAME): $(OBJS)
-		@gcc ${CFLAGS} ${INC_LIB} $^ -o ${NAME}
+		@gcc ${CFLAGS} $^ ${INC_LIB} -o ${NAME} 
 		@printf "\033[1m[ SCOP ]\033[1m\t\tcompilation complete.\t\033[0m\n"
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c Includes/Libmatvec/libmatvec.a Includes/Scop.h

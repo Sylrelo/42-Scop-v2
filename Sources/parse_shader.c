@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init_shader.c                                      :+:      :+:    :+:   */
+/*   parse_shader.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/04 14:31:59 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/04 16:24:47 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/15 11:30:14 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,11 +77,13 @@ int         create_shader_program(char *file_vertex, char *file_fragment)
     int			program;
 	int			success;
 	char		log[512];
-	const int 	vertex = load_shader(file_vertex, GL_VERTEX_SHADER);
-	const int 	fragment = load_shader(file_fragment, GL_FRAGMENT_SHADER);
+	const int 	vertex 		= load_shader(file_vertex, GL_VERTEX_SHADER);
+	const int 	fragment 	= load_shader(file_fragment, GL_FRAGMENT_SHADER);
+	const int 	geometry 	= load_shader("Shaders/geometry.glsl", GL_GEOMETRY_SHADER);
 
     printf("[OpenGL] Create program\n");
     program = glCreateProgram();
+	glAttachShader(program, geometry);
 	glAttachShader(program, vertex);
 	glAttachShader(program, fragment);
 	glLinkProgram(program);
@@ -94,6 +96,7 @@ int         create_shader_program(char *file_vertex, char *file_fragment)
 	}
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
+	glDeleteShader(geometry);
 	return (program);
 }
 

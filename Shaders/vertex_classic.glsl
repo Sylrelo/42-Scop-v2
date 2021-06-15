@@ -4,6 +4,13 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormals;
 layout (location = 2) in vec2 aTexCoord;
 
+// out GEOM_OUT {
+//     vec3 normals;
+//     vec2 texCoords;
+//     vec4 worldPosition;
+// } geom_out;
+
+
 // Material uniforms
 uniform vec3    kd;
 uniform vec3    ka;
@@ -24,18 +31,23 @@ flat out vec4   vertexColor;
 out vec2        TexCoord;
 
 out vec3        oNormal;
-out vec3        oLightPos;
-out vec3        oLightColor;
+// out vec3        oLightPos;
+// out vec3        oLightColor;
 
 void main()
 {
     oNormal     = aNormals; //normalize(vec3((Model) * vec4(aNormals, 1)));
-    oLightColor = lightColor;
-    oLightPos   = lightPos;
+    // oLightColor = lightColor;
+    // oLightPos   = lightPos;
+
+    // geom_out.normals    = aNormals;
+    // geom_out.texCoords  = aTexCoord;
+
+    // geom_out.worldPosition  = vec4(aPos, 1.0f);
 
     fragmentPosition = vec3(Model * vec4(aPos, 1.0));
 
-    gl_Position     = (Persp * View * Model) * vec4(aPos, 1.0f);
+    gl_Position     =  vec4(aPos, 1.0f);
     TexCoord        = aTexCoord;
     //outTextured     = textured;
     vertexColor     = vec4(kd, 1.0);

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 00:32:05 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 10:15:38 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,28 +37,6 @@ static void	realloc_obj_arrays(size_t *count, size_t *alloc, size_t size, void *
 	if (!(*array = realloc(*array, size * *alloc)))
 		die("Erreor realloc");
 }
-
-// static void	_realloc_end(size_t count, size_t size, size_t *alloc_count, void **array)
-// {
-// 	if (count)
-// 	{
-// 		*alloc_count = count;
-// 		if (!(*array = realloc(*array, size * *alloc_count)))
-// 			die ("Error parser_realloc_end v");
-// 	} 
-// 	else
-// 	{
-// 		*alloc_count = 0;
-// 		free(*array);
-// 	}
-// }
-
-// static void	parser_realloc_end(t_parser *parser, size_t v_count, size_t vn_count, size_t vt_count)
-// {
-// 	_realloc_end(v_count, sizeof(t_vec3f), &parser->v_count, (void *) &parser->v);
-// 	_realloc_end(vn_count, sizeof(t_vec3f), &parser->vn_count, (void *) &parser->vn);
-// 	_realloc_end(vt_count, sizeof(t_vec2f), &parser->vt_count, (void *) &parser->vt);
-// }
 
 static void get_relative_path(char path[256], char *file)
 {
@@ -129,7 +107,7 @@ void 		parser_init(t_scop *scop, char *file)
 
 	while ((read = getline(&line, &len, (FILE *) fp)) != -1)
 	{
-		if (!strncmp(line, "mtllib ", 7)) 
+		if (!strncmp(line, "mtllib ", 7))
 			parser_mtl_start(scop, path, line + 7);
 		else if (!strncmp(line, "usemtl ", 7))
 		{

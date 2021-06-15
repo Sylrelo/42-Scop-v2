@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 00:30:52 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 10:14:24 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ void		handle_mouse(GLFWwindow *window, t_vec3f *cam_rot);
 // glx_init.c
 void		init_window(GLFWwindow **window, uint32_t width, uint32_t height);
 void		init_opengl_buffer(t_scop *scop);
-void	init_opengl_buffer_multi(t_scop *scop);
+void		init_opengl_buffer_multi(t_scop *scop);
 
 // parse_fdf.c
 void 		parser_init_fdf(t_scop *scop, char *file);
@@ -126,7 +126,7 @@ void        calculate_missing_normal(t_mat *material);
 void        parser_init(t_scop *scop, char *argv);
 
 // parsing_mtl.c
-void        parser_mtl_start(t_scop *scop, char path[256], char *file);
+int        	parser_mtl_start(t_scop *scop, char path[256], char *file);
 void        init_mat_default_values(t_mat *material);
 
 // parsing_texture.c

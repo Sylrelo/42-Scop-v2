@@ -6,13 +6,15 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 00:26:27 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 10:10:11 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Scop.h"
 #include <stdio.h>
 #include <math.h>
+
+#include <sys/stat.h> // deplacer
 
 void	display_loop(t_scop *scop)
 {
@@ -129,19 +131,37 @@ int 	main(int argc, char *argv[])
 
 
 
-	// test
-	//tester existence des fichiers avant calloc
+	//deplacer
 	scop->objects_count = 0;
 	scop->objects = calloc(argc, sizeof(t_objects));
 
-	//fin test
-	printf("[Scop] Starting parser\n");
+	printf("[Scop] Starting parser\n\n");
+
+	struct stat		st;
 	while (--argc > 0)
 	{
-		printf("%d %s\n", argc, argv[argc]);
+		printf("+ Loading \033[1m%s\033[0m...	\n", argv[argc]);
+		if (!strstr(argv[argc], ".obj"))
+		{
+			printf("\033[0;31m- Error, extension is invalid, skipping.\033[0m\n");
+			continue ;
+		}
+		if (stat(argv[argc], &st))
+		{
+			printf("\033[0;31m- Error, file is not found.\033[0m\n");
+			continue ;
+		}
+		if (st.st_mode & S_IFDIR)
+		{
+			printf("\033[0;31m- Error, input file is a directory.\033[0m\n");
+			continue ;
+		}
 		parser_init(scop, argv[argc]);
+		printf("\n");
 	}
+	//
 
+	
 	printf("[Scop] Starting OpenGL Buffer initialization\n");
 	init_opengl_buffer_multi(scop);
 	printf("[Scop] Opening Window\n");

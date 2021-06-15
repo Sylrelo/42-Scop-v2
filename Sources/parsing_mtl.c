@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/04 11:18:58 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 00:30:22 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 10:14:35 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void        init_mat_default_values(t_mat *material)
     material->tf = (t_vec3f) {1.0, 1.0, 1.0};
 }
 
-void        parser_mtl_start(t_scop *scop, char path[256], char *file)
+int        parser_mtl_start(t_scop *scop, char path[256], char *file)
 {
     t_objects   *obj        = &scop->objects[scop->objects_count];
 	char	    *line 		= 0;
@@ -62,8 +62,13 @@ void        parser_mtl_start(t_scop *scop, char path[256], char *file)
     generate_filepath(filepath, path, file);
 
 	if (!(fp = fopen(filepath, "r")))
-        die("Error reading mtl file");
+    {
+		printf("\033[0;31m      Error while parsing MTL file \033[1m%s\033[0m\033[0;31m, skipping.\033[0m\n", filepath);
+        return (0);
+    }
+        // die("Error reading mtl file");
     
+    printf ("    Loading MTL file \033[1m%s\033[0m\n", filepath);
     obj->nb_mats   = 0;
     obj->materials = calloc(5, sizeof(t_mat));
 
@@ -94,4 +99,5 @@ void        parser_mtl_start(t_scop *scop, char path[256], char *file)
         die ("Material final realloc failed");
     obj->nb_mats = tmp_nb_mats;
     fclose(fp);
+    return (1);
 }

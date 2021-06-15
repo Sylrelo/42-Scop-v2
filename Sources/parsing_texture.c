@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:13:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:14:08 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 10:12:14 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,14 +44,11 @@ static void realloc_textures(size_t count, void **textures)
 
 	if (count == 0)
     {
-        printf("\e[1;34m[Debug] Texture initial calloc\e[m\n");
         if (!(*textures = calloc(10, sizeof(t_textures))))
             die ("Textures array initial allocation failed");
     }
     if (ncount > ocount)
     {
-        printf("\e[1;34m[Debug] Texture realloc (%zd, %d > %d = %d)\e[m\n", count, ocount, ncount, ncount * 10);
-
         if (!(*textures = realloc(*textures, ncount * 10 + sizeof(t_textures))))
             die ("Textures array realloc failed");
     }
@@ -67,17 +64,21 @@ void        parse_texture(t_scop *scop, t_mat *material, char path[256], char *f
     char            filepath[256];
 
     generate_filepath(filepath, path, file);
-
+    
     if (texture_id != -1)
     {
         material->tex_id = texture_id;
-        printf("Texture file \033[1m%s\033[0m already loaded.\n", file);
+        printf ("      Getting texture \033[1m%s\033[0m\n", filepath);
         return ;
     }
-    printf("Loading texture \033[1m%s\033[0m...\n", file);
 
     if (!(image = stbi_load(filepath, &width, &height, &channels, 0)))
-        die ("Cannot load texture");
+    {
+		printf("\033[0;31m      Error while parsing texture file \033[1m%s\033[0m\033[0;31m skipping.\033[0m\n", filepath);
+        return ;
+    }
+    
+    printf ("      Loading texture \033[1m%s\033[0m\n", filepath);
 
     realloc_textures(scop->textures_count, (void *) &scop->textures);
 
@@ -89,7 +90,6 @@ void        parse_texture(t_scop *scop, t_mat *material, char path[256], char *f
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     glGenerateMipmap(GL_TEXTURE_2D);
-    printf("Texture loaded.\n");
 
     material->tex_id = scop->textures_count;
     strcpy(scop->textures[scop->textures_count].filename, file);

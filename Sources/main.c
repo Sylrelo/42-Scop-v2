@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 10:10:11 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 10:27:59 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,29 +138,31 @@ int 	main(int argc, char *argv[])
 	printf("[Scop] Starting parser\n\n");
 
 	struct stat		st;
+	int				st_result;
+
 	while (--argc > 0)
 	{
-		printf("+ Loading \033[1m%s\033[0m...	\n", argv[argc]);
-		if (!strstr(argv[argc], ".obj"))
+		st_result = stat(argv[argc], &st);
+		if (st_result)
 		{
-			printf("\033[0;31m- Error, extension is invalid, skipping.\033[0m\n");
+			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mnot found, skipping.\033[0m\n\n", argv[argc]);
 			continue ;
 		}
-		if (stat(argv[argc], &st))
+		if (!strstr(argv[argc], ".obj"))
 		{
-			printf("\033[0;31m- Error, file is not found.\033[0m\n");
+			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mextension is invalid, skipping.\033[0m\n\n", argv[argc]);
 			continue ;
 		}
 		if (st.st_mode & S_IFDIR)
 		{
-			printf("\033[0;31m- Error, input file is a directory.\033[0m\n");
+			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mis a directory, skipping.\033[0m\n\n", argv[argc]);
 			continue ;
 		}
+		printf("+ Loading \033[1m%s\033[0m... (%.2f Mb)\n", argv[argc], st.st_size * 0.0000009765625);
 		parser_init(scop, argv[argc]);
 		printf("\n");
 	}
 	//
-
 	
 	printf("[Scop] Starting OpenGL Buffer initialization\n");
 	init_opengl_buffer_multi(scop);

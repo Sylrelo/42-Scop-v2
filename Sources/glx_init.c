@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:04:12 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 00:44:01 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/15 10:33:09 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,24 +48,22 @@ void			init_window(GLFWwindow **window, uint32_t width, uint32_t height)
 	glEnable(GL_DEPTH_TEST);  
 }
 
-
-static size_t	get_total_buffer_size(t_scop *scop)
+static void	get_total_buffer_size(t_scop *scop, size_t *buffer_size, size_t *total_mats)
 {
 	size_t	i           = 0;
 	size_t	j           = 0;
-	size_t	buffer_size = 0;
 
 	while (i < scop->objects_count)
 	{
 		j = 0;
 		while (j < scop->objects[i].nb_mats)
 		{
-			buffer_size += scop->objects[i].materials[j].gl_buffer_size;
+			*buffer_size += scop->objects[i].materials[j].gl_buffer_size;
 			j++;
 		}
+		*total_mats += scop->objects[i].nb_mats;
 		i++;
 	}
-	return (buffer_size);
 }
 
 static void		merge_all_buffers(t_scop *scop, float **buffer)
@@ -118,9 +116,12 @@ static void		free_all_buffers(t_scop *scop, float **buffer)
 
 void			init_opengl_buffer_multi(t_scop *scop)
 {;
-	const size_t buffer_size 	= get_total_buffer_size(scop);
-	float *tmp_buffer 			= NULL;
+	size_t buffer_size 	= 0;
+	size_t total_mats 	= 0;
+	float *tmp_buffer 	= NULL;
 
+	get_total_buffer_size(scop, &buffer_size, &total_mats);
+	
 	printf("[Scop] Merging all materials buffers\n");
 	
 	if (!(tmp_buffer = calloc(buffer_size, sizeof(float))))
@@ -146,4 +147,7 @@ void			init_opengl_buffer_multi(t_scop *scop)
     glEnableVertexAttribArray(2);
 
 	free_all_buffers(scop, &tmp_buffer);
+	// printf("+ Total buffer size : %zu\n", buffer_size);
+	printf("+ Total materials   : %zu\n", total_mats);
+	printf("+ Total triangles   : %zu\n", (buffer_size / 8) / 3);
 }

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:04:12 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 10:33:09 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/16 19:30:54 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,9 @@ void			init_window(GLFWwindow **window, uint32_t width, uint32_t height)
 	glfwSwapInterval(1);
 
 	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);  
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 static void	get_total_buffer_size(t_scop *scop, size_t *buffer_size, size_t *total_mats)

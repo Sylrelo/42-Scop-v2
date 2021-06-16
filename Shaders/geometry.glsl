@@ -7,9 +7,17 @@ uniform mat4	View;
 uniform mat4	Persp;
 uniform mat4	Model;
 
+uniform float   glfw_time;
+uniform int     glfw_options;
+
+out float       current_step;
+
+out vec4        fragPosition[3];
+
 void main(void)
 {
-    int i;
+
+    int i;  
     int len = gl_in.length();
 
     vec3 center;
@@ -27,10 +35,21 @@ void main(void)
     }
     center = (vmin + vmax) * .5;
 
+    const float timespan = .5f;
+    float w = 1 - fract(glfw_time / timespan);
+
     for (i = 0; i < len; i++)
     {
-        // gl_Position = (Persp * View * Model) * (gl_in[i].gl_Position + vec4(center * 4, 0));
-        gl_Position = (Persp * View * Model) * (gl_in[i].gl_Position);
+        if (glfw_options == 1)
+        {
+            
+            gl_Position = (Persp * View * Model) * (gl_in[i].gl_Position + vec4(center * w, 0));
+        }
+        else
+            gl_Position = (Persp * View * Model) * (gl_in[i].gl_Position);
+
+        current_step            = w;
+        fragPosition[i]        = (Persp * Model) * gl_in[i].gl_Position;
         EmitVertex();
     }
     EndPrimitive();

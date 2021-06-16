@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 22:04:25 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/16 19:30:21 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,10 @@ void	display_loop(t_scop *scop)
 	uint32_t loc_lightpos 	= glGetUniformLocation(scop->program, "lightPos");
 	uint32_t loc_lightcol 	= glGetUniformLocation(scop->program, "lightColor");
 
+	uint32_t loc_utime 		= glGetUniformLocation(scop->program, "glfw_time");
+	uint32_t loc_options 	= glGetUniformLocation(scop->program, "glfw_options");
+
+
 	t_mat4	mat_perspective = m4_perspective(1.0472, (float) scop->width / (float) scop->height, 0.00001f, 1000.0f);
 	t_mat4	mat_view 		= m4_init();
 	t_mat4	mat_model 		= m4_init();
@@ -47,12 +51,31 @@ void	display_loop(t_scop *scop)
 	glUniform3f(loc_lightpos, 0, 0, 0);
 	glUniform3f(loc_lightcol, 1, 1, 1);
 
+
+
+
+
+
+	float glfw_time = glfwGetTime();
+	const float base_time = glfw_time;
+	glfw_time -= base_time;
+
+	printf("%f\n", glfw_time);
 	while (!glfwWindowShouldClose(scop->window))
 	{
 		obj_i 	= 0;
 		offset 	= 0;
 		a 		+= 0.010;
 		offset_obj = 0;
+
+		glfw_time = glfwGetTime() - base_time;
+
+		if (glfw_time > .5)
+			glUniform1i(loc_options, 0);
+		else 
+			glUniform1i(loc_options, 1);
+
+		glUniform1f(loc_utime, glfw_time);
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

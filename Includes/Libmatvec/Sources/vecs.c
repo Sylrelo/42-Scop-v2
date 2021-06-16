@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:15:00 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:15:02 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/16 23:57:17 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@ t_vec3f		vec_add(t_vec3f u, t_vec3f v)
 
 t_vec3f		vec_sub(t_vec3f u, t_vec3f v)
 {
-	u.x = u.x - v.x;
-	u.y = u.y - v.y;
-	u.z = u.z - v.z;
+	u.x -= v.x;
+	u.y -= v.y;
+	u.z -= v.z;
 
     return (u);
 }
@@ -43,11 +43,13 @@ t_vec3f		vec_multf(t_vec3f u, float f)
 
 t_vec3f		vec_cross(t_vec3f u, t_vec3f v)
 {
-    u.x = u.y * v.z - u.z * v.y;
-    u.y = u.z * v.x - u.x * v.z;
-    u.z = u.x * v.y - u.y * v.x;
+	t_vec3f	result;
 
-    return (u);
+    result.x = u.y * v.z - u.z * v.y;
+    result.y = u.z * v.x - u.x * v.z;
+    result.z = u.x * v.y - u.y * v.x;
+
+    return (result);
 }
 
 float		vec_length(t_vec3f u)
@@ -64,4 +66,9 @@ t_vec3f		vec_normalize(t_vec3f u)
 	u.y *= l;
 	u.z *= l;
 	return (u);
+}
+
+float		vec_dot(t_vec3f u, t_vec3f v)
+{
+	return (fmaf(u.x, v.x, fmaf(u.y, v.y, fmaf(u.z, v.z, 0))));
 }

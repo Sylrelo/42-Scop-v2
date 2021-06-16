@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 10:14:24 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/16 23:04:12 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,14 +69,25 @@ typedef struct	s_objects
 	t_vec3f			min;
 	size_t			offset;
 }				t_objects;
+
+typedef struct	s_ogl
+{
+	GLint		p_ddepthmap;
+	GLint		p_render;
+
+	GLuint		depth_map_fbo;
+	GLuint		depth_map;
+}				t_ogl;
+
 typedef struct s_scop
 {
 	// OpenGL & GLFW
+	t_ogl			ogl;
 	GLFWwindow		*window;
 	GLuint			vao;
 	GLuint			vbo;
 	GLint			program;
-
+	
 	t_vec3f			center;
 
 	uint32_t		width;
@@ -95,7 +106,7 @@ typedef struct s_scop
 
 
 // parse_shader.c
-int    		create_shader_program(char *file_vertex, char *file_fragment);
+int         create_shader_program(char *file_vertex, char *file_fragment, char *file_geometry);
 
 // scop_utils.c
 void		die(char *string);
@@ -112,6 +123,8 @@ void		handle_mouse(GLFWwindow *window, t_vec3f *cam_rot);
 void		init_window(GLFWwindow **window, uint32_t width, uint32_t height);
 void		init_opengl_buffer(t_scop *scop);
 void		init_opengl_buffer_multi(t_scop *scop);
+void		init_depth_map(t_scop *scop);
+
 
 // parse_fdf.c
 void 		parser_init_fdf(t_scop *scop, char *file);

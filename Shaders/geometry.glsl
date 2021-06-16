@@ -12,7 +12,21 @@ uniform int     glfw_options;
 
 out float       current_step;
 
-out vec4        fragPosition[3];
+out vec3        geomOutNormal;
+
+in      vData
+{
+    vec3 normal;
+    vec2 texture;
+}       vertices[];
+
+out     fData
+{
+    vec3 normal;
+    vec2 texture;
+}       frag;
+
+// out vec4        fragPosition[3];
 
 void main(void)
 {
@@ -49,7 +63,10 @@ void main(void)
             gl_Position = (Persp * View * Model) * (gl_in[i].gl_Position);
 
         current_step            = w;
-        fragPosition[i]        = (Persp * Model) * gl_in[i].gl_Position;
+        frag.normal     = vertices[i].normal;
+        frag.texture    = vertices[i].texture;
+
+        // fragPosition[i]        = (Persp * Model) * gl_in[i].gl_Position;
         EmitVertex();
     }
     EndPrimitive();

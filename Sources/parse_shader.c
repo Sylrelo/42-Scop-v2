@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/04 14:31:59 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 11:30:14 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/16 23:03:17 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,9 @@ static int  load_shader(char *file, unsigned int type)
 	int			success;
 	char		log[512];
 
+	if (!file)
+		return (-1);
+	
 	source = load_file(file, &len);
 	shader = glCreateShader(type);
 	glShaderSource(shader, 1, (const GLchar * const*)&source, NULL);
@@ -72,18 +75,19 @@ static int  load_shader(char *file, unsigned int type)
 	return (shader);
 }
 
-int         create_shader_program(char *file_vertex, char *file_fragment)
+int         create_shader_program(char *file_vertex, char *file_fragment, char *file_geometry)
 {
     int			program;
 	int			success;
 	char		log[512];
 	const int 	vertex 		= load_shader(file_vertex, GL_VERTEX_SHADER);
 	const int 	fragment 	= load_shader(file_fragment, GL_FRAGMENT_SHADER);
-	const int 	geometry 	= load_shader("Shaders/geometry.glsl", GL_GEOMETRY_SHADER);
+	const int 	geometry 	= load_shader(file_geometry, GL_GEOMETRY_SHADER);
 
     printf("[OpenGL] Create program\n");
     program = glCreateProgram();
-	glAttachShader(program, geometry);
+	if (geometry != -1)
+		glAttachShader(program, geometry);
 	glAttachShader(program, vertex);
 	glAttachShader(program, fragment);
 	glLinkProgram(program);
@@ -96,7 +100,8 @@ int         create_shader_program(char *file_vertex, char *file_fragment)
 	}
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
-	glDeleteShader(geometry);
+	if (geometry != -1)
+		glDeleteShader(geometry);
 	return (program);
 }
 

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/16 19:30:21 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/17 00:21:04 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,17 +25,17 @@ void	display_loop(t_scop *scop)
 	size_t	offset 	= 0;
 	size_t offset_obj = 0;
 
-	GLuint glMatView 		= glGetUniformLocation(scop->program, "View");
-	GLuint glMatPersp 		= glGetUniformLocation(scop->program, "Persp");
-	GLuint glMatModel 		= glGetUniformLocation(scop->program, "Model");
-	uint32_t loc_kd			= glGetUniformLocation(scop->program, "kd");
-	uint32_t loc_ka			= glGetUniformLocation(scop->program, "ka");
-	uint32_t loc_textured 	= glGetUniformLocation(scop->program, "textured");
-	uint32_t loc_lightpos 	= glGetUniformLocation(scop->program, "lightPos");
-	uint32_t loc_lightcol 	= glGetUniformLocation(scop->program, "lightColor");
+	GLuint glMatView 		= glGetUniformLocation(scop->ogl.p_render, "View");
+	GLuint glMatPersp 		= glGetUniformLocation(scop->ogl.p_render, "Persp");
+	GLuint glMatModel 		= glGetUniformLocation(scop->ogl.p_render, "Model");
+	uint32_t loc_kd			= glGetUniformLocation(scop->ogl.p_render, "kd");
+	uint32_t loc_ka			= glGetUniformLocation(scop->ogl.p_render, "ka");
+	uint32_t loc_textured 	= glGetUniformLocation(scop->ogl.p_render, "textured");
+	uint32_t loc_lightpos 	= glGetUniformLocation(scop->ogl.p_render, "lightPos");
+	uint32_t loc_lightcol 	= glGetUniformLocation(scop->ogl.p_render, "lightColor");
 
-	uint32_t loc_utime 		= glGetUniformLocation(scop->program, "glfw_time");
-	uint32_t loc_options 	= glGetUniformLocation(scop->program, "glfw_options");
+	uint32_t loc_utime 		= glGetUniformLocation(scop->ogl.p_render, "glfw_time");
+	uint32_t loc_options 	= glGetUniformLocation(scop->ogl.p_render, "glfw_options");
 
 
 	t_mat4	mat_perspective = m4_perspective(1.0472, (float) scop->width / (float) scop->height, 0.00001f, 1000.0f);
@@ -51,9 +51,9 @@ void	display_loop(t_scop *scop)
 	glUniform3f(loc_lightpos, 0, 0, 0);
 	glUniform3f(loc_lightcol, 1, 1, 1);
 
-
-
-
+	t_mat4	test = m4_look_at((t_vec3f){0, 0, -20}, (t_vec3f){0, .5, 10});
+	
+	m4_print(test);;
 
 
 	float glfw_time = glfwGetTime();
@@ -67,6 +67,11 @@ void	display_loop(t_scop *scop)
 		offset 	= 0;
 		a 		+= 0.010;
 		offset_obj = 0;
+
+
+
+		test = m4_look_at((t_vec3f){-5, 3, 5}, (t_vec3f){0, 0, 0});
+
 
 		glfw_time = glfwGetTime() - base_time;
 
@@ -93,6 +98,7 @@ void	display_loop(t_scop *scop)
 						m4_translate(0, 0, 0)
 					);
 
+		mat_view = test;
 		glUniformMatrix4fv(glMatView, 1, GL_FALSE, mat_view.value[0]);
 		glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model.value[0]);
 		
@@ -127,8 +133,12 @@ void	display_loop(t_scop *scop)
 			}
 			obj_i++;
 		}
+		
 		glfwSwapBuffers(scop->window);
+
 		glfwPollEvents();
+		// printf("%f\n", 1 / ((glfwGetTime() - base_time) -  glfw_time));
+
 	}
 }
 
@@ -151,7 +161,7 @@ int 	main(int argc, char *argv[])
 		
 	printf("[Scop] Starting OpenGL initialization\n");
 	init_window(&scop->window, scop->width, scop->height);
-
+	init_depth_map(scop);
 
 
 	//deplacer
@@ -163,6 +173,10 @@ int 	main(int argc, char *argv[])
 	struct stat		st;
 	int				st_result;
 
+	float start = glfwGetTime();
+	const float diff = start;
+	start -= diff;
+	
 	while (--argc > 0)
 	{
 		st_result = stat(argv[argc], &st);
@@ -185,6 +199,8 @@ int 	main(int argc, char *argv[])
 		parser_init(scop, argv[argc]);
 		printf("\n");
 	}
+	printf("Time taken : %.2f\n", (glfwGetTime() - diff) - start);
+
 	//
 	
 	printf("[Scop] Starting OpenGL Buffer initialization\n");
@@ -192,8 +208,10 @@ int 	main(int argc, char *argv[])
 	printf("[Scop] Opening Window\n");
 	glfwShowWindow(scop->window);
 
-	scop->program = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl");
-	glUseProgram(scop->program);
+	scop->ogl.p_render = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl", "Shaders/geometry.glsl");
+	scop->ogl.p_ddepthmap = create_shader_program("Shaders/shadowmap_directional.vertex.glsl", "Shaders/shadowmap_directional.fragment.glsl", NULL);
+
+	glUseProgram(scop->ogl.p_render);
 
 	printf("[Scop] Ready\n");
 

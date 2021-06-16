@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LIbmatvec.h                                        :+:      :+:    :+:   */
+/*   Libmatvec.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:15:25 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:15:26 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/16 23:57:24 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ t_vec3f		vec_sub(t_vec3f u, t_vec3f v);
 t_vec3f		vec_cross(t_vec3f u, t_vec3f v);
 t_vec3f		vec_multf(t_vec3f u, float f);
 t_vec3f		vec_normalize(t_vec3f u);
+float		vec_dot(t_vec3f u, t_vec3f v);
 float		vec_length(t_vec3f u);
 
 // Matrices Utils

@@ -13,8 +13,8 @@ layout (location = 2) in vec2 aTexCoord;
 uniform vec3    kd;
 uniform vec3    ka;
 
-uniform vec3    lightPos;  
-uniform vec3    lightColor;  
+// uniform vec3    lightPos;  
+// uniform vec3    lightColor;  
 
 // Matrices uniforms
 uniform mat4	View;
@@ -25,17 +25,26 @@ uniform mat4	Model;
 // out vec3        fragmentPosition;
 //flat out int    outTextured;
 // flat out vec4   vertexColor; 
-out vec2        TexCoord;
+// out vec2        TexCoord;
 out vec3        oNormal;
 
 // out vec3        oLightPos;
 // out vec3        oLightColor;
+
+out     vData
+{
+    vec3 normal;
+    vec2 texture;
+}       vertex;
+
 
 void main()
 {
 
     // vertex_out.normals = aNormals;
     // vertex_out.texCoords = aTexCoord;
+    vertex.normal = aNormals;
+    vertex.texture = aTexCoord;
 
     oNormal     = aNormals; //normalize(vec3((Model) * vec4(aNormals, 1)));
     // oLightColor = lightColor;
@@ -49,7 +58,7 @@ void main()
     // fragmentPosition = vec3(Model * vec4(aPos, 1.0));
 
     gl_Position     =  vec4(aPos, 1.0f);
-    TexCoord        = aTexCoord;
+    // TexCoord        = aTexCoord;
     //outTextured     = textured;
     // vertexColor     = vec4(kd, 1.0);
 

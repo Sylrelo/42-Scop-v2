@@ -6,13 +6,14 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:13:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 10:16:33 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/17 12:11:56 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Scop.h"
 #include <stdio.h>
 #include <strings.h>
+#include <math.h>
 
 static ssize_t  get_material_id(t_mat *materials, size_t material_count, const char *material_name)
 {
@@ -78,18 +79,12 @@ void            calculate_missing_normal(t_mat *material)
 
 void            update_minmax(t_vec3f *min, t_vec3f *max, float buffer[8])
 {
-    if (buffer[0] > max->x)
-        max->x = buffer[0];
-    if (buffer[0] < min->x)
-        min->x = buffer[0];
-    if (buffer[1] > max->y)
-        max->y = buffer[1];
-    if (buffer[1] < min->y)
-        min->y = buffer[1];
-    if (buffer[2] > max->z)
-        max->z = buffer[2];
-    if (buffer[2] < min->z)
-        min->z = buffer[2];
+    max->x = fmax(max->x, buffer[0]);
+    max->y = fmax(max->y, buffer[1]);
+    max->z = fmax(max->z, buffer[2]);
+    min->x = fmin(min->x, buffer[0]);
+    min->y = fmin(min->y, buffer[1]);
+    min->z = fmin(min->z, buffer[2]);
 }
 
 static size_t   parse_vertex(t_parser *parser, t_mat *material, char *line)

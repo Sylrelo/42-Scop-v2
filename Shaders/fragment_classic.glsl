@@ -41,7 +41,7 @@ void main()
     vec3 norm       = normalize(ModelNorm);
     vec3 lightDir   = normalize(vec3(-2.5f, 2.5f, 10.0f));
 
-    float d        = 1; //max(dot(norm, lightDir), 0.0);
+    float d        =  1;//max(dot(norm, lightDir), 0.0);
 
     if (glfw_options == 0)
         step = 0;
@@ -50,4 +50,5 @@ void main()
         FragColor = vec4(kd * d, 1 - step);
     if (textured == 1)
         FragColor = vec4(texture(ourTexture, frag.texture).xyz * d, 1 - step);
+
 } 

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/17 00:21:04 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/17 13:12:48 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,11 @@ void	display_loop(t_scop *scop)
 	t_mat4	mat_view 		= m4_init();
 	t_mat4	mat_model 		= m4_init();
 
+
+	// mat_perspective = m4_orthogonal(-10, 100.f, -100, 100, -100, 100);
 	glUniformMatrix4fv(glMatPersp, 1, GL_FALSE, mat_perspective.value[0]);
+
+	m4_print(mat_perspective);
 
 	float a = 0;
 
@@ -98,7 +102,7 @@ void	display_loop(t_scop *scop)
 						m4_translate(0, 0, 0)
 					);
 
-		mat_view = test;
+		// mat_view = test;
 		glUniformMatrix4fv(glMatView, 1, GL_FALSE, mat_view.value[0]);
 		glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model.value[0]);
 		
@@ -208,8 +212,8 @@ int 	main(int argc, char *argv[])
 	printf("[Scop] Opening Window\n");
 	glfwShowWindow(scop->window);
 
-	scop->ogl.p_render = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl", "Shaders/geometry.glsl");
-	scop->ogl.p_ddepthmap = create_shader_program("Shaders/shadowmap_directional.vertex.glsl", "Shaders/shadowmap_directional.fragment.glsl", NULL);
+	scop->ogl.p_render = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl", "Shaders/geometry_classic.glsl");
+	scop->ogl.p_ddepthmap = create_shader_program("Shaders/v.shadowmap_directional.glsl", "Shaders/f.shadowmap_directional.glsl", NULL);
 
 	glUseProgram(scop->ogl.p_render);
 

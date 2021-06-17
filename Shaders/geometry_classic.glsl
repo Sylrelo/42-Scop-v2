@@ -56,7 +56,6 @@ void main(void)
     {
         if (glfw_options == 1)
         {
-            
             gl_Position = (Persp * View * Model) * (gl_in[i].gl_Position + vec4(center * w, 0));
         }
         else

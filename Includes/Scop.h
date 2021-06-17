@@ -20,6 +20,9 @@
 #include "libc_extends.h"
 
 #define MAT_GL_BUFFER_REALLOC_VALUE 5000
+#define SHADOW_WIDTH 1024
+#define SHADOW_HEIGHT 1024
+
 typedef enum e_parsing
 {
 	VERTICE	= 0x01,
@@ -70,14 +73,32 @@ typedef struct	s_objects
 	size_t			offset;
 }				t_objects;
 
+typedef struct	s_uniforms
+{
+	uint32_t	m4_projection;
+	uint32_t	m4_view;
+	uint32_t	m4_model;
+
+	uint32_t 	m4_shadow[6];
+	
+	uint32_t 	light_pos;
+	uint32_t	far_plane;
+
+}				t_uniforms;
+
 typedef struct	s_ogl
 {
 	GLint		p_ddepthmap;
 	GLint		p_render;
 
+	t_uniforms	u_ddepthmap;
+	t_uniforms	u_render;
+
 	GLuint		depth_map_fbo;
 	GLuint		depth_map;
+
 }				t_ogl;
+
 
 typedef struct s_scop
 {

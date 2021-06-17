@@ -16,18 +16,110 @@
 
 #include <sys/stat.h> // deplacer
 
+void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
+{
+	uniform->m4_projection 	= glGetUniformLocation(program, "Persp");
+	uniform->m4_view 		= glGetUniformLocation(program, "View");
+	uniform->m4_model 		= glGetUniformLocation(program, "Model");
+
+	uniform->light_pos 		= glGetUniformLocation(program, "light_pos");
+	uniform->far_plane 		= glGetUniformLocation(program, "far_plane");
+
+	uniform->m4_shadow[0] 	= glGetUniformLocation(program, "shadowMatrices[0]");
+	uniform->m4_shadow[1] 	= glGetUniformLocation(program, "shadowMatrices[1]");
+	uniform->m4_shadow[2] 	= glGetUniformLocation(program, "shadowMatrices[2]");
+	uniform->m4_shadow[3] 	= glGetUniformLocation(program, "shadowMatrices[3]");
+	uniform->m4_shadow[4] 	= glGetUniformLocation(program, "shadowMatrices[4]");
+	uniform->m4_shadow[5] 	= glGetUniformLocation(program, "shadowMatrices[5]");
+
+}
+
+void	render_depth_cubemap(t_scop *scop)
+{
+	const t_uniforms 	uniform 	= scop->ogl.u_ddepthmap;
+	t_vec3f				light_pos 	= (t_vec3f){3, 5, 5};
+	float 				far_plane 	= 100.0f;
+
+	t_mat4	mat_perspective = m4_perspective(1.0472, (float) SHADOW_WIDTH / (float) SHADOW_HEIGHT, 0.00001f, far_plane);
+	t_mat4	mat_view 		= m4_init();
+	t_mat4	mat_model 		= m4_init();
+
+
+	t_mat4	transforms[6];
+
+	transforms[0] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){1, 0, 0}), (t_vec3f){0, -1, 0});
+	transforms[1] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){-1, 0, 0}), (t_vec3f){0, -1, 0});
+	transforms[2] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 1, 0}), (t_vec3f){0, 0, 1});
+	transforms[3] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, -1, 0}), (t_vec3f){0, 0, -1});
+	transforms[4] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 0, 1}), (t_vec3f){0, -1, 0});
+	transforms[5] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 0, -1}), (t_vec3f){0, -1, 0});
+
+
+	glUniform1f(uniform.far_plane, far_plane);
+	glUniform3f(uniform.far_plane, light_pos.x, light_pos.y, light_pos.z);
+
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, scop->ogl.depth_map_fbo);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(scop->ogl.p_ddepthmap);
+    for (int i = 0; i < 6; i++)
+    {
+    	glUniformMatrix4fv(uniform.m4_shadow[i], 1, GL_FALSE, transforms[i].value[0]);
+    }
+    // ConfigureShaderAndMatrices();
+    // RenderScene();
+
+	size_t obj_i = 0;
+	size_t mat_i = 0;
+	size_t offset = 0;
+	size_t offset_obj = 0;
+	t_objects object;
+	t_mat material;
+
+	obj_i = 0;
+
+	while (obj_i < scop->objects_count)
+	{
+		mat_i = 0;
+		offset = 0;
+		object = scop->objects[obj_i];
+		
+		if (obj_i > 0)
+			offset_obj = scop->objects[obj_i - 1].offset;
+		while (mat_i < object.nb_mats)
+		{
+			material = object.materials[mat_i];
+			if (mat_i > 0)
+				offset += object.materials[mat_i - 1].gl_buffer_size;
+
+
+			glDrawArrays(GL_TRIANGLES, (offset_obj + offset) / 8, (material.gl_buffer_size) / 8);
+			mat_i++;
+		}
+		obj_i++;
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+}
+
 void	display_loop(t_scop *scop)
 {
-	t_mat		material;
+	t_mat			material;
+	t_uniforms 		uniform;
 	t_objects		object;
+
 	size_t	mat_i 	= 0;
 	size_t	obj_i 	= 0;
 	size_t	offset 	= 0;
 	size_t offset_obj = 0;
 
-	GLuint glMatView 		= glGetUniformLocation(scop->ogl.p_render, "View");
-	GLuint glMatPersp 		= glGetUniformLocation(scop->ogl.p_render, "Persp");
-	GLuint glMatModel 		= glGetUniformLocation(scop->ogl.p_render, "Model");
+	get_uniforms_location(&scop->ogl.u_render, scop->ogl.p_render);
+	get_uniforms_location(&scop->ogl.u_ddepthmap, scop->ogl.p_ddepthmap);
+
+	uniform = scop->ogl.u_render;
+
 	uint32_t loc_kd			= glGetUniformLocation(scop->ogl.p_render, "kd");
 	uint32_t loc_ka			= glGetUniformLocation(scop->ogl.p_render, "ka");
 	uint32_t loc_textured 	= glGetUniformLocation(scop->ogl.p_render, "textured");
@@ -44,7 +136,7 @@ void	display_loop(t_scop *scop)
 
 
 	// mat_perspective = m4_orthogonal(-10, 100.f, -100, 100, -100, 100);
-	glUniformMatrix4fv(glMatPersp, 1, GL_FALSE, mat_perspective.value[0]);
+	glUniformMatrix4fv(uniform.m4_projection, 1, GL_FALSE, mat_perspective.value[0]);
 
 	m4_print(mat_perspective);
 
@@ -55,9 +147,9 @@ void	display_loop(t_scop *scop)
 	glUniform3f(loc_lightpos, 0, 0, 0);
 	glUniform3f(loc_lightcol, 1, 1, 1);
 
-	t_mat4	test = m4_look_at((t_vec3f){0, 0, -20}, (t_vec3f){0, .5, 10});
+	// t_mat4	test = m4_look_at((t_vec3f){0, 0, -20}, (t_vec3f){0, .5, 10});
 	
-	m4_print(test);;
+	// m4_print(test);;
 
 
 	float glfw_time = glfwGetTime();
@@ -73,8 +165,16 @@ void	display_loop(t_scop *scop)
 		offset_obj = 0;
 
 
+		render_depth_cubemap(scop);
 
-		test = m4_look_at((t_vec3f){-5, 3, 5}, (t_vec3f){0, 0, 0});
+    	glUseProgram(scop->ogl.p_render);
+
+		glViewport(0, 0, scop->width * 2, scop->height * 2);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+		// test = m4_look_at((t_vec3f){-5, 3, 5}, (t_vec3f){0, 0, 0});
 
 
 		glfw_time = glfwGetTime() - base_time;
@@ -86,7 +186,6 @@ void	display_loop(t_scop *scop)
 
 		glUniform1f(loc_utime, glfw_time);
 		
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		handle_keyboard(scop->window, scop->keys);
 		handle_mouse(scop->window,  &scop->cam_rot);
@@ -103,8 +202,8 @@ void	display_loop(t_scop *scop)
 					);
 
 		// mat_view = test;
-		glUniformMatrix4fv(glMatView, 1, GL_FALSE, mat_view.value[0]);
-		glUniformMatrix4fv(glMatModel, 1, GL_FALSE, mat_model.value[0]);
+		glUniformMatrix4fv(uniform.m4_view, 1, GL_FALSE, mat_view.value[0]);
+		glUniformMatrix4fv(uniform.m4_model, 1, GL_FALSE, mat_model.value[0]);
 		
 		obj_i = 0;
 
@@ -213,7 +312,7 @@ int 	main(int argc, char *argv[])
 	glfwShowWindow(scop->window);
 
 	scop->ogl.p_render = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl", "Shaders/geometry_classic.glsl");
-	scop->ogl.p_ddepthmap = create_shader_program("Shaders/v.shadowmap_directional.glsl", "Shaders/f.shadowmap_directional.glsl", NULL);
+	scop->ogl.p_ddepthmap = create_shader_program("Shaders/Depthcube/vertex.glsl", "Shaders/Depthcube/fragment.glsl", "Shaders/Depthcube/geometry.glsl");
 
 	glUseProgram(scop->ogl.p_render);
 

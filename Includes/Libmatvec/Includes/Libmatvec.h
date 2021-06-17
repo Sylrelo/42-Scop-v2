@@ -59,7 +59,7 @@ t_mat4		m4_mult3(t_mat4 rotation, t_mat4 scale, t_mat4 translate);
 
 // mat_projection.c
 t_mat4		m4_perspective(float fov, float aspect, float near, float far);
-t_mat4		m4_look_at(t_vec3f from, t_vec3f to);
+t_mat4		m4_look_at(t_vec3f from, t_vec3f to, t_vec3f upv);
 t_mat4		m4_orthogonal(float near, float far, float left, float right, float bottom, float top);
 
 // mat_transform.c

@@ -61,9 +61,9 @@ t_mat4		m4_orthogonal(float near, float far, float left, float right, float bott
 	return (result);
 }
 
-t_mat4		m4_look_at(t_vec3f from, t_vec3f to)
+t_mat4		m4_look_at(t_vec3f from, t_vec3f to, t_vec3f upv)
 {
-	t_vec3f tmp 	= (t_vec3f){0, 1, 0};;
+	t_vec3f tmp 	= upv;
 	t_vec3f forward = vec_normalize(vec_sub(to, from));
 	t_vec3f right 	= vec_normalize(vec_cross(tmp, forward));
 	t_vec3f up 		= vec_cross(forward, right);

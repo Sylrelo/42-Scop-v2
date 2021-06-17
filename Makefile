@@ -22,7 +22,7 @@ all: CREATE_OBJDIR COMPILE_EXTERN_LIBS $(NAME)
 
 COMPILE_EXTERN_LIBS:
 		@make -C ./Includes/Libmatvec
-
+		${project_path}
 CREATE_OBJDIR:
 		@mkdir -p $(OBJ_DIR)
 
@@ -35,6 +35,10 @@ $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c Includes/Libmatvec/libmatvec.a Includes/Scop.h
 
 mk: 
 	@mkdir -p .Objects
+
+run:
+	@make
+	./scop Resources/Wavefront/42.obj
 
 clean:
 		@rm -rf $(OBJ_DIR)

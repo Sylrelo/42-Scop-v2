@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:15:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/13 01:15:12 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/17 14:46:34 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,13 +50,8 @@ t_mat4		m4_rotation_around_center(t_vec3f center, float x, float y, float z)
 	const t_mat4	trans_center 	= m4_translate(inverse_center.x, inverse_center.y, inverse_center.z);
 	const t_mat4	trans_origin	= m4_translate(center.x, center.y, center.z);
 	const t_mat4	rotation		= m4_rotation(x, y, z);
-	t_mat4			result;
 
-
-	result = m4_mult(trans_center, rotation);
-	result = m4_mult(result, trans_origin);
-
-	return (result);
+	return (m4_mult(m4_mult(trans_center, rotation), trans_origin));
 }
 
 t_mat4		m4_scale(float x, float y, float z)

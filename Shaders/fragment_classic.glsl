@@ -41,7 +41,7 @@ void main()
     vec3 norm       = normalize(ModelNorm);
     vec3 lightDir   = normalize(vec3(-2.5f, 2.5f, 10.0f));
 
-    float d        =  1;//max(dot(norm, lightDir), 0.0);
+    float d        = max(dot(norm, lightDir), 0.0);
 
     if (glfw_options == 0)
         step = 0;

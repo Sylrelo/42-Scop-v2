@@ -20,15 +20,17 @@ in float        current_step;
 
 uniform int     glfw_options;
 
-uniform sampler2D ourTexture;
+// uniform sampler2D   ourTexture;
+uniform samplerCube depthMap;
 
 uniform mat4	Persp;
 uniform mat4	Model;
 
 in      fData
 {
-    vec3 normal;
-    vec2 texture;
+    vec3    normal;
+    vec2    texture;
+    vec3    frag_pos;
 }       frag;
 
 
@@ -48,7 +50,14 @@ void main()
     
     if (textured == 0)
         FragColor = vec4(kd * d, 1 - step);
-    if (textured == 1)
-        FragColor = vec4(texture(ourTexture, frag.texture).xyz * d, 1 - step);
+    // if (textured == 1)
+        // FragColor = vec4(texture(ourTexture, frag.texture).xyz * d, 1 - step);
+
+    vec3 fragToLight = frag.frag_pos - vec3(0, 0, -5);
+    // use the light to fragment vector to sample from the depth map    
+    float closestDepth = texture(depthMap, fragToLight).r;
+
+    // FragColor = vec4(vec3(closestDepth / 25.0f), 1.0);  
+
 
 } 

@@ -16,14 +16,15 @@ out vec3        geomOutNormal;
 
 in      vData
 {
-    vec3 normal;
-    vec2 texture;
+    vec3    normal;
+    vec2    texture;
 }       vertices[];
 
 out     fData
 {
-    vec3 normal;
-    vec2 texture;
+    vec3    normal;
+    vec2    texture;
+    vec3    frag_pos;
 }       frag;
 
 // out vec4        fragPosition[3];
@@ -64,6 +65,7 @@ void main(void)
         current_step            = w;
         frag.normal     = vertices[i].normal;
         frag.texture    = vertices[i].texture;
+        frag.frag_pos   = vec3((Model) * (gl_in[i].gl_Position));
 
         // fragPosition[i]        = (Persp * Model) * gl_in[i].gl_Position;
         EmitVertex();

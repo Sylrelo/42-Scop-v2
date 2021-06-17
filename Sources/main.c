@@ -37,11 +37,10 @@ void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
 void	render_depth_cubemap(t_scop *scop)
 {
 	const t_uniforms 	uniform 	= scop->ogl.u_ddepthmap;
-	t_vec3f				light_pos 	= (t_vec3f){3, 5, 5};
-	float 				far_plane 	= 100.0f;
+	t_vec3f				light_pos 	= (t_vec3f){0, 0, -5};
+	float 				far_plane 	= 25.0f;
 
-	t_mat4	mat_perspective = m4_perspective(1.0472, (float) SHADOW_WIDTH / (float) SHADOW_HEIGHT, 0.00001f, far_plane);
-	t_mat4	mat_view 		= m4_init();
+	t_mat4	mat_perspective = m4_perspective(1.0472, (float) SHADOW_WIDTH / (float) SHADOW_HEIGHT, 1, far_plane);
 	t_mat4	mat_model 		= m4_init();
 
 
@@ -58,6 +57,7 @@ void	render_depth_cubemap(t_scop *scop)
 	glUniform1f(uniform.far_plane, far_plane);
 	glUniform3f(uniform.far_plane, light_pos.x, light_pos.y, light_pos.z);
 
+
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, scop->ogl.depth_map_fbo);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -67,8 +67,17 @@ void	render_depth_cubemap(t_scop *scop)
     {
     	glUniformMatrix4fv(uniform.m4_shadow[i], 1, GL_FALSE, transforms[i].value[0]);
     }
-    // ConfigureShaderAndMatrices();
-    // RenderScene();
+
+	mat_model = m4_mult(
+						m4_mult(
+							m4_scale(1, 1, 1), 
+							m4_rotation_around_center(scop->center, 0, 0, 0)), 
+						m4_translate(0, 0, 0)
+					);
+
+		// mat_view = test;
+		glUniformMatrix4fv(uniform.m4_projection, 1, GL_FALSE, mat_perspective.value[0]);
+		glUniformMatrix4fv(uniform.m4_model, 1, GL_FALSE, mat_model.value[0]);
 
 	size_t obj_i = 0;
 	size_t mat_i = 0;
@@ -78,6 +87,7 @@ void	render_depth_cubemap(t_scop *scop)
 	t_mat material;
 
 	obj_i = 0;
+
 
 	while (obj_i < scop->objects_count)
 	{
@@ -176,6 +186,8 @@ void	display_loop(t_scop *scop)
 
 		// test = m4_look_at((t_vec3f){-5, 3, 5}, (t_vec3f){0, 0, 0});
 
+		glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scop->ogl.depth_map);
 
 		glfw_time = glfwGetTime() - base_time;
 
@@ -227,7 +239,8 @@ void	display_loop(t_scop *scop)
 				{
 					glActiveTexture(GL_TEXTURE0);
 					glBindTexture(GL_TEXTURE_2D, scop->textures[material.tex_id].gl_texture);
-					glUniform1i(loc_textured, 1);
+					glUniform1i(loc_textured, 0);
+
 				}
 				else
 					glUniform1i(loc_textured, 0);

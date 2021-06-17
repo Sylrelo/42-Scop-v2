@@ -81,5 +81,7 @@ t_mat4		m4_look_at(t_vec3f from, t_vec3f to, t_vec3f upv)
 	result.value[2][0] =  right.z;
 	result.value[2][1] =  up.z;
 	result.value[2][2] = -forward.z;
+
+	// return (result);
 	return (m4_mult(m4_translate(-from.x, -from.y, -from.z), result));
 }

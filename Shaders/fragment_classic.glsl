@@ -53,11 +53,10 @@ void main()
     // if (textured == 1)
         // FragColor = vec4(texture(ourTexture, frag.texture).xyz * d, 1 - step);
 
-    vec3 fragToLight = frag.frag_pos - vec3(0, 0, -5);
-    // use the light to fragment vector to sample from the depth map    
+    vec3 fragToLight = frag.frag_pos - vec3(0, 5, -15);
     float closestDepth = texture(depthMap, fragToLight).r;
 
-    // FragColor = vec4(vec3(closestDepth / 25.0f), 1.0);  
+    FragColor = vec4(vec3(closestDepth / 25.0f), 1.0);  
 
 
 } 

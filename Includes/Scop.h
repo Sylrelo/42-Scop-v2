@@ -97,6 +97,7 @@ typedef struct	s_ogl
 	GLuint		depth_map_fbo;
 	GLuint		depth_map;
 
+	GLint 		vao;
 }				t_ogl;
 
 

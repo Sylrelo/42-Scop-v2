@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <cglm/cglm.h> 
+
 #include <sys/stat.h> // deplacer
 
 void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
@@ -37,7 +39,7 @@ void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
 void	render_depth_cubemap(t_scop *scop)
 {
 	const t_uniforms 	uniform 	= scop->ogl.u_ddepthmap;
-	t_vec3f				light_pos 	= (t_vec3f){0, 0, -5};
+	t_vec3f				light_pos 	= (t_vec3f){0, 5, -15};
 	float 				far_plane 	= 25.0f;
 
 	t_mat4	mat_perspective = m4_perspective(1.0472, (float) SHADOW_WIDTH / (float) SHADOW_HEIGHT, 1, far_plane);
@@ -46,6 +48,19 @@ void	render_depth_cubemap(t_scop *scop)
 
 	t_mat4	transforms[6];
 
+
+	mat4 trans[6];
+	vec3 lig = (vec3){0, 5, -15};
+
+
+	glm_lookat(lig, (vec3){lig[0] + 1,	 	lig[1] + 0, 		lig[2] + 0}, (vec3){0, -1, 0}, trans[0]);
+	glm_lookat(lig, (vec3){lig[0] + -1, 	lig[1] + 0, 		lig[2] + 0}, (vec3){0, -1, 0}, trans[1]);
+	glm_lookat(lig, (vec3){lig[0] + 0, 		lig[1] + 1, 		lig[2] + 0}, (vec3){0, 0, 1}, trans[2]);
+	glm_lookat(lig, (vec3){lig[0] + 0, 		lig[1] + -1, 		lig[2] + 0}, (vec3){0, 0, -1}, trans[3]);
+	glm_lookat(lig, (vec3){lig[0] + 0, 		lig[1] + 0, 		lig[2] + 1}, (vec3){0, -1, 0}, trans[4]);
+	glm_lookat(lig, (vec3){lig[0] + 0, 		lig[1] + 0, 		lig[2] + -1}, (vec3){0, -1, 0}, trans[5]);
+
+
 	transforms[0] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){1, 0, 0}), (t_vec3f){0, -1, 0});
 	transforms[1] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){-1, 0, 0}), (t_vec3f){0, -1, 0});
 	transforms[2] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 1, 0}), (t_vec3f){0, 0, 1});
@@ -53,21 +68,23 @@ void	render_depth_cubemap(t_scop *scop)
 	transforms[4] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 0, 1}), (t_vec3f){0, -1, 0});
 	transforms[5] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 0, -1}), (t_vec3f){0, -1, 0});
 
-
-	glUniform1f(uniform.far_plane, far_plane);
-	glUniform3f(uniform.far_plane, light_pos.x, light_pos.y, light_pos.z);
-
-
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, scop->ogl.depth_map_fbo);
     glClear(GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(scop->ogl.p_ddepthmap);
+
+
+	glUniform1f(uniform.far_plane, far_plane);
+	glUniform3f(uniform.far_plane, light_pos.x, light_pos.y, light_pos.z);
+
+
+
     for (int i = 0; i < 6; i++)
     {
-    	glUniformMatrix4fv(uniform.m4_shadow[i], 1, GL_FALSE, transforms[i].value[0]);
+    	// glUniformMatrix4fv(uniform.m4_shadow[i], 1, GL_FALSE, transforms[i].value[0]);
+    	glUniformMatrix4fv(uniform.m4_shadow[i], 1, GL_FALSE, trans[i][0]);
     }
-
 	mat_model = m4_mult(
 						m4_mult(
 							m4_scale(1, 1, 1), 
@@ -75,9 +92,8 @@ void	render_depth_cubemap(t_scop *scop)
 						m4_translate(0, 0, 0)
 					);
 
-		// mat_view = test;
-		glUniformMatrix4fv(uniform.m4_projection, 1, GL_FALSE, mat_perspective.value[0]);
-		glUniformMatrix4fv(uniform.m4_model, 1, GL_FALSE, mat_model.value[0]);
+	glUniformMatrix4fv(uniform.m4_projection, 1, GL_FALSE, mat_perspective.value[0]);
+	glUniformMatrix4fv(uniform.m4_model, 1, GL_FALSE, mat_model.value[0]);
 
 	size_t obj_i = 0;
 	size_t mat_i = 0;
@@ -88,7 +104,7 @@ void	render_depth_cubemap(t_scop *scop)
 
 	obj_i = 0;
 
-
+	glBindVertexArray(scop->vao);
 	while (obj_i < scop->objects_count)
 	{
 		mat_i = 0;
@@ -102,7 +118,6 @@ void	render_depth_cubemap(t_scop *scop)
 			material = object.materials[mat_i];
 			if (mat_i > 0)
 				offset += object.materials[mat_i - 1].gl_buffer_size;
-
 
 			glDrawArrays(GL_TRIANGLES, (offset_obj + offset) / 8, (material.gl_buffer_size) / 8);
 			mat_i++;
@@ -157,11 +172,23 @@ void	display_loop(t_scop *scop)
 	glUniform3f(loc_lightpos, 0, 0, 0);
 	glUniform3f(loc_lightcol, 1, 1, 1);
 
-	// t_mat4	test = m4_look_at((t_vec3f){0, 0, -20}, (t_vec3f){0, .5, 10});
+	t_vec3f light_pos= (t_vec3f){0, 5, -15};
+
+	// t_mat4	test = 	m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 1, 0}), (t_vec3f){0, 0, 1});
+
 	
+
+
+	// test = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){1, 0, 0}), (t_vec3f){0, -1, 0});
+	// test = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){-1, 0, 0}), (t_vec3f){0, -1, 0});
+	// test = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 1, 0}), (t_vec3f){0, 0, 1});
+	// test= m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, -1, 0}), (t_vec3f){0, 0, -1});
+	// test= m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 0, 1}), (t_vec3f){0, -1, 0});
+	// test = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 0, -1}), (t_vec3f){0, -1, 0});
+
 	// m4_print(test);;
 
-
+glDisable(GL_CULL_FACE);
 	float glfw_time = glfwGetTime();
 	const float base_time = glfw_time;
 	glfw_time -= base_time;
@@ -214,9 +241,19 @@ void	display_loop(t_scop *scop)
 					);
 
 		// mat_view = test;
+
 		glUniformMatrix4fv(uniform.m4_view, 1, GL_FALSE, mat_view.value[0]);
 		glUniformMatrix4fv(uniform.m4_model, 1, GL_FALSE, mat_model.value[0]);
 		
+		glBindVertexArray(scop->vao);
+
+		// mat4 eeffe;
+
+		// glm_lookat((vec3){0, 5, -15}, (vec3){1, 5, -15}, (vec3){0, -1, 0}, eeffe);
+
+		// glUniformMatrix4fv(uniform.m4_view, 1, GL_FALSE, eeffe[0]);
+
+
 		obj_i = 0;
 
 		while (obj_i < scop->objects_count)

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/17 13:38:30 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/18 16:02:50 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,322 +14,136 @@
 #include <stdio.h>
 #include <math.h>
 
-#include <cglm/cglm.h> 
-
 #include <sys/stat.h> // deplacer
+#include <float.h>
 
 void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
 {
 	uniform->m4_projection 	= glGetUniformLocation(program, "Persp");
 	uniform->m4_view 		= glGetUniformLocation(program, "View");
 	uniform->m4_model 		= glGetUniformLocation(program, "Model");
-
-	uniform->light_pos 		= glGetUniformLocation(program, "light_pos");
-	uniform->far_plane 		= glGetUniformLocation(program, "far_plane");
-
-	uniform->m4_shadow[0] 	= glGetUniformLocation(program, "shadowMatrices[0]");
-	uniform->m4_shadow[1] 	= glGetUniformLocation(program, "shadowMatrices[1]");
-	uniform->m4_shadow[2] 	= glGetUniformLocation(program, "shadowMatrices[2]");
-	uniform->m4_shadow[3] 	= glGetUniformLocation(program, "shadowMatrices[3]");
-	uniform->m4_shadow[4] 	= glGetUniformLocation(program, "shadowMatrices[4]");
-	uniform->m4_shadow[5] 	= glGetUniformLocation(program, "shadowMatrices[5]");
-
+	uniform->kd 			= glGetUniformLocation(program, "kd");
+	uniform->ka 			= glGetUniformLocation(program, "ka");
+	uniform->textured 		= glGetUniformLocation(program, "textured");
+	uniform->glfw_time 		= glGetUniformLocation(program, "glfw_time");
+	uniform->glfw_options 	= glGetUniformLocation(program, "glfw_options");
 }
 
-void	render_depth_cubemap(t_scop *scop)
+void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *scop)
 {
-	const t_uniforms 	uniform 	= scop->ogl.u_ddepthmap;
-	t_vec3f				light_pos 	= (t_vec3f){0, 5, -15};
-	float 				far_plane 	= 25.0f;
+	t_mat4	mat_view 		= m4_init();
+	t_mat4	mat_perspective;
 
-	t_mat4	mat_perspective = m4_perspective(1.0472, (float) SHADOW_WIDTH / (float) SHADOW_HEIGHT, 1, far_plane);
-	t_mat4	mat_model 		= m4_init();
+	if (glfw_time > .5)
+		glUniform1i(uniform.glfw_options, 0);
+	else 
+		glUniform1i(uniform.glfw_options, 1);
+	glUniform1f(uniform.glfw_time, glfw_time);
 
+	mat_view = m4_viewmat(scop->cam_rot.x, scop->cam_rot.y, scop->cam_rot.z, m4_translate(scop->cam_pos.x, scop->cam_pos.y, scop->cam_pos.z));
+	glUniformMatrix4fv(uniform.m4_view, 1, GL_FALSE, mat_view.value[0]);
 
-	t_mat4	transforms[6];
-
-
-	mat4 trans[6];
-	vec3 lig = (vec3){0, 5, -15};
-
-
-	glm_lookat(lig, (vec3){lig[0] + 1,	 	lig[1] + 0, 		lig[2] + 0}, (vec3){0, -1, 0}, trans[0]);
-	glm_lookat(lig, (vec3){lig[0] + -1, 	lig[1] + 0, 		lig[2] + 0}, (vec3){0, -1, 0}, trans[1]);
-	glm_lookat(lig, (vec3){lig[0] + 0, 		lig[1] + 1, 		lig[2] + 0}, (vec3){0, 0, 1}, trans[2]);
-	glm_lookat(lig, (vec3){lig[0] + 0, 		lig[1] + -1, 		lig[2] + 0}, (vec3){0, 0, -1}, trans[3]);
-	glm_lookat(lig, (vec3){lig[0] + 0, 		lig[1] + 0, 		lig[2] + 1}, (vec3){0, -1, 0}, trans[4]);
-	glm_lookat(lig, (vec3){lig[0] + 0, 		lig[1] + 0, 		lig[2] + -1}, (vec3){0, -1, 0}, trans[5]);
-
-
-	transforms[0] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){1, 0, 0}), (t_vec3f){0, -1, 0});
-	transforms[1] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){-1, 0, 0}), (t_vec3f){0, -1, 0});
-	transforms[2] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 1, 0}), (t_vec3f){0, 0, 1});
-	transforms[3] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, -1, 0}), (t_vec3f){0, 0, -1});
-	transforms[4] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 0, 1}), (t_vec3f){0, -1, 0});
-	transforms[5] = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 0, -1}), (t_vec3f){0, -1, 0});
-
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, scop->ogl.depth_map_fbo);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    glUseProgram(scop->ogl.p_ddepthmap);
-
-
-	glUniform1f(uniform.far_plane, far_plane);
-	glUniform3f(uniform.far_plane, light_pos.x, light_pos.y, light_pos.z);
-
-
-
-    for (int i = 0; i < 6; i++)
-    {
-    	// glUniformMatrix4fv(uniform.m4_shadow[i], 1, GL_FALSE, transforms[i].value[0]);
-    	glUniformMatrix4fv(uniform.m4_shadow[i], 1, GL_FALSE, trans[i][0]);
-    }
-	mat_model = m4_mult(
-						m4_mult(
-							m4_scale(1, 1, 1), 
-							m4_rotation_around_center(scop->center, 0, 0, 0)), 
-						m4_translate(0, 0, 0)
-					);
-
+	mat_perspective = m4_perspective(1.0472, (float) scop->width / (float) scop->height, 0.00001f, 1000.0f);
 	glUniformMatrix4fv(uniform.m4_projection, 1, GL_FALSE, mat_perspective.value[0]);
-	glUniformMatrix4fv(uniform.m4_model, 1, GL_FALSE, mat_model.value[0]);
+}
 
-	size_t obj_i = 0;
-	size_t mat_i = 0;
-	size_t offset = 0;
-	size_t offset_obj = 0;
-	t_objects object;
-	t_mat material;
+void	send_model_transformations(uint32_t u_model, t_objects object)
+{
+	static float a = 0;
 
-	obj_i = 0;
+	const t_mat4	mat_scale 		= m4_scale(1, 1, 1);
+	const t_mat4	mat_translate 	= m4_translate(object.pos.x, object.pos.y, object.pos.z);
+	const t_mat4	mat_rotate		= m4_rotation_around_center(object.center, 0, a, 0);
+	const t_mat4	mat_model 		= m4_mult(m4_mult(mat_scale, mat_rotate), mat_translate);
 
-	glBindVertexArray(scop->vao);
-	while (obj_i < scop->objects_count)
+	glUniformMatrix4fv(u_model, 1, GL_FALSE, mat_model.value[0]);
+	//a += 0.1;
+}
+
+void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat material)
+{
+	glUniform3f(uniform.kd, material.kd.x, material.kd.y, material.kd.z);
+	glUniform3f(uniform.ka, material.ka.x, material.ka.y, material.ka.z);
+
+	if (material.tex_id != -1)
 	{
-		mat_i = 0;
-		offset = 0;
-		object = scop->objects[obj_i];
-		
-		if (obj_i > 0)
-			offset_obj = scop->objects[obj_i - 1].offset;
-		while (mat_i < object.nb_mats)
-		{
-			material = object.materials[mat_i];
-			if (mat_i > 0)
-				offset += object.materials[mat_i - 1].gl_buffer_size;
-
-			glDrawArrays(GL_TRIANGLES, (offset_obj + offset) / 8, (material.gl_buffer_size) / 8);
-			mat_i++;
-		}
-		obj_i++;
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textures[material.tex_id].gl_texture);
+		glUniform1i(uniform.textured, 1);
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
+	else
+		glUniform1i(uniform.textured, 0);
 }
 
 void	display_loop(t_scop *scop)
 {
-	t_mat			material;
 	t_uniforms 		uniform;
-	t_objects		object;
+	float		glfw_time;
+	float		base_time;
+	size_t		offset_mat;
+	size_t		offset_obj;
+	t_objects	object;
+	t_mat		material;
 
-	size_t	mat_i 	= 0;
-	size_t	obj_i 	= 0;
-	size_t	offset 	= 0;
-	size_t offset_obj = 0;
-
+	float			rot = 0;
+	
 	get_uniforms_location(&scop->ogl.u_render, scop->ogl.p_render);
-	get_uniforms_location(&scop->ogl.u_ddepthmap, scop->ogl.p_ddepthmap);
 
 	uniform = scop->ogl.u_render;
 
-	uint32_t loc_kd			= glGetUniformLocation(scop->ogl.p_render, "kd");
-	uint32_t loc_ka			= glGetUniformLocation(scop->ogl.p_render, "ka");
-	uint32_t loc_textured 	= glGetUniformLocation(scop->ogl.p_render, "textured");
-	uint32_t loc_lightpos 	= glGetUniformLocation(scop->ogl.p_render, "lightPos");
-	uint32_t loc_lightcol 	= glGetUniformLocation(scop->ogl.p_render, "lightColor");
-
-	uint32_t loc_utime 		= glGetUniformLocation(scop->ogl.p_render, "glfw_time");
-	uint32_t loc_options 	= glGetUniformLocation(scop->ogl.p_render, "glfw_options");
-
-
-	t_mat4	mat_perspective = m4_perspective(1.0472, (float) scop->width / (float) scop->height, 0.00001f, 1000.0f);
-	t_mat4	mat_view 		= m4_init();
-	t_mat4	mat_model 		= m4_init();
-
-
-	// mat_perspective = m4_orthogonal(-10, 100.f, -100, 100, -100, 100);
-	glUniformMatrix4fv(uniform.m4_projection, 1, GL_FALSE, mat_perspective.value[0]);
-
-	m4_print(mat_perspective);
-
-	float a = 0;
-
-	// glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-
-	glUniform3f(loc_lightpos, 0, 0, 0);
-	glUniform3f(loc_lightcol, 1, 1, 1);
-
-	t_vec3f light_pos= (t_vec3f){0, 5, -15};
-
-	// t_mat4	test = 	m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 1, 0}), (t_vec3f){0, 0, 1});
-
-	
-
-
-	// test = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){1, 0, 0}), (t_vec3f){0, -1, 0});
-	// test = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){-1, 0, 0}), (t_vec3f){0, -1, 0});
-	// test = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 1, 0}), (t_vec3f){0, 0, 1});
-	// test= m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, -1, 0}), (t_vec3f){0, 0, -1});
-	// test= m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 0, 1}), (t_vec3f){0, -1, 0});
-	// test = m4_look_at(light_pos, vec_add(light_pos, (t_vec3f){0, 0, -1}), (t_vec3f){0, -1, 0});
-
-	// m4_print(test);;
-
-glDisable(GL_CULL_FACE);
-	float glfw_time = glfwGetTime();
-	const float base_time = glfw_time;
+	glfw_time = glfwGetTime();
+	base_time = glfw_time;
 	glfw_time -= base_time;
 
-	printf("%f\n", glfw_time);
 	while (!glfwWindowShouldClose(scop->window))
 	{
-		obj_i 	= 0;
-		offset 	= 0;
-		a 		+= 0.010;
-		offset_obj = 0;
-
-
-		render_depth_cubemap(scop);
-
-    	glUseProgram(scop->ogl.p_render);
-
-		glViewport(0, 0, scop->width * 2, scop->height * 2);
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-		// test = m4_look_at((t_vec3f){-5, 3, 5}, (t_vec3f){0, 0, 0});
-
-		glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scop->ogl.depth_map);
-
-		glfw_time = glfwGetTime() - base_time;
-
-		if (glfw_time > .5)
-			glUniform1i(loc_options, 0);
-		else 
-			glUniform1i(loc_options, 1);
-
-		glUniform1f(loc_utime, glfw_time);
+		offset_mat 		= 0;
+		offset_obj 		= 0;
+		rot				+= 0.010;
 		
-
+		glfw_time = glfwGetTime() - base_time;
+		
 		handle_keyboard(scop->window, scop->keys);
 		handle_mouse(scop->window,  &scop->cam_rot);
-		handle_transformations(scop->keys, &scop->cam_pos, &scop->cam_rot);
+		handle_transformations(scop->keys, &scop->cam_pos, &scop->cam_rot, scop->multiplier);
 
-		mat_view = m4_viewmat(scop->cam_rot.x, scop->cam_rot.y, scop->cam_rot.z, 
-							m4_translate(scop->cam_pos.x, scop->cam_pos.y, scop->cam_pos.z));
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, scop->width * 2, scop->height * 2);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    	glUseProgram(scop->ogl.p_render);
 
-		mat_model = m4_mult(
-						m4_mult(
-							m4_scale(1, 1, 1), 
-							m4_rotation_around_center(scop->center, 0, 0, 0)), 
-						m4_translate(0, 0, 0)
-					);
+		send_default_uniforms(uniform, glfw_time, scop);
 
-		// mat_view = test;
-
-		glUniformMatrix4fv(uniform.m4_view, 1, GL_FALSE, mat_view.value[0]);
-		glUniformMatrix4fv(uniform.m4_model, 1, GL_FALSE, mat_model.value[0]);
-		
-		glBindVertexArray(scop->vao);
-
-		// mat4 eeffe;
-
-		// glm_lookat((vec3){0, 5, -15}, (vec3){1, 5, -15}, (vec3){0, -1, 0}, eeffe);
-
-		// glUniformMatrix4fv(uniform.m4_view, 1, GL_FALSE, eeffe[0]);
-
-
-		obj_i = 0;
-
-		while (obj_i < scop->objects_count)
+		for (size_t obj_i = 0; obj_i < scop->objects_count; obj_i++)
 		{
-			mat_i = 0;
-			offset = 0;
-			object = scop->objects[obj_i];
+			offset_mat 	= 0;
+			object 		= scop->objects[obj_i];
 			
 			if (obj_i > 0)
 				offset_obj = scop->objects[obj_i - 1].offset;
-			while (mat_i < object.nb_mats)
+			for (size_t mat_i = 0; mat_i < object.nb_mats; mat_i++)
 			{
+				send_model_transformations(uniform.m4_model, object);
 				material = object.materials[mat_i];
 				if (mat_i > 0)
-					offset += object.materials[mat_i - 1].gl_buffer_size;
-
-				glUniform3f(loc_kd, material.kd.x, material.kd.y, material.kd.z);
-				glUniform3f(loc_ka, material.ka.x, material.ka.y, material.ka.z);
-				if (material.tex_id != -1)
-				{
-					glActiveTexture(GL_TEXTURE0);
-					glBindTexture(GL_TEXTURE_2D, scop->textures[material.tex_id].gl_texture);
-					glUniform1i(loc_textured, 0);
-
-				}
-				else
-					glUniform1i(loc_textured, 0);
-				glDrawArrays(GL_TRIANGLES, (offset_obj + offset) / 8, (material.gl_buffer_size) / 8);
-				mat_i++;
+					offset_mat += object.materials[mat_i - 1].gl_buffer_size;
+				send_material_data(uniform, scop->textures, material);
+				glDrawArrays(GL_TRIANGLES, (offset_obj + offset_mat) / 8, (material.gl_buffer_size) / 8);
 			}
-			obj_i++;
 		}
-		
 		glfwSwapBuffers(scop->window);
-
 		glfwPollEvents();
-		// printf("%f\n", 1 / ((glfwGetTime() - base_time) -  glfw_time));
-
 	}
 }
 
-int 	main(int argc, char *argv[])
+void	start_parser(t_scop *scop, int argc, char *argv[])
 {
-	t_scop	*scop;
-
-	scop = calloc(1, sizeof(t_scop));
-
-	scop->textures_count = 0;
-	scop->textures = NULL;
-
-	scop->cam_pos = (t_vec3f) {0, 0, 0};
-	scop->cam_rot = (t_vec3f) {0, 0, 0};
-	
-	scop->width = 1280;
-	scop->height = 720;
-
-	memset(scop->keys, 0, sizeof(uint32_t) * 348);
-		
-	printf("[Scop] Starting OpenGL initialization\n");
-	init_window(&scop->window, scop->width, scop->height);
-	init_depth_map(scop);
-
-
-	//deplacer
-	scop->objects_count = 0;
-	scop->objects = calloc(argc, sizeof(t_objects));
-
-	printf("[Scop] Starting parser\n\n");
-
 	struct stat		st;
 	int				st_result;
+	float			start	= glfwGetTime();
+	float			diff 	= start;
 
-	float start = glfwGetTime();
-	const float diff = start;
 	start -= diff;
-	
 	while (--argc > 0)
 	{
 		st_result = stat(argv[argc], &st);
@@ -353,28 +167,109 @@ int 	main(int argc, char *argv[])
 		printf("\n");
 	}
 	printf("Time taken : %.2f\n", (glfwGetTime() - diff) - start);
+}
 
-	//
+void	auto_positions(t_scop *scop)
+{
+	t_objects	*obj;
+	t_objects	*prev_obj;
+	t_vec3f		min;
+	t_vec3f		max;
+	t_vec3f		center;
+	float		max_component;
+
+	max	= (t_vec3f){ -FLT_MAX, -FLT_MAX, -FLT_MAX };
+	min	= (t_vec3f){ FLT_MAX, FLT_MAX, FLT_MAX };
+	max_component = -FLT_MAX;
+	
+	for (size_t obji = 0; obji < scop->objects_count; obji++)
+	{
+		obj = &scop->objects[obji];
+		obj->pos = (t_vec3f) {-obj->center.x, -obj->min.y, -obj->center.z};
+		if (obji > 0)
+		{
+			prev_obj = &scop->objects[obji - 1];
+			obj->pos.x += prev_obj->pos.x + prev_obj->max.x + obj->max.x + obj->center.x;
+		}
+		max.x = fmax(max.x, obj->pos.x);
+		max.y = fmax(max.y, obj->pos.y);
+		max.z = fmax(max.z, obj->pos.z);
+		min.x = fmin(min.x, obj->pos.x);
+		min.y = fmin(min.y, obj->pos.y);
+		min.z = fmin(min.z, obj->pos.z);
+		if (scop->objects_count == 1)
+		{
+			obj->pos = (t_vec3f) {-obj->center.x, -obj->center.y / 2, -obj->center.z};
+			max.x = fmax(max.x, obj->max.x);
+			max.y = fmax(max.y, obj->max.y);
+			max.z = fmax(max.z, obj->max.z);
+			min.x = fmin(min.x, obj->min.x);
+			min.y = fmin(min.y, obj->min.y);
+			min.z = fmin(min.z, obj->min.z);
+		}
+		
+	}
+	
+	center = vec_multf(vec_add(min, max), .5);
+
+	max_component = fmax(max_component, max.x);
+	max_component = fmax(max_component, max.y);
+	max_component = fmax(max_component, max.z);
+
+	if (scop->objects_count > 1)
+	{
+		scop->cam_pos.x -= center.x;
+		scop->cam_pos.y -= center.y;
+	}
+	scop->cam_pos.z -= max_component ;
+
+	scop->multiplier = max_component * 0.125;
+}
+
+int 	main(int argc, char *argv[])
+{
+	t_scop	*scop;
+
+	scop = calloc(1, sizeof(t_scop));
+
+	if (!scop)
+		die ("Could not start Scop");
+
+	scop->textures_count 	= 0;
+	scop->textures 			= NULL;
+	scop->cam_pos			= (t_vec3f) {0, 0, 0};
+	scop->cam_rot			= (t_vec3f) {0, 0, 0};
+	scop->width	 			= 1600;
+	scop->height 			= 900;
+	scop->multiplier		= 1;
+	memset(scop->keys, 0, sizeof(uint32_t) * 348);
+		
+	printf("[Scop] Starting OpenGL initialization\n");
+	init_window(&scop->window, scop->width, scop->height);
+
+	scop->objects_count = 0;
+	scop->objects = calloc(argc, sizeof(t_objects));
+
+	printf("[Scop] Starting parser\n\n");
+	start_parser(scop, argc, argv);
 	
 	printf("[Scop] Starting OpenGL Buffer initialization\n");
 	init_opengl_buffer_multi(scop);
+
 	printf("[Scop] Opening Window\n");
 	glfwShowWindow(scop->window);
 
 	scop->ogl.p_render = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl", "Shaders/geometry_classic.glsl");
-	scop->ogl.p_ddepthmap = create_shader_program("Shaders/Depthcube/vertex.glsl", "Shaders/Depthcube/fragment.glsl", "Shaders/Depthcube/geometry.glsl");
 
 	glUseProgram(scop->ogl.p_render);
 
 	printf("[Scop] Ready\n");
 
-	scop->cam_pos.x -= scop->center.x * .5;
-	scop->cam_pos.y -= scop->center.y * .5;
-	scop->cam_pos.z -= scop->center.z + 8;
-
+	auto_positions(scop);
+	//scop->cam_pos.x -= scop->center.x * .5;
+	//scop->cam_pos.y -= scop->center.y * .5;
+	//scop->cam_pos.z -= scop->center.z + 8;
 
 	display_loop(scop);
-
 	clean_exit(scop);
-	(void)argc;
 }

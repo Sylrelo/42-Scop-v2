@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/15 10:37:12 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/18 15:22:22 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,6 @@ void 		parser_init(t_scop *scop, char *file)
 	scop->objects[scop->objects_count].max = parser.max;
 	scop->objects[scop->objects_count].min = parser.min;
 	
-	scop->center = vec_multf(vec_add(parser.min, parser.max), .5);
 	scop->objects_count++;
 
 }

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:02:39 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/14 21:59:25 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/18 15:45:28 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void	handle_keyboard(GLFWwindow *window, uint32_t keys[349])
     keys[GLFW_KEY_D] = glfwGetKey(window, GLFW_KEY_D);
     keys[GLFW_KEY_R] = glfwGetKey(window, GLFW_KEY_R);
     keys[GLFW_KEY_F] = glfwGetKey(window, GLFW_KEY_F);
+    keys[GLFW_KEY_LEFT_SHIFT] = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE))
         exit (1);
@@ -81,7 +82,7 @@ void	handle_mouse(GLFWwindow *window, t_vec3f *cam_rot)
 	pos_y_old = pos_y;
 }
 
-void 	handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot)
+void 	handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot, float multiplier)
 {
 	t_vec3f	move 		= (t_vec3f) {0, 0, 0};
 
@@ -97,7 +98,10 @@ void 	handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_
 	    move.x += 0.1;
     if (keys[GLFW_KEY_D])
 	    move.x -= 0.1;
-
+    if (keys[GLFW_KEY_LEFT_SHIFT])
+        move = vec_multf(move, multiplier);
+        
+   
 	move = m4_mult_vec3f(m4_rotation(0, cam_rot->y, 0), move);
 	*cam_pos = vec_add(*cam_pos, move);
 }

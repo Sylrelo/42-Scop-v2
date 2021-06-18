@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/16 23:04:12 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/18 15:44:41 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 #include "libc_extends.h"
 
 #define MAT_GL_BUFFER_REALLOC_VALUE 5000
-#define SHADOW_WIDTH 1024
-#define SHADOW_HEIGHT 1024
+// #define SHADOW_WIDTH 1024 * 2
+// #define SHADOW_HEIGHT 1024 * 2
 
 typedef enum e_parsing
 {
@@ -79,27 +79,20 @@ typedef struct	s_uniforms
 	uint32_t	m4_view;
 	uint32_t	m4_model;
 
-	uint32_t 	m4_shadow[6];
-	
-	uint32_t 	light_pos;
-	uint32_t	far_plane;
+	uint32_t	ka;
+	uint32_t	kd;
+	uint32_t	textured;
 
+	uint32_t	glfw_time;
+	uint32_t	glfw_options;
 }				t_uniforms;
 
 typedef struct	s_ogl
 {
-	GLint		p_ddepthmap;
 	GLint		p_render;
-
-	t_uniforms	u_ddepthmap;
 	t_uniforms	u_render;
-
-	GLuint		depth_map_fbo;
-	GLuint		depth_map;
-
 	GLint 		vao;
 }				t_ogl;
-
 
 typedef struct s_scop
 {
@@ -110,8 +103,6 @@ typedef struct s_scop
 	GLuint			vbo;
 	GLint			program;
 	
-	t_vec3f			center;
-
 	uint32_t		width;
 	uint32_t		height;
 	uint32_t		keys[349];
@@ -122,6 +113,7 @@ typedef struct s_scop
 	t_objects		*objects;
 	size_t			objects_count;
 
+	float			multiplier;
 	t_vec3f			cam_pos;
 	t_vec3f			cam_rot;
 }				t_scop;
@@ -138,7 +130,7 @@ void    	clean_exit(t_scop *scop);
 
 // glfw_events.c
 void		handle_keyboard(GLFWwindow *window, uint32_t keys[349]);
-void 		handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot);
+void 		handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot, float multiplier);
 void		handle_mouse(GLFWwindow *window, t_vec3f *cam_rot);
 
 // glx_init.c

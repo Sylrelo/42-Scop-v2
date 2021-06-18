@@ -4,67 +4,20 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormals;
 layout (location = 2) in vec2 aTexCoord;
 
-// out SHADER_DATA {
-//     vec3 normals;
-//     vec2 texCoords;
-// } vertex_out;
-
-// Material uniforms
-uniform vec3    kd;
-uniform vec3    ka;
-
-// uniform vec3    lightPos;  
-// uniform vec3    lightColor;  
-
-// Matrices uniforms
-uniform mat4	View;
-uniform mat4	Persp;
-uniform mat4	Model;
-//uniform int     textured;
-
-// out vec3        fragmentPosition;
-//flat out int    outTextured;
-// flat out vec4   vertexColor; 
-// out vec2        TexCoord;
-out vec3        oNormal;
-
-// out vec3        oLightPos;
-// out vec3        oLightColor;
-
 out     vData
 {
-    vec3 normal;
-    vec2 texture;
+    vec3    normal;
+    vec2    texture;
+    vec4    frag_pos;
 }       vertex;
 
 
 void main()
 {
-
-    // vertex_out.normals = aNormals;
-    // vertex_out.texCoords = aTexCoord;
-    vertex.normal = aNormals;
-    vertex.texture = aTexCoord;
-
-    oNormal     = aNormals; //normalize(vec3((Model) * vec4(aNormals, 1)));
-    // oLightColor = lightColor;
-    // oLightPos   = lightPos;
-
-    // geom_out.normals    = aNormals;
-    // geom_out.texCoords  = aTexCoord;
-
-    // geom_out.worldPosition  = vec4(aPos, 1.0f);
-
-    // fragmentPosition = vec3(Model * vec4(aPos, 1.0));
-
-    gl_Position     =  vec4(aPos, 1.0f);
-    // TexCoord        = aTexCoord;
-    //outTextured     = textured;
-    // vertexColor     = vec4(kd, 1.0);
-
-    // vertexColor     =  vec4(aPos.y * 0.4f + 0.4f, aPos.z * 0.1 + aPos.y * 0.4f + 0.1f, 0.2f, 1.0f);
-
- //   vertexColor = vec4(0.2, 0.2, 0.2, 1);
+    vertex.normal   = aNormals;
+    vertex.texture  = aTexCoord;
+    vertex.frag_pos =   vec4(aPos, 1.0f);
+    gl_Position     =   vec4(aPos, 1.0f);
 }
 
 

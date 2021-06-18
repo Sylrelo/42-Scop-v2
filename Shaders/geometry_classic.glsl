@@ -18,6 +18,7 @@ in      vData
 {
     vec3    normal;
     vec2    texture;
+    vec4    frag_pos;
 }       vertices[];
 
 out     fData
@@ -65,7 +66,7 @@ void main(void)
         current_step            = w;
         frag.normal     = vertices[i].normal;
         frag.texture    = vertices[i].texture;
-        frag.frag_pos   = vec3((Model) * (gl_in[i].gl_Position));
+        frag.frag_pos   = vec3(Model * vertices[i].frag_pos);
 
         // fragPosition[i]        = (Persp * Model) * gl_in[i].gl_Position;
         EmitVertex();

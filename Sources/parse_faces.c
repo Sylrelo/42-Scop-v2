@@ -28,25 +28,25 @@ static ssize_t  get_material_id(t_mat *materials, size_t material_count, const c
     return -1;
 }
 
-void        mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size)
+static void     mat_push_buffer(t_mat *material, float *buffer)
 {
     if (material->tmp_allocated == 0)
     {
-        material->gl_buffer = realloc(NULL, sizeof(float) * buffer_size * MAT_GL_BUFFER_REALLOC_VALUE);
+        material->gl_buffer = realloc(NULL, sizeof(float) * BUFFER_COMPONENT * MAT_GL_BUFFER_REALLOC_VALUE);
         material->tmp_allocated = MAT_GL_BUFFER_REALLOC_VALUE;
     }
     else if (material->tmp_allocated + 1 > material->tmp_allocated)
     {
         material->tmp_allocated += MAT_GL_BUFFER_REALLOC_VALUE;
-        material->gl_buffer = realloc(material->gl_buffer, sizeof(float) * buffer_size * material->tmp_allocated);
+        material->gl_buffer = realloc(material->gl_buffer, sizeof(float) * BUFFER_COMPONENT * material->tmp_allocated);
     }
     if (!material->gl_buffer) 
         die("Realloc failed for mat_push_buffer");
-    _floatncat(material->gl_buffer, buffer, material->gl_buffer_size, buffer_size);
-    material->gl_buffer_size += buffer_size;
+    _floatncat(material->gl_buffer, buffer, material->gl_buffer_size, BUFFER_COMPONENT);
+    material->gl_buffer_size += BUFFER_COMPONENT;
 }
 
-void            calculate_missing_normal(t_mat *material)
+static void     calculate_missing_normal(t_mat *material)
 {
     size_t i = 0;
     size_t j = 0;
@@ -54,29 +54,51 @@ void            calculate_missing_normal(t_mat *material)
     t_vec3f	pt[3];
     t_vec3f normal;
 
-    if (material->gl_buffer_size % (8 * 3) == 0)
+    if (material->gl_buffer_size % (BUFFER_COMPONENT * 3) == 0)
     {
-        while (i < 8 * 3)
+        while (i < BUFFER_COMPONENT * 3)
         {
-            cbuffer = &material->gl_buffer[material->gl_buffer_size - (8 * 3) + i];
+            cbuffer = &material->gl_buffer[material->gl_buffer_size - (BUFFER_COMPONENT * 3) + i];
             pt[j] = (t_vec3f){*cbuffer, *(cbuffer + 1), *(cbuffer + 2)};
-            i += 8;
+            i += BUFFER_COMPONENT;
             j++;
         }
         normal = vec_cross(vec_sub(pt[1], pt[0]), vec_sub(pt[2], pt[0]));
         i = 0;
-        while (i < 8 * 3)
+        while (i < BUFFER_COMPONENT * 3)
         {
-            cbuffer = &material->gl_buffer[material->gl_buffer_size - (8 * 3) + i];
+            cbuffer = &material->gl_buffer[material->gl_buffer_size - (BUFFER_COMPONENT * 3) + i];
             *(cbuffer + 3) = normal.x;
             *(cbuffer + 4) = normal.y;
             *(cbuffer + 5) = normal.z;
-            i += 8;
+            i += BUFFER_COMPONENT;
         }
     }
 }
 
-void            update_minmax(t_vec3f *min, t_vec3f *max, float buffer[8])
+static void     generate_random_color(t_mat *material)
+{
+    size_t  i = 0;
+    float   *cbuffer;
+    t_vec3f rgb;
+
+    if (material->gl_buffer_size % (BUFFER_COMPONENT * 3) == 0)
+    {
+        rgb.x = random_float(20, 100, 0.01);
+        rgb.y = random_float(25, 100, 0.01);
+        rgb.z = random_float(55, 100, 0.01);
+        while (i < BUFFER_COMPONENT * 3)
+        {
+            cbuffer = &material->gl_buffer[material->gl_buffer_size - (BUFFER_COMPONENT * 3) + i];
+            *(cbuffer + 8) = rgb.x;
+            *(cbuffer + 9) = rgb.y;
+            *(cbuffer + 10) = rgb.z;
+            i += BUFFER_COMPONENT;
+        }
+    }
+}
+
+void            update_minmax(t_vec3f *min, t_vec3f *max, float buffer[BUFFER_COMPONENT])
 {
     max->x = fmax(max->x, buffer[0]);
     max->y = fmax(max->y, buffer[1]);
@@ -88,13 +110,13 @@ void            update_minmax(t_vec3f *min, t_vec3f *max, float buffer[8])
 
 static size_t   parse_vertex(t_parser *parser, t_mat *material, char *line)
 {
-    uint16_t face_type = 0x0;
-	size_t	index_v = 0;
-	size_t	index_vt = 0;
-	size_t	index_vn = 0;
-    float   buffer[8];
+    uint16_t face_type  = 0x0;
+	size_t	index_v     = 0;
+	size_t	index_vt    = 0;
+	size_t	index_vn    = 0;
+    float   buffer[BUFFER_COMPONENT];
 
-    _floatset(buffer, 0.00f, 8);
+    _floatset(buffer, 0.00f, BUFFER_COMPONENT);
 
     if (sscanf(line, "%zd/%zd/%zd", &index_v, &index_vt, &index_vn) == 3)
 		face_type = VERTICE | TEXTURE | NORMAL;
@@ -135,7 +157,8 @@ static size_t   parse_vertex(t_parser *parser, t_mat *material, char *line)
        buffer[7] = parser->vt[index_vt - 1].y;
     }
 
-    mat_push_buffer(material, buffer, 8);
+    mat_push_buffer(material, buffer);
+    generate_random_color(material);
     if ((face_type & NORMAL) != NORMAL)
         calculate_missing_normal(material);
     return (1);
@@ -209,7 +232,5 @@ size_t          parse_face(t_parser *parser, t_mat **materials, size_t *material
         parse_vertex(parser, &(*materials)[material_id], _strtrim(token));
 		token = strtok(NULL, " ");
 	}
-
-    // print_matlist(*material_count, *materials);
     return (1);
 }

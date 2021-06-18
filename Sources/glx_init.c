@@ -143,13 +143,15 @@ void			init_opengl_buffer_multi(t_scop *scop)
 
 	glBufferData(GL_ARRAY_BUFFER, (buffer_size * sizeof(float)), (void *) tmp_buffer, GL_STATIC_DRAW);
 	printf("%d\n", glGetError());
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(3 * sizeof(float)));
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void *)(6 * sizeof(float)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, BUFFER_COMPONENT * sizeof(float), (const void *)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, BUFFER_COMPONENT * sizeof(float), (const void *)(3 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, BUFFER_COMPONENT * sizeof(float), (const void *)(6 * sizeof(float)));
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, BUFFER_COMPONENT * sizeof(float), (const void *)(8 * sizeof(float)));
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(3);
 	printf("%d\n", glGetError());
 
 	free_all_buffers(scop, &tmp_buffer);

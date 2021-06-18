@@ -19,9 +19,9 @@
 #include "Libmatvec.h"
 #include "libc_extends.h"
 
+// Do not edit theses values
 #define MAT_GL_BUFFER_REALLOC_VALUE 5000
-// #define SHADOW_WIDTH 1024 * 2
-// #define SHADOW_HEIGHT 1024 * 2
+#define BUFFER_COMPONENT 11
 
 typedef enum e_parsing
 {
@@ -92,11 +92,11 @@ typedef struct	s_ogl
 	GLint		p_render;
 	t_uniforms	u_render;
 	GLint 		vao;
+	uint32_t	s_texturing;
 }				t_ogl;
 
 typedef struct s_scop
 {
-	// OpenGL & GLFW
 	t_ogl			ogl;
 	GLFWwindow		*window;
 	GLuint			vao;
@@ -126,6 +126,7 @@ int         create_shader_program(char *file_vertex, char *file_fragment, char *
 void		die(char *string);
 void   		print_matlist(size_t nb_mat, t_mat *materials);
 void    	clean_exit(t_scop *scop);
+float		random_float(int min, int max, float prec);
 
 
 // glfw_events.c
@@ -144,10 +145,7 @@ void		init_depth_map(t_scop *scop);
 void 		parser_init_fdf(t_scop *scop, char *file);
 
 // parse_face.c
-void        mat_push_buffer(t_mat *material, float *buffer, size_t buffer_size);
 size_t      parse_face(t_parser *parser, t_mat **materials, size_t *material_count, char *last_mtl, char *line);
-void        update_minmax(t_vec3f *min, t_vec3f *max, float buffer[8]);
-void        calculate_missing_normal(t_mat *material);
 
 // parsing_init.c
 void        parser_init(t_scop *scop, char *argv);

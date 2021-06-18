@@ -2,8 +2,9 @@
   
 out vec4            FragColor;
 
-in vec3            normal;
+in vec3             normal;
 in vec2             tex_coords;
+in vec3             color;
 
 uniform mat4	    Model;
 uniform int         textured;
@@ -28,4 +29,6 @@ void main()
         FragColor = vec4(kd * d, 1);
     if (textured == 1)
         FragColor = vec4(texture(ourTexture, tex_coords).xyz * d, 1);
+
+    FragColor = vec4(color * d, 1);
 }

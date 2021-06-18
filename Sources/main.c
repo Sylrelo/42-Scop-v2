@@ -13,7 +13,7 @@
 #include "Scop.h"
 #include <stdio.h>
 #include <math.h>
-
+#include <time.h>
 #include <sys/stat.h> // deplacer
 #include <float.h>
 
@@ -121,7 +121,7 @@ void	display_loop(t_scop *scop)
 			offset_mat 	= 0;
 			object 		= scop->objects[obj_i];
 			
-			scop->objects[obj_i].rot.y += 0.015;
+			scop->objects[obj_i].rot.y += 0.005;
 
 			if (obj_i > 0)
 				offset_obj = scop->objects[obj_i - 1].offset;
@@ -133,7 +133,7 @@ void	display_loop(t_scop *scop)
 					offset_mat += object.materials[mat_i - 1].gl_buffer_size;
 				send_material_data(uniform, scop->textures, material);
 				// printf("%zu %zu | %zu %zu\n", obj_i, mat_i, (offset_obj + offset_mat) / 8 / 3, (material.gl_buffer_size) / 8 / 3);
-				glDrawArrays(GL_TRIANGLES, (offset_obj + offset_mat) / 8, (material.gl_buffer_size) / 8);
+				glDrawArrays(GL_TRIANGLES, (offset_obj + offset_mat) / BUFFER_COMPONENT, (material.gl_buffer_size) / BUFFER_COMPONENT);
 			}
 		}
 
@@ -245,13 +245,16 @@ int 	main(int argc, char *argv[])
 	if (!scop)
 		die ("Could not start Scop");
 
+	srand(time(NULL));
+
 	scop->textures_count 	= 0;
 	scop->textures 			= NULL;
 	scop->cam_pos			= (t_vec3f) {0, 0, 0};
 	scop->cam_rot			= (t_vec3f) {0, 0, 0};
-	scop->width	 			= 1920;
-	scop->height 			= 1080;
+	scop->width	 			= 1280;
+	scop->height 			= 720;
 	scop->multiplier		= 1;
+	scop->ogl.s_texturing	= 0;
 	memset(scop->keys, 0, sizeof(uint32_t) * 348);
 		
 	printf("[Scop] Starting OpenGL initialization\n");
@@ -263,7 +266,6 @@ int 	main(int argc, char *argv[])
 	scop->ogl.p_render = create_shader_program("Shaders/simple/vertex.glsl", "Shaders/simple/fragment.glsl", NULL);
 	// scop->ogl.p_render = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl", "Shaders/geometry_classic.glsl");
 
-
 	printf("[Scop] Starting parser\n\n");
 	start_parser(scop, argc, argv);
 	
@@ -273,16 +275,11 @@ int 	main(int argc, char *argv[])
 	printf("[Scop] Opening Window\n");
 	glfwShowWindow(scop->window);
 
-	// scop->ogl.p_render = create_shader_program("Shaders/simple/vertex.glsl", "Shaders/simple/fragment.glsl", NULL);
-
 	glUseProgram(scop->ogl.p_render);
 
 	printf("[Scop] Ready\n");
 
 	auto_positions(scop);
-	//scop->cam_pos.x -= scop->center.x * .5;
-	//scop->cam_pos.y -= scop->center.y * .5;
-	//scop->cam_pos.z -= scop->center.z + 8;
 
 	display_loop(scop);
 	clean_exit(scop);

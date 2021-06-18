@@ -12,6 +12,12 @@
 
 #include "Scop.h"
 #include <stdio.h>
+#include <time.h>
+
+float	random_float(int min, int max, float prec)
+{
+	return ((min + rand() % max) * prec);
+}
 
 void    print_matlist(size_t nb_mat, t_mat *materials)
 {

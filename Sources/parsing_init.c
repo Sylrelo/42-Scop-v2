@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/18 15:22:22 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/18 19:26:44 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,26 @@ static void get_relative_path(char path[256], char *file)
 	free(file_tmp);
 }
 
+void		print_progress(size_t *old, size_t oyo, t_stat st)
+{
+	char		progress[103];
+	size_t		percent = (int)((oyo / (float)st.st_size) * 100);
+
+	if (percent >= 98)
+		percent = 100;
+	strcpy(progress, "[                                                                                                    ]");
+	if (*old != percent)
+	{
+		*old = percent;
+		dprintf(1, "\r");
+		for (size_t i = 0; i < percent; i++)
+		{
+			progress[1 + i] = '-';
+		}
+		dprintf(1, "%s %zu%%", progress, percent);
+	}
+}
+
 void 		parser_init(t_scop *scop, char *file)
 {
 	t_parser	parser;
@@ -105,38 +125,49 @@ void 		parser_init(t_scop *scop, char *file)
 	if (!(parser.vt = calloc(parser.vt_count, sizeof(t_vec2f))))
 		die("Error calloc vt");
 
+	size_t oyo = 0;
+	size_t old = 0;
 	while ((read = getline(&line, &len, (FILE *) fp)) != -1)
 	{
+		oyo += read;
+
 		if (!strncmp(line, "mtllib ", 7))
 			parser_mtl_start(scop, path, line + 7);
 		else if (!strncmp(line, "usemtl ", 7))
 		{
+			print_progress(&old, oyo, st);
 			memset(last_mtl, 0, 256);
 			strcpy(last_mtl, _strtrim(line + 7));
 		}
 		else if (!strncmp(line, "v ", 2)) 
 		{
+			print_progress(&old, oyo, st);
 			realloc_obj_arrays(&v_count, &parser.v_count, sizeof(t_vec3f), (void *) &parser.v);
 			sscanf(line, "v %f %f %f", &parser.v[v_count].x, &parser.v[v_count].y, &parser.v[v_count].z);
 			v_count++;
 		} 
 		else if (!strncmp(line, "vn ", 3)) 
 		{
+			print_progress(&old, oyo, st);
 			realloc_obj_arrays(&vn_count, &parser.vn_count, sizeof(t_vec3f), (void *) &parser.vn);
 			sscanf(line, "vn %f %f %f", &parser.vn[vn_count].x, &parser.vn[vn_count].y, &parser.vn[vn_count].z);
 			vn_count++;
 		}
 		else if (!strncmp(line, "vt ", 3)) 
 		{
+			print_progress(&old, oyo, st);
 			realloc_obj_arrays(&vt_count, &parser.vt_count, sizeof(t_vec2f), (void *) &parser.vt);
 			sscanf(line, "vt %f %f", &parser.vt[vt_count].x, &parser.vt[vt_count].y);
 			vt_count++;
 		}
 		else if (!strncmp(line, "f ", 2)) 
 		{
+			print_progress(&old, oyo, st);
 			parse_face(&parser, &scop->objects[scop->objects_count].materials, &scop->objects[scop->objects_count].nb_mats, last_mtl, _strtrim(line + 2));
 			f_count++;
 		}
+		// if ()
+		// dprintf(1, "")
 	}
 
 	free_obj_arrays(&parser);

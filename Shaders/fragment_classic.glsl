@@ -22,22 +22,21 @@ in      fData
 
 void main()
 {
-    float step      = current_step;
+   float step      = current_step;
 
-    vec3 ModelNorm  = vec3(((Model)) * vec4(frag.normal, 1));
+   vec3 ModelNorm  = vec3(((Model)) * vec4(frag.normal, 0));
 
-    vec3 norm       = normalize(ModelNorm);
-    vec3 lightDir   = normalize(vec3(-2.5f, 2.5f, 10.0f));
+   vec3 norm       = normalize(ModelNorm);
+   vec3 lightDir   = normalize(vec3(-2.5f, 2.5f, 10.0f));
 
-    float d        = 1;//max(dot(norm, lightDir), 0.0);
+   float d        = 1;//max(dot(norm, lightDir), 0.0);
+   if (glfw_options == 0)
+       step = 0;
 
-    if (glfw_options == 0)
-        step = 0;
-    
-    if (textured == 0)
-        FragColor = vec4(kd * d, 1 - step);
-    if (textured == 1)
-       FragColor = vec4(texture(ourTexture, frag.texture).xyz * d, 1 - step);
 
-    //FragColor = vec4(1, 1, 1, 1);
+   if (textured == 0)
+       FragColor = vec4(kd * d, 1 - step);
+   if (textured == 1)
+     FragColor = vec4(texture(ourTexture, frag.texture).xyz * d, 1 - step);
+
 } 

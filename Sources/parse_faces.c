@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:13:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/17 13:35:13 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/18 18:22:15 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,17 +54,29 @@ void            calculate_missing_normal(t_mat *material)
     t_vec3f	pt[3];
     t_vec3f normal;
 
+
+    static int caca = 0;
+
+    //printf("%d - %d\n", caca, material->gl_buffer_size % (8 * 3) == 0);
+    
     if (material->gl_buffer_size % (8 * 3) == 0)
     {
+
         while (i < 8 * 3)
         {
-            j = 0;
+            printf("%d\n", i);
             cbuffer = &material->gl_buffer[material->gl_buffer_size - (8 * 3) + i];
             pt[j] = (t_vec3f){*cbuffer, *(cbuffer + 1), *(cbuffer + 2)};
             i += 8;
             j++;
         }
+        
+        printf("%f %f %f\n", pt[0].x,  pt[0].y, pt[0].z);
+        printf("%f %f %f\n", pt[1].x,  pt[1].y, pt[1].z);
+        printf("%f %f %f\n", pt[2].x,  pt[2].y, pt[2].z);
+
         normal = vec_cross(vec_sub(pt[1], pt[0]), vec_sub(pt[2], pt[0]));
+
         i = 0;
         while (i < 8 * 3)
         {
@@ -74,7 +86,11 @@ void            calculate_missing_normal(t_mat *material)
             *(cbuffer + 5) = normal.z;
             i += 8;
         }
+
+        printf("%f %f %f\n", *(cbuffer + 3), *(cbuffer + 4), *(cbuffer + 5));
+        caca++;
     }
+
 }
 
 void            update_minmax(t_vec3f *min, t_vec3f *max, float buffer[8])
@@ -201,6 +217,7 @@ size_t          parse_face(t_parser *parser, t_mat **materials, size_t *material
             return (0);
     }
 
+
 	if (sides_count > 3)
         return (triangulate(parser, &(*materials)[material_id], sides_count, line));
 
@@ -209,6 +226,7 @@ size_t          parse_face(t_parser *parser, t_mat **materials, size_t *material
         parse_vertex(parser, &(*materials)[material_id], _strtrim(token));
 		token = strtok(NULL, " ");
 	}
+
     // print_matlist(*material_count, *materials);
     return (1);
 }

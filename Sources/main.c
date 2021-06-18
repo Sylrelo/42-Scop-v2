@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/18 16:02:50 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/18 18:02:19 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,29 +35,30 @@ void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *scop)
 	t_mat4	mat_perspective;
 
 	if (glfw_time > .5)
+	{
 		glUniform1i(uniform.glfw_options, 0);
-	else 
+		glUniform1f(uniform.glfw_time, glfw_time);
+	}
+	else
+	{
 		glUniform1i(uniform.glfw_options, 1);
-	glUniform1f(uniform.glfw_time, glfw_time);
+		glUniform1f(uniform.glfw_time, .5);
+	}
 
 	mat_view = m4_viewmat(scop->cam_rot.x, scop->cam_rot.y, scop->cam_rot.z, m4_translate(scop->cam_pos.x, scop->cam_pos.y, scop->cam_pos.z));
 	glUniformMatrix4fv(uniform.m4_view, 1, GL_FALSE, mat_view.value[0]);
-
 	mat_perspective = m4_perspective(1.0472, (float) scop->width / (float) scop->height, 0.00001f, 1000.0f);
 	glUniformMatrix4fv(uniform.m4_projection, 1, GL_FALSE, mat_perspective.value[0]);
 }
 
 void	send_model_transformations(uint32_t u_model, t_objects object)
 {
-	static float a = 0;
-
 	const t_mat4	mat_scale 		= m4_scale(1, 1, 1);
 	const t_mat4	mat_translate 	= m4_translate(object.pos.x, object.pos.y, object.pos.z);
-	const t_mat4	mat_rotate		= m4_rotation_around_center(object.center, 0, a, 0);
+	const t_mat4	mat_rotate		= m4_rotation_around_center(object.center, object.rot.x, object.rot.y, object.rot.z);
 	const t_mat4	mat_model 		= m4_mult(m4_mult(mat_scale, mat_rotate), mat_translate);
 
 	glUniformMatrix4fv(u_model, 1, GL_FALSE, mat_model.value[0]);
-	//a += 0.1;
 }
 
 void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat material)
@@ -94,6 +95,8 @@ void	display_loop(t_scop *scop)
 	glfw_time = glfwGetTime();
 	base_time = glfw_time;
 	glfw_time -= base_time;
+	
+    glUseProgram(scop->ogl.p_render);
 
 	while (!glfwWindowShouldClose(scop->window))
 	{
@@ -107,10 +110,9 @@ void	display_loop(t_scop *scop)
 		handle_mouse(scop->window,  &scop->cam_rot);
 		handle_transformations(scop->keys, &scop->cam_pos, &scop->cam_rot, scop->multiplier);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, scop->width * 2, scop->height * 2);
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//glViewport(0, 0, scop->width * 2, scop->height * 2);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    	glUseProgram(scop->ogl.p_render);
 
 		send_default_uniforms(uniform, glfw_time, scop);
 
@@ -119,6 +121,8 @@ void	display_loop(t_scop *scop)
 			offset_mat 	= 0;
 			object 		= scop->objects[obj_i];
 			
+			scop->objects[obj_i].rot.y += 0.015;
+
 			if (obj_i > 0)
 				offset_obj = scop->objects[obj_i - 1].offset;
 			for (size_t mat_i = 0; mat_i < object.nb_mats; mat_i++)
@@ -128,9 +132,14 @@ void	display_loop(t_scop *scop)
 				if (mat_i > 0)
 					offset_mat += object.materials[mat_i - 1].gl_buffer_size;
 				send_material_data(uniform, scop->textures, material);
+				// printf("%zu %zu | %zu %zu\n", obj_i, mat_i, (offset_obj + offset_mat) / 8 / 3, (material.gl_buffer_size) / 8 / 3);
 				glDrawArrays(GL_TRIANGLES, (offset_obj + offset_mat) / 8, (material.gl_buffer_size) / 8);
 			}
 		}
+
+
+		// send_model_transformations(uniform.m4_model, scop->objects[0]);
+		// glDrawArrays(GL_TRIANGLES, 0, 2500000 );
 		glfwSwapBuffers(scop->window);
 		glfwPollEvents();
 	}
@@ -186,6 +195,7 @@ void	auto_positions(t_scop *scop)
 	{
 		obj = &scop->objects[obji];
 		obj->pos = (t_vec3f) {-obj->center.x, -obj->min.y, -obj->center.z};
+		obj->rot = (t_vec3f) {0, (rand() % 100) * 0.01, 0};
 		if (obji > 0)
 		{
 			prev_obj = &scop->objects[obji - 1];
@@ -239,8 +249,8 @@ int 	main(int argc, char *argv[])
 	scop->textures 			= NULL;
 	scop->cam_pos			= (t_vec3f) {0, 0, 0};
 	scop->cam_rot			= (t_vec3f) {0, 0, 0};
-	scop->width	 			= 1600;
-	scop->height 			= 900;
+	scop->width	 			= 1920;
+	scop->height 			= 1080;
 	scop->multiplier		= 1;
 	memset(scop->keys, 0, sizeof(uint32_t) * 348);
 		
@@ -249,6 +259,10 @@ int 	main(int argc, char *argv[])
 
 	scop->objects_count = 0;
 	scop->objects = calloc(argc, sizeof(t_objects));
+
+	scop->ogl.p_render = create_shader_program("Shaders/simple/vertex.glsl", "Shaders/simple/fragment.glsl", NULL);
+	// scop->ogl.p_render = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl", "Shaders/geometry_classic.glsl");
+
 
 	printf("[Scop] Starting parser\n\n");
 	start_parser(scop, argc, argv);
@@ -259,7 +273,7 @@ int 	main(int argc, char *argv[])
 	printf("[Scop] Opening Window\n");
 	glfwShowWindow(scop->window);
 
-	scop->ogl.p_render = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl", "Shaders/geometry_classic.glsl");
+	// scop->ogl.p_render = create_shader_program("Shaders/simple/vertex.glsl", "Shaders/simple/fragment.glsl", NULL);
 
 	glUseProgram(scop->ogl.p_render);
 

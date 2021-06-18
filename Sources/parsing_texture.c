@@ -88,7 +88,6 @@ void        parse_texture(t_scop *scop, t_mat *material, char path[256], char *f
     if (texture_id != -1)
     {
         material->tex_id = texture_id;
-        printf ("      Getting texture \033[1m%s\033[0m\n", filepath);
         return ;
     }
 
@@ -98,7 +97,7 @@ void        parse_texture(t_scop *scop, t_mat *material, char path[256], char *f
         return ;
     }
     
-    printf ("      Loading texture \033[1m%s\033[0m\n", filepath);
+    printf ("      Texture \033[1m%s\033[0m loaded.\n", filepath);
 
     generate_gl_texture(scop, width, height, image, file, GL_UNSIGNED_BYTE);
     material->tex_id = scop->textures_count - 1;

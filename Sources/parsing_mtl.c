@@ -68,7 +68,7 @@ int        parser_mtl_start(t_scop *scop, char path[256], char *file)
     }
         // die("Error reading mtl file");
     
-    printf ("    Loading MTL file \033[1m%s\033[0m\n", filepath);
+    printf ("    MTL file \033[1m%s\033[0m loaded.\n", filepath);
     obj->nb_mats   = 0;
     obj->materials = calloc(5, sizeof(t_mat));
 

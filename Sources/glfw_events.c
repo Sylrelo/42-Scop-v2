@@ -31,6 +31,10 @@ void	handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing)
     keys[GLFW_KEY_F] = glfwGetKey(window, GLFW_KEY_F);
     keys[GLFW_KEY_T] = glfwGetKey(window, GLFW_KEY_T);
     keys[GLFW_KEY_LEFT_SHIFT] = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
+    keys[GLFW_KEY_LEFT] = glfwGetKey(window, GLFW_KEY_LEFT);
+    keys[GLFW_KEY_RIGHT] = glfwGetKey(window, GLFW_KEY_RIGHT);
+    keys[GLFW_KEY_UP] = glfwGetKey(window, GLFW_KEY_UP);
+    keys[GLFW_KEY_DOWN] = glfwGetKey(window, GLFW_KEY_DOWN);
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE))
         exit (1);
@@ -91,9 +95,11 @@ void	handle_mouse(GLFWwindow *window, t_vec3f *cam_rot)
 	pos_y_old = pos_y;
 }
 
-void 	handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot, float multiplier)
+void 	handle_transformations(t_scop *scop)
 {
-	t_vec3f	move 		= (t_vec3f) {0, 0, 0};
+    const uint32_t *keys    = scop->keys;
+	t_vec3f	move 		    = (t_vec3f) {0, 0, 0};
+    float multiplier        = 1;
 
     if (keys[GLFW_KEY_W])
 	    move.z += 0.1;
@@ -108,9 +114,26 @@ void 	handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_
     if (keys[GLFW_KEY_D])
 	    move.x -= 0.1;
     if (keys[GLFW_KEY_LEFT_SHIFT])
-        move = vec_multf(move, multiplier);
+    {
+        multiplier = scop->multiplier;
+        move = vec_multf(move, scop->multiplier);
+    }
         
-   
-	move = m4_mult_vec3f(m4_rotation(0, cam_rot->y, 0), move);
-	*cam_pos = vec_add(*cam_pos, move);
+
+    if (keys[GLFW_KEY_LEFT])
+        for (size_t i = 0; i < scop->objects_count; i++)
+                scop->objects[i].rot.y += 0.01 * multiplier;
+    if (keys[GLFW_KEY_RIGHT])
+        for (size_t i = 0; i < scop->objects_count; i++)
+                scop->objects[i].rot.y -= 0.01 * multiplier;
+    if (keys[GLFW_KEY_UP])
+        for (size_t i = 0; i < scop->objects_count; i++)
+                scop->objects[i].rot.x += 0.01 * multiplier;
+    if (keys[GLFW_KEY_DOWN])
+        for (size_t i = 0; i < scop->objects_count; i++)
+                scop->objects[i].rot.x -= 0.01 * multiplier;
+
+
+	move = m4_mult_vec3f(m4_rotation(scop->cam_rot.x, scop->cam_rot.y, 0), move);
+	scop->cam_pos = vec_add(scop->cam_pos, move);
 }

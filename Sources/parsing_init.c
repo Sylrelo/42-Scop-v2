@@ -63,17 +63,17 @@ static void get_relative_path(char path[256], char *file)
 	free(file_tmp);
 }
 
-void		print_progress(size_t *old, size_t oyo, t_stat st)
+void		print_progress(size_t *old_percent, size_t current, t_stat st)
 {
 	char		progress[103];
-	size_t		percent = (int)((oyo / (float)st.st_size) * 100);
+	size_t		percent = (int)((current / (float)st.st_size) * 100);
 
 	if (percent >= 98)
 		percent = 100;
 	strcpy(progress, "[                                                                                                    ]");
-	if (*old != percent)
+	if (*old_percent != percent)
 	{
-		*old = percent;
+		*old_percent = percent;
 		dprintf(1, "\r");
 		for (size_t i = 0; i < percent; i++)
 		{

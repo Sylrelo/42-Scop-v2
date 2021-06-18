@@ -137,7 +137,7 @@ float		random_float(int min, int max, float prec);
 
 // glfw_events.c
 void		handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing);
-void 		handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot, float multiplier);
+void 		handle_transformations(t_scop *scop);
 void		handle_mouse(GLFWwindow *window, t_vec3f *cam_rot);
 
 // glx_init.c

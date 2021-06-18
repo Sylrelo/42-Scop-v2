@@ -118,8 +118,8 @@ void	display_loop(t_scop *scop)
 		glfw_time = glfwGetTime() - base_time;
 		
 		handle_keyboard(scop->window, scop->keys, &scop->ogl.s_texturing);
-		handle_mouse(scop->window,  &scop->cam_rot);
-		handle_transformations(scop->keys, &scop->cam_pos, &scop->cam_rot, scop->multiplier);
+		handle_mouse(scop->window, &scop->cam_rot);
+		handle_transformations(scop);
     	
 		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//glViewport(0, 0, scop->width * 2, scop->height * 2);
@@ -140,7 +140,7 @@ void	display_loop(t_scop *scop)
 			offset_mat 	= 0;
 			object 		= scop->objects[obj_i];
 			
-			scop->objects[obj_i].rot.y += 0.005;
+			// scop->objects[obj_i].rot.y += 0.005;
 
 			if (obj_i > 0)
 				offset_obj = scop->objects[obj_i - 1].offset;

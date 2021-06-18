@@ -13,7 +13,7 @@
 #include "Scop.h"
 #include <stdio.h>
 
-void	handle_keyboard(GLFWwindow *window, uint32_t keys[349])
+void	handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing)
 {
     const float     glfw_time       = glfwGetTime();
     static float    key_timeout     = 0;
@@ -29,6 +29,7 @@ void	handle_keyboard(GLFWwindow *window, uint32_t keys[349])
     keys[GLFW_KEY_D] = glfwGetKey(window, GLFW_KEY_D);
     keys[GLFW_KEY_R] = glfwGetKey(window, GLFW_KEY_R);
     keys[GLFW_KEY_F] = glfwGetKey(window, GLFW_KEY_F);
+    keys[GLFW_KEY_T] = glfwGetKey(window, GLFW_KEY_T);
     keys[GLFW_KEY_LEFT_SHIFT] = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE))
@@ -57,6 +58,14 @@ void	handle_keyboard(GLFWwindow *window, uint32_t keys[349])
         else
             glDisable(GL_DEPTH_TEST);
         gl_depth_test = !gl_depth_test;
+        key_timeout = glfw_time;
+    }
+    if (glfwGetKey(window, GLFW_KEY_T) && time_diff)
+    {
+        (*s_texturing)++;
+        if (*s_texturing >= 3)
+            *s_texturing = 0;
+
         key_timeout = glfw_time;
     }
     glPolygonMode(GL_FRONT_AND_BACK, render_option);

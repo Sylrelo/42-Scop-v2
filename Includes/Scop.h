@@ -92,7 +92,7 @@ typedef struct	s_ogl
 	GLint		p_render;
 	t_uniforms	u_render;
 	GLint 		vao;
-	uint32_t	s_texturing;
+	int			s_texturing;
 }				t_ogl;
 
 typedef struct s_scop
@@ -130,7 +130,7 @@ float		random_float(int min, int max, float prec);
 
 
 // glfw_events.c
-void		handle_keyboard(GLFWwindow *window, uint32_t keys[349]);
+void		handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing);
 void 		handle_transformations(uint32_t keys[349], t_vec3f *cam_pos, t_vec3f *cam_rot, float multiplier);
 void		handle_mouse(GLFWwindow *window, t_vec3f *cam_rot);
 

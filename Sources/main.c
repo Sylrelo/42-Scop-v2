@@ -61,7 +61,7 @@ void	send_model_transformations(uint32_t u_model, t_objects object)
 	glUniformMatrix4fv(u_model, 1, GL_FALSE, mat_model.value[0]);
 }
 
-void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat material)
+void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat material, int s_texturing)
 {
 	glUniform3f(uniform.kd, material.kd.x, material.kd.y, material.kd.z);
 	glUniform3f(uniform.ka, material.ka.x, material.ka.y, material.ka.z);
@@ -70,10 +70,10 @@ void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat material
 	{
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textures[material.tex_id].gl_texture);
-		glUniform1i(uniform.textured, 1);
+		glUniform1i(uniform.textured, s_texturing);
 	}
 	else
-		glUniform1i(uniform.textured, 0);
+		glUniform1i(uniform.textured, s_texturing != 1 ? s_texturing : 0);
 }
 
 void	display_loop(t_scop *scop)
@@ -106,7 +106,7 @@ void	display_loop(t_scop *scop)
 		
 		glfw_time = glfwGetTime() - base_time;
 		
-		handle_keyboard(scop->window, scop->keys);
+		handle_keyboard(scop->window, scop->keys, &scop->ogl.s_texturing);
 		handle_mouse(scop->window,  &scop->cam_rot);
 		handle_transformations(scop->keys, &scop->cam_pos, &scop->cam_rot, scop->multiplier);
 
@@ -131,7 +131,7 @@ void	display_loop(t_scop *scop)
 				material = object.materials[mat_i];
 				if (mat_i > 0)
 					offset_mat += object.materials[mat_i - 1].gl_buffer_size;
-				send_material_data(uniform, scop->textures, material);
+				send_material_data(uniform, scop->textures, material, scop->ogl.s_texturing);
 				// printf("%zu %zu | %zu %zu\n", obj_i, mat_i, (offset_obj + offset_mat) / 8 / 3, (material.gl_buffer_size) / 8 / 3);
 				glDrawArrays(GL_TRIANGLES, (offset_obj + offset_mat) / BUFFER_COMPONENT, (material.gl_buffer_size) / BUFFER_COMPONENT);
 			}

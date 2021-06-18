@@ -27,8 +27,8 @@ void main()
 
     if (textured == 0)
         FragColor = vec4(kd * d, 1);
-    if (textured == 1)
+    else if (textured == 1)
         FragColor = vec4(texture(ourTexture, tex_coords).xyz * d, 1);
-
-    FragColor = vec4(color * d, 1);
+    else
+        FragColor = vec4(color * d, 1);
 }

@@ -63,7 +63,7 @@ void	handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing)
     if (glfwGetKey(window, GLFW_KEY_T) && time_diff)
     {
         (*s_texturing)++;
-        if (*s_texturing >= 3)
+        if (*s_texturing >= 4)
             *s_texturing = 0;
 
         key_timeout = glfw_time;

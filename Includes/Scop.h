@@ -46,6 +46,8 @@ typedef struct	s_textures
 {
 	char		filename[256];
 	uint32_t	gl_texture;
+	uint32_t	width;
+	uint32_t	height;
 }				t_textures;
 
 typedef struct	s_mat
@@ -85,6 +87,10 @@ typedef struct	s_uniforms
 
 	uint32_t	glfw_time;
 	uint32_t	glfw_options;
+
+	uint32_t 	tex_size;
+	uint32_t 	obj_max_y;
+	uint32_t 	obj_center;
 }				t_uniforms;
 
 typedef struct	s_ogl
@@ -156,5 +162,6 @@ void        init_mat_default_values(t_mat *material);
 
 // parsing_texture.c
 void        parse_texture(t_scop *scop, t_mat *material, char path[256], char *file);
+void        generate_gl_texture(t_scop *scop, size_t width, size_t height, void *tex, char *file, unsigned int type);
 
 #endif

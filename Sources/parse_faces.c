@@ -84,8 +84,8 @@ static void     generate_random_color(t_mat *material)
 
     if (material->gl_buffer_size % (BUFFER_COMPONENT * 3) == 0)
     {
-        rgb.x = random_float(20, 100, 0.01);
-        rgb.y = random_float(25, 100, 0.01);
+        rgb.x = random_float(20, 90, 0.01);
+        rgb.y = random_float(25, 90, 0.01);
         rgb.z = random_float(55, 100, 0.01);
         while (i < BUFFER_COMPONENT * 3)
         {

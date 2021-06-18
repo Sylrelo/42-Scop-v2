@@ -27,6 +27,11 @@ void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
 	uniform->textured 		= glGetUniformLocation(program, "textured");
 	uniform->glfw_time 		= glGetUniformLocation(program, "glfw_time");
 	uniform->glfw_options 	= glGetUniformLocation(program, "glfw_options");
+
+	uniform->tex_size 		= glGetUniformLocation(program, "tex_size");
+	uniform->obj_max_y 		= glGetUniformLocation(program, "obj_max_y");
+	uniform->obj_center 	= glGetUniformLocation(program, "obj_center");
+
 }
 
 void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *scop)
@@ -51,28 +56,34 @@ void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *scop)
 	glUniformMatrix4fv(uniform.m4_projection, 1, GL_FALSE, mat_perspective.value[0]);
 }
 
-void	send_model_transformations(uint32_t u_model, t_objects object)
+void	send_model_data(t_uniforms uniform, t_objects object)
 {
 	const t_mat4	mat_scale 		= m4_scale(1, 1, 1);
 	const t_mat4	mat_translate 	= m4_translate(object.pos.x, object.pos.y, object.pos.z);
 	const t_mat4	mat_rotate		= m4_rotation_around_center(object.center, object.rot.x, object.rot.y, object.rot.z);
 	const t_mat4	mat_model 		= m4_mult(m4_mult(mat_scale, mat_rotate), mat_translate);
 
-	glUniformMatrix4fv(u_model, 1, GL_FALSE, mat_model.value[0]);
+	glUniformMatrix4fv(uniform.m4_model, 1, GL_FALSE, mat_model.value[0]);
+	glUniform1f(uniform.obj_max_y, object.max.y);
+	glUniform3f(uniform.obj_center, object.center.x, object.center.y, object.center.z);
 }
 
 void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat material, int s_texturing)
 {
+	t_textures	tex;
+
 	glUniform3f(uniform.kd, material.kd.x, material.kd.y, material.kd.z);
 	glUniform3f(uniform.ka, material.ka.x, material.ka.y, material.ka.z);
 
-	if (material.tex_id != -1)
+	if (s_texturing == 1 && material.tex_id != -1)
 	{
+		tex = textures[material.tex_id];
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textures[material.tex_id].gl_texture);
-		glUniform1i(uniform.textured, s_texturing);
+		glBindTexture(GL_TEXTURE_2D, tex.gl_texture);
+		glUniform1i(uniform.textured, 1);
+		glUniform2f(uniform.tex_size, tex.width, tex.height);
 	}
-	else
+	else if (s_texturing != 2)
 		glUniform1i(uniform.textured, s_texturing != 1 ? s_texturing : 0);
 }
 
@@ -109,12 +120,20 @@ void	display_loop(t_scop *scop)
 		handle_keyboard(scop->window, scop->keys, &scop->ogl.s_texturing);
 		handle_mouse(scop->window,  &scop->cam_rot);
 		handle_transformations(scop->keys, &scop->cam_pos, &scop->cam_rot, scop->multiplier);
-
+    	
 		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//glViewport(0, 0, scop->width * 2, scop->height * 2);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		send_default_uniforms(uniform, glfw_time, scop);
+
+		if (scop->ogl.s_texturing == 2)
+		{
+			glUniform2f(uniform.tex_size, scop->textures[scop->textures_count - 1].width, scop->textures[scop->textures_count - 1].height);
+			glUniform1i(uniform.textured, 2);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, scop->textures[scop->textures_count - 1].gl_texture);
+		}
 
 		for (size_t obj_i = 0; obj_i < scop->objects_count; obj_i++)
 		{
@@ -127,7 +146,7 @@ void	display_loop(t_scop *scop)
 				offset_obj = scop->objects[obj_i - 1].offset;
 			for (size_t mat_i = 0; mat_i < object.nb_mats; mat_i++)
 			{
-				send_model_transformations(uniform.m4_model, object);
+				send_model_data(uniform, object);
 				material = object.materials[mat_i];
 				if (mat_i > 0)
 					offset_mat += object.materials[mat_i - 1].gl_buffer_size;
@@ -136,10 +155,6 @@ void	display_loop(t_scop *scop)
 				glDrawArrays(GL_TRIANGLES, (offset_obj + offset_mat) / BUFFER_COMPONENT, (material.gl_buffer_size) / BUFFER_COMPONENT);
 			}
 		}
-
-
-		// send_model_transformations(uniform.m4_model, scop->objects[0]);
-		// glDrawArrays(GL_TRIANGLES, 0, 2500000 );
 		glfwSwapBuffers(scop->window);
 		glfwPollEvents();
 	}
@@ -280,6 +295,28 @@ int 	main(int argc, char *argv[])
 	printf("[Scop] Ready\n");
 
 	auto_positions(scop);
+
+
+	float pixels[48] = {
+	    0.0f, 0.0f, 0.0f,
+	    1.0f, 1.0f, 1.0f,
+	    1.0f, 1.0f, 1.0f,
+	    0.0f, 0.0f, 0.0f,
+	    0.0f, 0.0f, 0.0f,
+	    1.0f, 1.0f, 1.0f,
+	    1.0f, 1.0f, 1.0f,
+	    0.0f, 0.0f, 0.0f,
+	    0.0f, 0.0f, 0.0f,
+	    1.0f, 1.0f, 1.0f,
+	    1.0f, 1.0f, 1.0f,
+	    0.0f, 0.0f, 0.0f,
+	    0.0f, 0.0f, 0.0f,
+	    1.0f, 1.0f, 1.0f,
+	    1.0f, 1.0f, 1.0f,
+	    0.0f, 0.0f, 0.0f,
+	};
+	generate_gl_texture(scop, 4, 4, pixels, "CHECKER", GL_FLOAT);
+
 
 	display_loop(scop);
 	clean_exit(scop);

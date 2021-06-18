@@ -54,6 +54,26 @@ static void realloc_textures(size_t count, void **textures)
     }
 }
 
+void        generate_gl_texture(t_scop *scop, size_t width, size_t height, void *tex, char *file, unsigned int type)
+{
+    realloc_textures(scop->textures_count, (void *) &scop->textures);
+
+    glGenTextures(1, &scop->textures[scop->textures_count].gl_texture);
+    glBindTexture(GL_TEXTURE_2D, scop->textures[scop->textures_count].gl_texture);  
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, type, tex);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    scop->textures[scop->textures_count].width  = width;
+    scop->textures[scop->textures_count].height = height;
+    strcpy(scop->textures[scop->textures_count].filename, file);
+    scop->textures_count++;
+
+}
+
 void        parse_texture(t_scop *scop, t_mat *material, char path[256], char *file)
 {
     const int texture_id = find_already_loaded(scop->textures, scop->textures_count, file);
@@ -80,19 +100,7 @@ void        parse_texture(t_scop *scop, t_mat *material, char path[256], char *f
     
     printf ("      Loading texture \033[1m%s\033[0m\n", filepath);
 
-    realloc_textures(scop->textures_count, (void *) &scop->textures);
-
-    glGenTextures(1, &scop->textures[scop->textures_count].gl_texture);
-    glBindTexture(GL_TEXTURE_2D, scop->textures[scop->textures_count].gl_texture);  
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    material->tex_id = scop->textures_count;
-    strcpy(scop->textures[scop->textures_count].filename, file);
+    generate_gl_texture(scop, width, height, image, file, GL_UNSIGNED_BYTE);
+    material->tex_id = scop->textures_count - 1;
     stbi_image_free(image);
-    scop->textures_count++;
 }

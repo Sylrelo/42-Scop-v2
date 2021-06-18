@@ -12,6 +12,7 @@ uniform mat4	    Model;
 out vec3            normal;
 out vec2            tex_coords;
 out vec3            color;
+out vec4            frag_position;
 
 
 void main()
@@ -19,6 +20,7 @@ void main()
     color           = vColor;
     normal          = aNormals;
     tex_coords      = aTexCoord;
+    frag_position   = vec4(aPos, 1.0f);
     gl_Position     = (Persp * View * Model) * vec4(aPos, 1.0f);
 }
 

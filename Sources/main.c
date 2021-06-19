@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/19 14:59:03 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 16:41:52 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <sys/stat.h> // deplacer
 #include <float.h>
 
-
+#include <math.h>
 #include "stb_image.h"
 
 void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
@@ -152,7 +152,7 @@ void	display_loop(t_scop *scop)
 				if (mat_i > 0)
 					offset_mat += object.materials[mat_i - 1].gl_buffer_size;
 				
-				if (scop->ogl.s_texturing == 2)
+				if (scop->ogl.s_texturing == 2 && scop->textures_count)
 				{
 					glUniform2f(uniform.tex_size, scop->textures[scop->textures_count - 1].width, scop->textures[scop->textures_count - 1].height);
 					glUniform1i(uniform.textured, 2);
@@ -166,39 +166,6 @@ void	display_loop(t_scop *scop)
 		glfwSwapBuffers(scop->window);
 		glfwPollEvents();
 	}
-}
-
-void	start_parser(t_scop *scop, int argc, char *argv[])
-{
-	struct stat		st;
-	int				st_result;
-	float			start	= glfwGetTime();
-	float			diff 	= start;
-
-	start -= diff;
-	while (--argc > 0)
-	{
-		st_result = stat(argv[argc], &st);
-		if (st_result)
-		{
-			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mnot found, skipping.\033[0m\n\n", argv[argc]);
-			continue ;
-		}
-		if (!strstr(argv[argc], ".obj"))
-		{
-			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mextension is invalid, skipping.\033[0m\n\n", argv[argc]);
-			continue ;
-		}
-		if (st.st_mode & S_IFDIR)
-		{
-			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mis a directory, skipping.\033[0m\n\n", argv[argc]);
-			continue ;
-		}
-		printf("+ Loading \033[1m%s\033[0m... (%.2f Mb)\n", argv[argc], st.st_size * 0.0000009765625);
-		parser_init(scop, argv[argc]);
-		printf("\n");
-	}
-	printf("Time taken : %.2f\n", (glfwGetTime() - diff) - start);
 }
 
 void	auto_positions(t_scop *scop)
@@ -218,7 +185,7 @@ void	auto_positions(t_scop *scop)
 	{
 		obj = &scop->objects[obji];
 		obj->pos = (t_vec3f) {-obj->center.x, -obj->min.y, -obj->center.z};
-		obj->rot = (t_vec3f) {0, (rand() % 100) * 0.01, 0};
+		obj->rot = (t_vec3f) {0, 0, 0};
 		if (obji > 0)
 		{
 			prev_obj = &scop->objects[obji - 1];
@@ -255,7 +222,90 @@ void	auto_positions(t_scop *scop)
 	}
 	scop->cam_pos.z -= max_component ;
 
-	scop->multiplier = max_component * 0.125;
+	printf("%f\n", max_component * 0.125);
+	scop->multiplier = fmin(max_component * 0.125, 30);
+}
+
+void	parse_basic_texture(t_scop *scop, char *file)
+{
+    unsigned char   *image;
+    int             width;
+    int             height;
+    int             channels;
+
+ 	if (!(image = stbi_load(file, &width, &height, &channels, 0)))
+    {
+        return ;
+    }
+	generate_gl_texture(scop, width, height, image, "CHECKER", GL_UNSIGNED_BYTE);
+	free(image);
+	image = NULL;
+}
+
+void	start_parser(t_scop *scop, int argc, char *argv[])
+{
+	struct stat		st;
+	int				st_result;
+	float			start		= glfwGetTime();
+	float			diff 		= start;
+	size_t			buffer_size = 0;
+	size_t			total_mats	= 0;
+	uint8_t			basic_texture_parsed = 0;
+
+	start -= diff;
+
+	for (int i = 1; i < argc; i++)
+	{
+		if (!strncmp(argv[i], "-t", 2))
+		{
+			if ((argc - 1) - i >= 1 && basic_texture_parsed)
+			{
+				printf("\033[0;31m- [-t] Basic texture already parsed. Skipping\033[0m\n\n");
+				i++;
+				continue ;
+			}
+			else if ((argc - 1) - i >= 1)
+			{
+				parse_basic_texture(scop, argv[i + 1]);
+				basic_texture_parsed = 1;
+				i++;
+				continue ;
+			}
+			else
+			{
+				printf("\033[0;31m- [-t] Missing texture path.\033[0m\n\n");
+				continue ;
+			}
+		}
+		st_result = stat(argv[i], &st);
+		
+		if (st_result)
+		{
+			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mnot found, skipping.\033[0m\n\n", argv[i]);
+			continue ;
+		}
+		if (!strstr(argv[i], ".obj"))
+		{
+			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mextension is invalid, skipping.\033[0m\n\n", argv[i]);
+			continue ;
+		}
+		if (st.st_mode & S_IFDIR)
+		{
+			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mis a directory, skipping.\033[0m\n\n", argv[i]);
+			continue ;
+		}
+		printf("+ Loading \033[1m%s\033[0m... (%.2f Mb)\n", argv[i], st.st_size * 0.0000009765625);
+		parser_init(scop, argv[i]);
+		printf("\n");
+
+		get_total_buffer_size(scop, &buffer_size, &total_mats);
+		if (buffer_size / BUFFER_COMPONENT / 3 > 17500000 || (((buffer_size * sizeof(float)) * 0.000001) * 1.5) >= 4000 || total_mats >= 300)
+		{
+			printf("\033[0;31m- Maximum triangles, materials or memory exceeded. For safety, parsing has been stopped\033[0m\n\n");
+			break ;
+		}
+	}
+	printf("Time taken : %.2f\n", (glfwGetTime() - diff) - start);
 }
 
 int 	main(int argc, char *argv[])
@@ -303,19 +353,6 @@ int 	main(int argc, char *argv[])
 
 	auto_positions(scop);
 
-
-	// pas fini ça la berk
-    unsigned char   *image;
-    int             width;
-    int             height;
-    int             channels;
-
- 	if (!(image = stbi_load("Resources/large_qpupier.png", &width, &height, &channels, 0)))
-    {
-        return (1);
-    }
-	generate_gl_texture(scop, width, height, image, "CHECKER", GL_UNSIGNED_BYTE);
-	// 
 	
 	display_loop(scop);
 	clean_exit(scop);

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/19 14:54:20 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 15:49:46 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,7 @@ void		init_window(GLFWwindow **window, uint32_t width, uint32_t height);
 void		init_opengl_buffer(t_scop *scop);
 void		init_opengl_buffer_multi(t_scop *scop);
 void		init_depth_map(t_scop *scop);
+void		get_total_buffer_size(t_scop *scop, size_t *buffer_size, size_t *total_mats);
 
 
 // parse_fdf.c

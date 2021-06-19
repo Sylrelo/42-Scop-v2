@@ -22,14 +22,11 @@ static void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
 	uniform->textured 		= glGetUniformLocation(program, "textured");
 	uniform->glfw_time 		= glGetUniformLocation(program, "glfw_time");
 	uniform->glfw_options 	= glGetUniformLocation(program, "glfw_options");
-
 	uniform->tex_size 		= glGetUniformLocation(program, "tex_size");
 	uniform->obj_max_y 		= glGetUniformLocation(program, "obj_max_y");
 	uniform->obj_center 	= glGetUniformLocation(program, "obj_center");
-
 	uniform->tex_basic 		= glGetUniformLocation(program, "basic_texture");
 	uniform->tex_object 	= glGetUniformLocation(program, "ourTexture");
-
 	uniform->object_selected= glGetUniformLocation(program, "object_selected");
 }
 
@@ -53,7 +50,6 @@ static void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *s
 	glUniformMatrix4fv(uniform.m4_view, 1, GL_FALSE, mat_view.value[0]);
 	mat_perspective = m4_perspective(1.0472, (float) scop->width / (float) scop->height, 0.00001f, 1000.0f);
 	glUniformMatrix4fv(uniform.m4_projection, 1, GL_FALSE, mat_perspective.value[0]);
-
 	glUniform1i(uniform.tex_basic, 0);
 	glUniform1i(uniform.tex_object, 1);
 }

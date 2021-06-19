@@ -66,7 +66,6 @@ int        parser_mtl_start(t_scop *scop, char path[256], char *file)
 		printf("\033[0;31m      Error while parsing MTL file \033[1m%s\033[0m\033[0;31m, skipping.\033[0m\n", filepath);
         return (0);
     }
-        // die("Error reading mtl file");
     
     printf ("    MTL file \033[1m%s\033[0m loaded.\n", filepath);
     obj->nb_mats   = 0;

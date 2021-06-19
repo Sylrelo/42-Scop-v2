@@ -13,7 +13,7 @@
 #include "Scop.h"
 #include <stdio.h>
 
-void	handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing, short *selected_object, size_t objects_count)
+void                handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing, short *selected_object, size_t objects_count)
 {
     const float     glfw_time       = glfwGetTime();
     static float    key_timeout     = 0;
@@ -85,7 +85,7 @@ void	handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing, s
     glPolygonMode(GL_FRONT_AND_BACK, render_option);
 }
 
-void	handle_mouse(GLFWwindow *window, t_vec3f *cam_rot)
+void                handle_mouse(GLFWwindow *window, t_vec3f *cam_rot)
 {
 	static double pos_x_old = 0;
 	static double pos_y_old = 0;
@@ -105,7 +105,7 @@ void	handle_mouse(GLFWwindow *window, t_vec3f *cam_rot)
 	pos_y_old = pos_y;
 }
 
-static void     rotate_object(t_scop *scop, t_vec3f rot, float scale, float multiplier)
+static void         rotate_object(t_scop *scop, t_vec3f rot, float scale, float multiplier)
 {
     if (scop->selected_object == -1)
     {
@@ -130,7 +130,7 @@ static void     rotate_object(t_scop *scop, t_vec3f rot, float scale, float mult
     }
 }
 
-void 	handle_transformations(t_scop *scop)
+void                handle_transformations(t_scop *scop)
 {
     const uint32_t *keys    = scop->keys;
 	t_vec3f	move 		    = (t_vec3f) {0, 0, 0};

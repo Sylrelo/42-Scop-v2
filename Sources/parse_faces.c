@@ -226,8 +226,10 @@ size_t          parse_face(t_parser *parser, t_mat **materials, size_t *material
     ssize_t material_id         = get_material_id(*materials, *material_count, last_mtl);
     char *token                 = NULL;
 
+
     if (!last_mtl || material_id == -1)
     {
+        printf("%s\n", last_mtl);
         if (material_id == -1 && *material_count == 0)
         {
             *material_count = 1;

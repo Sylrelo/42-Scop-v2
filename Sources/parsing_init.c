@@ -103,6 +103,7 @@ void 		parser_init(t_scop *scop, char *file)
 	size_t		len 			= 0;
 	size_t		read_total		= 0;
 	size_t		old_percent		= 0;
+	char 		mtl_loaded		= 0;
 
 	if (stat(file, &st))
 		die ("File not found.");
@@ -141,8 +142,8 @@ void 		parser_init(t_scop *scop, char *file)
 		read_total += read;
 
 		if (!strncmp(line, "mtllib ", 7))
-			parser_mtl_start(scop, path, line + 7);
-		else if (!strncmp(line, "usemtl ", 7))
+			mtl_loaded = parser_mtl_start(scop, path, line + 7);
+		else if (!strncmp(line, "usemtl ", 7) && mtl_loaded)
 		{
 			print_progress(&old_percent, read_total, st);
 			memset(last_mtl, 0, 256);

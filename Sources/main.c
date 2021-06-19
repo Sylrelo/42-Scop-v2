@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/19 16:57:11 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 17:17:07 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,6 +159,40 @@ static void	start_parser(t_scop *scop, int argc, char *argv[])
 int 		main(int argc, char *argv[])
 {
 	t_scop	*scop;
+
+	if (!(argc - 1))
+	{
+		printf("Usage : \n");
+		printf("\t ./scop object.obj\n");
+		printf("\t ./scop -t texture.jpg object.obj\n");
+		printf("\t You can add multiple object file, separated by space\n");
+		printf("\t\t ./scop object.obj object.obj ...\n");
+		printf("\n");
+		printf("Keybinding and Mouse control : \n");
+		printf("\t Mouse rotate the camera\n");
+		printf("\t WASD to move the camera\n");
+
+		printf("\t 1, 2, 3          : Switch between filled triangle, wireframe, or points rendering\n");
+		printf("\t 4                : Enable or disable face culling\n");
+		printf("\t 5                : Enable or disable depth test\n");
+		printf("\t T                : Switch between material color, material texture, global object texture or per-triangle color.\n");
+		printf("\t Arrow LEFT/RIGHT : Rotate all objects on Y axis around object center.\n");
+		printf("\t Arrow UP/DOWN    : Rotate all objects on X axis around object center.\n");
+		printf("\n");
+		printf("Bonus : \n");
+		printf("\t - Auto triangulation of convex polygons\n");
+		printf("\t - Auto UV mapping of incomplete objects\n");
+		printf("\t - Auto normal calculation of incomplete objects\n");
+		printf("\t - Handling of all object parameters (V and/or VT and/or VN)\n");
+		printf("\t - Camera movement with mouse and keyboard\n");
+		printf("\t - Multiple objects\n");
+		printf("\t - Material file parsing\n");
+		printf("\t - Multiple colors and/or textures per object, based on material\n");
+		printf("\t - Keybinding options\n");
+		printf("\t - Directional light\n");
+		printf("\t - Auto positioning when multiple objects are selected\n");
+		exit (1);
+	}
 
 	if (!(scop = calloc(1, sizeof(t_scop))))
 		die ("Could not start Scop");

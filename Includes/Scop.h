@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/19 15:49:46 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 16:48:08 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,9 @@ typedef struct s_scop
 	t_vec3f			cam_pos;
 	t_vec3f			cam_rot;
 }				t_scop;
+
+// display.c
+void	display_loop(t_scop *scop);
 
 
 // parse_shader.c

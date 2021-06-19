@@ -46,25 +46,6 @@ vec2 cylinder_mapping(float x, float y, float z)
     return (vec2(u, v));
 }
 
-vec2 weird_mapping(float x, float y, float z)
-{
-    float   u;
-    float   v;
-    
-
-    // u : atan : calcul de l'angle entre z, et x
-    // 2pi = 360 deg
-    //u = (0.5 + atan(z - obj_center.z, x - obj_center.x)) / (PI * 2.f);
-    //v = ((y - obj_center.y)) + .5;
-
-    //  u /= tex_size.x / 2;
-    //  v /= tex_size.y / 2;
-    //v *= -1;
-    return (vec2(z, x));
-}
-
-
-
 void main()
 {
     vec3 ModelNorm  = vec3( Model * vec4(normal, 0));

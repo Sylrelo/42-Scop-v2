@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:04:12 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/19 16:10:05 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 16:56:02 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,6 @@ void			init_opengl_buffer_multi(t_scop *scop)
 	size_t total_triangles 	= 0;
 
 	get_total_buffer_size(scop, &buffer_size, &total_mats);
-	
 	printf("[Scop] Merging all materials buffers\n");
 	
 	if (!(tmp_buffer = calloc(buffer_size, sizeof(float))))

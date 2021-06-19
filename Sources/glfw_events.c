@@ -13,7 +13,7 @@
 #include "Scop.h"
 #include <stdio.h>
 
-void	handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing)
+void	handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing, short *selected_object, size_t objects_count)
 {
     const float     glfw_time       = glfwGetTime();
     static float    key_timeout     = 0;
@@ -23,18 +23,22 @@ void	handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing)
     static uint8_t  gl_cull_face    = 1;
     static uint8_t  gl_depth_test   = 1;
     
-    keys[GLFW_KEY_W] = glfwGetKey(window, GLFW_KEY_W);
-    keys[GLFW_KEY_A] = glfwGetKey(window, GLFW_KEY_A);
-    keys[GLFW_KEY_S] = glfwGetKey(window, GLFW_KEY_S);
-    keys[GLFW_KEY_D] = glfwGetKey(window, GLFW_KEY_D);
-    keys[GLFW_KEY_R] = glfwGetKey(window, GLFW_KEY_R);
-    keys[GLFW_KEY_F] = glfwGetKey(window, GLFW_KEY_F);
-    keys[GLFW_KEY_T] = glfwGetKey(window, GLFW_KEY_T);
-    keys[GLFW_KEY_LEFT_SHIFT] = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
-    keys[GLFW_KEY_LEFT] = glfwGetKey(window, GLFW_KEY_LEFT);
-    keys[GLFW_KEY_RIGHT] = glfwGetKey(window, GLFW_KEY_RIGHT);
-    keys[GLFW_KEY_UP] = glfwGetKey(window, GLFW_KEY_UP);
-    keys[GLFW_KEY_DOWN] = glfwGetKey(window, GLFW_KEY_DOWN);
+    keys[GLFW_KEY_W]            = glfwGetKey(window, GLFW_KEY_W);
+    keys[GLFW_KEY_A]            = glfwGetKey(window, GLFW_KEY_A);
+    keys[GLFW_KEY_S]            = glfwGetKey(window, GLFW_KEY_S);
+    keys[GLFW_KEY_D]            = glfwGetKey(window, GLFW_KEY_D);
+    keys[GLFW_KEY_R]            = glfwGetKey(window, GLFW_KEY_R);
+    keys[GLFW_KEY_F]            = glfwGetKey(window, GLFW_KEY_F);
+    keys[GLFW_KEY_T]            = glfwGetKey(window, GLFW_KEY_T);
+    keys[GLFW_KEY_LEFT_SHIFT]   = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
+    keys[GLFW_KEY_LEFT]         = glfwGetKey(window, GLFW_KEY_LEFT);
+    keys[GLFW_KEY_RIGHT]        = glfwGetKey(window, GLFW_KEY_RIGHT);
+    keys[GLFW_KEY_UP]           = glfwGetKey(window, GLFW_KEY_UP);
+    keys[GLFW_KEY_DOWN]         = glfwGetKey(window, GLFW_KEY_DOWN);
+    keys[GLFW_KEY_PERIOD]       = glfwGetKey(window, GLFW_KEY_PERIOD);
+    keys[GLFW_KEY_COMMA]        = glfwGetKey(window, GLFW_KEY_COMMA);
+    keys[GLFW_KEY_MINUS]        = glfwGetKey(window, GLFW_KEY_MINUS);
+    keys[GLFW_KEY_EQUAL]        = glfwGetKey(window, GLFW_KEY_EQUAL);
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE))
         exit (1);
@@ -69,8 +73,14 @@ void	handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing)
         (*s_texturing)++;
         if (*s_texturing >= 4)
             *s_texturing = 0;
-
         key_timeout = glfw_time;
+    }
+    if (glfwGetKey(window, GLFW_KEY_O) && time_diff)
+    {
+            (*selected_object)++;
+        if ((size_t) *selected_object >= objects_count)
+            *selected_object = -1;
+        key_timeout = glfw_time - .15;
     }
     glPolygonMode(GL_FRONT_AND_BACK, render_option);
 }
@@ -95,6 +105,31 @@ void	handle_mouse(GLFWwindow *window, t_vec3f *cam_rot)
 	pos_y_old = pos_y;
 }
 
+static void     rotate_object(t_scop *scop, t_vec3f rot, float scale, float multiplier)
+{
+    if (scop->selected_object == -1)
+    {
+        for (size_t i = 0; i < scop->objects_count; i++)
+        {
+            scop->objects[i].rot.x += rot.x * multiplier;
+            scop->objects[i].rot.y += rot.y * multiplier;
+            scop->objects[i].rot.z += rot.z * multiplier;
+            scop->objects[i].scale += scale * multiplier;
+            if (scop->objects[i].scale <= 0)
+                scop->objects[i].scale = 0;
+        }
+    }
+    else
+    {
+        scop->objects[(size_t) scop->selected_object].scale += scale * multiplier;
+        scop->objects[(size_t) scop->selected_object].rot.x += rot.x * multiplier;
+        scop->objects[(size_t) scop->selected_object].rot.y += rot.y * multiplier;
+        scop->objects[(size_t) scop->selected_object].rot.z += rot.z * multiplier;
+        if (scop->objects[(size_t) scop->selected_object].rot.z <= 0)
+            scop->objects[(size_t) scop->selected_object].rot.z = 0;
+    }
+}
+
 void 	handle_transformations(t_scop *scop)
 {
     const uint32_t *keys    = scop->keys;
@@ -106,9 +141,9 @@ void 	handle_transformations(t_scop *scop)
     if (keys[GLFW_KEY_S])
 	    move.z -= 0.1;
     if (keys[GLFW_KEY_R])
-	    move.y += 0.1;
-    if (keys[GLFW_KEY_F])
 	    move.y -= 0.1;
+    if (keys[GLFW_KEY_F])
+	    move.y += 0.1;
     if (keys[GLFW_KEY_A])
 	    move.x += 0.1;
     if (keys[GLFW_KEY_D])
@@ -118,22 +153,33 @@ void 	handle_transformations(t_scop *scop)
         multiplier = scop->multiplier;
         move = vec_multf(move, scop->multiplier);
     }
-        
 
     if (keys[GLFW_KEY_LEFT])
-        for (size_t i = 0; i < scop->objects_count; i++)
-                scop->objects[i].rot.y += 0.01 * multiplier;
+        rotate_object(scop, (t_vec3f){0, 0.01, 0}, 0, multiplier);
     if (keys[GLFW_KEY_RIGHT])
-        for (size_t i = 0; i < scop->objects_count; i++)
-                scop->objects[i].rot.y -= 0.01 * multiplier;
+        rotate_object(scop, (t_vec3f){0, -0.01, 0}, 0, multiplier);
     if (keys[GLFW_KEY_UP])
-        for (size_t i = 0; i < scop->objects_count; i++)
-                scop->objects[i].rot.x += 0.01 * multiplier;
+        rotate_object(scop, (t_vec3f){0.01, 0, 0}, 0, multiplier);
     if (keys[GLFW_KEY_DOWN])
-        for (size_t i = 0; i < scop->objects_count; i++)
-                scop->objects[i].rot.x -= 0.01 * multiplier;
+        rotate_object(scop, (t_vec3f){-0.01, 0, 0}, 0, multiplier);
+    if (keys[GLFW_KEY_COMMA])
+        rotate_object(scop, (t_vec3f){0, 0, 0.01}, 0, multiplier);
+    if (keys[GLFW_KEY_PERIOD])
+        rotate_object(scop, (t_vec3f){0, 0, -0.01}, 0, multiplier);
+    if (keys[GLFW_KEY_MINUS])
+        rotate_object(scop, (t_vec3f){0, 0, 0}, -0.01, multiplier);
+    if (keys[GLFW_KEY_EQUAL])
+        rotate_object(scop, (t_vec3f){0, 0, 0}, 0.01, multiplier);
 
-
-	move = m4_mult_vec3f(m4_rotation(scop->cam_rot.x, scop->cam_rot.y, 0), move);
-	scop->cam_pos = vec_add(scop->cam_pos, move);
+    if (scop->selected_object != -1)
+    {
+        scop->objects[(size_t) scop->selected_object].pos.x -= move.x;
+        scop->objects[(size_t) scop->selected_object].pos.y -= move.y;
+        scop->objects[(size_t) scop->selected_object].pos.z -= move.z;
+    }
+    else
+    {
+        move = m4_mult_vec3f(m4_rotation(scop->cam_rot.x, scop->cam_rot.y, 0), move);
+        scop->cam_pos = vec_add(scop->cam_pos, move);
+    }
 }

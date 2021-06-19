@@ -32,47 +32,48 @@ typedef enum e_parsing
 
 typedef struct s_parser
 {
+	size_t		v_count;
+	size_t		vn_count;
+	size_t		vt_count;
 	t_vec3f		min;
 	t_vec3f		max;
 	t_vec3f		*v;
 	t_vec3f		*vn;
 	t_vec2f		*vt;
-	size_t		v_count;
-	size_t		vn_count;
-	size_t		vt_count;
 }				t_parser;
 
 typedef struct	s_textures
 {
-	char		filename[256];
 	uint32_t	gl_texture;
 	uint32_t	width;
 	uint32_t	height;
+	char		filename[256];
 }				t_textures;
 
 typedef struct	s_mat
 {
+	int			tex_id;
+	size_t		gl_buffer_size;
+	size_t		tmp_allocated;
+	float		*gl_buffer;
 	t_vec3f		ka;
 	t_vec3f		kd;
 	t_vec3f		ks;
 	t_vec3f		tf;
-	float		*gl_buffer;
-	int			tex_id;
 	char		material_name[256];
-	size_t		gl_buffer_size;
-	size_t		tmp_allocated;
 }				t_mat;
 
 typedef struct	s_objects
 {
-	t_mat			*materials;
 	size_t			nb_mats;
+	size_t			offset;
+	float 			scale;
 	t_vec3f			pos;
 	t_vec3f			rot;
 	t_vec3f			center;
 	t_vec3f			max;
 	t_vec3f			min;
-	size_t			offset;
+	t_mat			*materials;
 }				t_objects;
 
 typedef struct	s_uniforms
@@ -94,41 +95,41 @@ typedef struct	s_uniforms
 
 	uint32_t	tex_basic;
 	uint32_t	tex_object;
+
+	uint32_t	object_selected;
+
 }				t_uniforms;
 
 typedef struct	s_ogl
 {
-	GLint		p_render;
-	t_uniforms	u_render;
-	GLint 		vao;
 	int			s_texturing;
+	GLint		p_render;
+	GLint 		vao;
+	t_uniforms	u_render;
 }				t_ogl;
 
 typedef struct s_scop
 {
+	uint32_t		keys[349];
+	t_textures		*textures;
+	t_objects		*objects;
 	t_ogl			ogl;
+	t_vec3f			cam_rot;
 	GLFWwindow		*window;
-	GLuint			vao;
-	GLuint			vbo;
-	GLint			program;
-	
+	t_vec3f			cam_pos;
+	float			multiplier;
+	size_t			textures_count;
+	size_t			objects_count;
+	uint32_t		vao;
+	uint32_t		vbo;
 	uint32_t		width;
 	uint32_t		height;
-	uint32_t		keys[349];
-
-	t_textures		*textures;
-	size_t			textures_count;
-
-	t_objects		*objects;
-	size_t			objects_count;
-
-	float			multiplier;
-	t_vec3f			cam_pos;
-	t_vec3f			cam_rot;
+	int				program;
+	short 			selected_object;
 }				t_scop;
 
 // display.c
-void	display_loop(t_scop *scop);
+void		display_loop(t_scop *scop);
 
 
 // parse_shader.c
@@ -142,7 +143,7 @@ float		random_float(int min, int max, float prec);
 
 
 // glfw_events.c
-void		handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing);
+void		handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing, short *selected_object, size_t objects_count);
 void 		handle_transformations(t_scop *scop);
 void		handle_mouse(GLFWwindow *window, t_vec3f *cam_rot);
 

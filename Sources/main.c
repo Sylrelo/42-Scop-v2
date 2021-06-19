@@ -33,12 +33,13 @@ static void	auto_object_position(t_scop *scop)
 	for (size_t obji = 0; obji < scop->objects_count; obji++)
 	{
 		obj = &scop->objects[obji];
+		obj->scale = 1.0f;
 		obj->pos = (t_vec3f) {-obj->center.x, -obj->min.y, -obj->center.z};
 		obj->rot = (t_vec3f) {0, 0, 0};
 		if (obji > 0)
 		{
 			prev_obj = &scop->objects[obji - 1];
-			obj->pos.x += prev_obj->pos.x + prev_obj->max.x + obj->max.x + obj->center.x;
+			obj->pos.x += prev_obj->pos.x + prev_obj->max.x + (obj->max.x + obj->center.x) * 2;
 		}
 		max.x = fmax(max.x, obj->pos.x);
 		max.y = fmax(max.y, obj->pos.y);
@@ -165,7 +166,6 @@ int 		main(int argc, char *argv[])
 {
 	t_scop	*scop;
 
-	printf("/!\ ATTENTION SEGFAULT SUR PATH SANS / A GERER /!\ \n\n");
 	if (!(argc - 1))
 	{
 		printf("Usage : \n");
@@ -209,11 +209,12 @@ int 		main(int argc, char *argv[])
 	scop->textures 			= NULL;
 	scop->cam_pos			= (t_vec3f) {0, 0, 0};
 	scop->cam_rot			= (t_vec3f) {0, 0, 0};
-	scop->width	 			= 1920;
-	scop->height 			= 1080;
+	scop->width	 			= 1280;
+	scop->height 			= 720;
 	scop->multiplier		= 1;
 	scop->ogl.s_texturing	= 0;
 	scop->objects_count		= 0;
+	scop->selected_object	= -1;
 	memset(scop->keys, 0, sizeof(uint32_t) * 348);
 		
 	printf("[Scop] Starting OpenGL initialization\n");
@@ -241,7 +242,6 @@ int 		main(int argc, char *argv[])
 	glUseProgram(scop->ogl.p_render);
 
 	printf("[Scop] Ready\n");
-
 	auto_object_position(scop);
 
 	display_loop(scop);

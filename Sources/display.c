@@ -30,6 +30,7 @@ static void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
 	uniform->tex_basic 		= glGetUniformLocation(program, "basic_texture");
 	uniform->tex_object 	= glGetUniformLocation(program, "ourTexture");
 
+	uniform->object_selected= glGetUniformLocation(program, "object_selected");
 }
 
 static void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *scop)
@@ -59,7 +60,7 @@ static void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *s
 
 static void	send_model_data(t_uniforms uniform, t_objects object)
 {
-	const t_mat4	mat_scale 		= m4_scale(1, 1, 1);
+	const t_mat4	mat_scale 		= m4_scale(object.scale, object.scale, object.scale);
 	const t_mat4	mat_translate 	= m4_translate(object.pos.x, object.pos.y, object.pos.z);
 	const t_mat4	mat_rotate		= m4_rotation_around_center(object.center, object.rot.x, object.rot.y, object.rot.z);
 	const t_mat4	mat_model 		= m4_mult(m4_mult(mat_scale, mat_rotate), mat_translate);
@@ -86,66 +87,6 @@ static void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat m
 	}
 	else if (s_texturing != 2)
 		glUniform1i(uniform.textured, s_texturing != 1 ? s_texturing : 0);
-}
-
-
-
-#include <stdio.h>
-
-void		check_mouse_object(t_scop *scop)
-{
-	double pos_x;
-	double pos_y;
-	glfwGetCursorPos(scop->window, &pos_x, &pos_y);
-
-	if (pos_x < 0 || pos_x >= scop->width || pos_y < 0 || pos_y > scop->height)
-		return ;
-
-	
-	t_mat4	mat_model;
-	t_mat4	mat_camera;
-	t_mat4	mat_final;
-	t_objects	object;
-	t_vec4f		min;
-	t_vec4f		max;
-	t_vec3f		msp;
-	t_mat4 mat_perspective = m4_perspective(1.0472, (float) scop->width / (float) scop->height, 0.00001f, 1000.0f);
-
-
-	// mat_camera = m4_viewmat(scop->cam_rot.x, scop->cam_rot.y, scop->cam_rot.z, m4_translate(scop->cam_pos.x, scop->cam_pos.y, scop->cam_pos.z));
-	mat_camera = m4_mult(m4_mult(m4_scale(1, 1, 1), m4_rotation(scop->cam_rot.x, scop->cam_rot.y, scop->cam_rot.z)), m4_translate(scop->cam_pos.x, scop->cam_pos.y, scop->cam_pos.z));
-	msp.x = (pos_x / (scop->width * .5)) - 1;
-	msp.y = (pos_y / (scop->height * .5)) - 1;
-	msp.z = 1;
-
-	for (size_t obji = 0; obji < scop->objects_count; obji++)
-	{
-		object = scop->objects[obji];
-		//mat_model = m4_mult(m4_mult(m4_scale(1, 1, 1), m4_rotation_around_center(object.center, object.rot.x, object.rot.y, object.rot.z)), m4_translate(object.pos.x, object.pos.y, object.pos.z));
-		
-		mat_model = m4_init();
-
-		mat_final = m4_mult(m4_mult(mat_perspective, mat_camera), mat_model);
-		
-		m4_print(mat_final);
-		
-		min = m4_mult_vec4f(mat_final, (t_vec4f){object.min.x, object.min.y, object.min.z, 1});
-		max = m4_mult_vec4f(mat_final, (t_vec4f){object.max.x, object.max.y, object.max.z, 1});
-
-
-		min.x /= min.w;
-		max.x /= max.w;
-		printf("min %f %f %f %f\n", min.x, min.y, min.z, min.w);
-		printf("max %f %f %f %f\n", max.x, max.y, max.z, max.w);
-		printf("msp %f %f %f\n", msp.x, msp.y, msp.z);
-
-		if (msp.x >= max.x && msp.x <= min.x )
-		{
-			printf("Object found : %zu\n", obji);
-		}
-	}
-	printf("\n");
-	
 }
 
 void	    display_loop(t_scop *scop)
@@ -175,11 +116,10 @@ void	    display_loop(t_scop *scop)
 		
 		glfw_time = glfwGetTime() - base_time;
 		
-		handle_keyboard(scop->window, scop->keys, &scop->ogl.s_texturing);
-		// handle_mouse(scop->window, &scop->cam_rot);
+		handle_keyboard(scop->window, scop->keys, &scop->ogl.s_texturing, &scop->selected_object, scop->objects_count);
+		handle_mouse(scop->window, &scop->cam_rot);
 		handle_transformations(scop);
     	
-		check_mouse_object(scop);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		send_default_uniforms(uniform, glfw_time, scop);
@@ -187,7 +127,11 @@ void	    display_loop(t_scop *scop)
 		{
 			offset_mat 	= 0;
 			object 		= scop->objects[obj_i];
-			
+			if ((short) obj_i == scop->selected_object)
+				glUniform1i(uniform.object_selected, 1);
+			else
+				glUniform1i(uniform.object_selected, 0);
+
 			if (obj_i > 0)
 				offset_obj = scop->objects[obj_i - 1].offset;
 			for (size_t mat_i = 0; mat_i < object.nb_mats; mat_i++)

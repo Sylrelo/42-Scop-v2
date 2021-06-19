@@ -34,5 +34,11 @@ t_vec4f	m4_mult_vec4f(t_mat4 mat, t_vec4f vec)
 	result.z = vec.x * mat.value[2][0] + vec.y * mat.value[2][1] + vec.z * mat.value[2][2] + vec.w * mat.value[2][3];
 	result.w = vec.x * mat.value[3][0] + vec.y * mat.value[3][1] + vec.z * mat.value[3][2] + vec.w * mat.value[3][3];
 
+	if (result.w != 1)
+	{
+		result.x /= result.w;
+		result.y /= result.w;
+		result.z /= result.w;
+	}
 	return (result);
 }

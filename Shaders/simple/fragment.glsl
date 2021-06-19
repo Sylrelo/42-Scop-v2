@@ -19,6 +19,8 @@ uniform vec2        tex_size;
 uniform float       obj_max_y;
 uniform vec3        obj_center;
 
+uniform bool        object_selected;
+
 vec2    sphere_mapping(float x, float y, float z)
 {
     float   u;
@@ -48,6 +50,8 @@ vec2 cylinder_mapping(float x, float y, float z)
 
 void main()
 {
+    vec4 final_color;
+
     vec3 ModelNorm  = vec3( Model * vec4(normal, 0));
 
     vec3 norm       = normalize(ModelNorm);
@@ -57,13 +61,17 @@ void main()
     float d         = max(dot(norm, lightDir), 0.0);
 
     if (textured == 0)
-        FragColor = vec4(kd * d, 1);
+        final_color = vec4(kd * d, 1);
     else if (textured == 1)
-        FragColor = vec4(texture(ourTexture, tex_coords).xyz * d, 1);
+        final_color = vec4(texture(ourTexture, tex_coords).xyz * d, 1);
     else if (textured == 2)
-        FragColor = vec4(texture(basic_texture, tex_coords).xyz * d, 1);
-
-       //FragColor = vec4(texture(ourTexture, cylinder_mapping(frag_position.x, frag_position.y, frag_position.y)).xyz * d, 1);
+        final_color = vec4(texture(basic_texture, tex_coords).xyz * d, 1);
+       //final_color = vec4(texture(ourTexture, cylinder_mapping(frag_position.x, frag_position.y, frag_position.y)).xyz * d, 1);
     else
-        FragColor = vec4(color * d, 1);
+        final_color = vec4(color * d, 1);
+
+    if (object_selected)
+        FragColor = (final_color * .75) * vec4(1.25, 0, 0, 1);
+    else
+        FragColor = final_color;
 }

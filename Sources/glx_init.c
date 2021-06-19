@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:04:12 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/19 16:56:02 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 18:15:32 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void			init_window(GLFWwindow **window, uint32_t width, uint32_t height)
 	}
 	printf("[OpenGL] Initializing GL3W\n");
 	glfwSetInputMode(*window, GLFW_STICKY_KEYS, 1);
-	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSwapInterval(1);
 
 	glEnable(GL_CULL_FACE);

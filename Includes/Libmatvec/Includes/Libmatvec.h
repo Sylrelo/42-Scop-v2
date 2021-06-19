@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:15:25 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/17 12:48:07 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/19 18:37:57 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,14 @@ typedef struct s_vec3f
 	float	y;
 	float	z;
 }				t_vec3f;
+
+typedef struct s_vec4f
+{
+	float	x;
+	float	y;
+	float	z;
+	float	w;
+}				t_vec4f;
 
 typedef struct s_vec2f
 {
@@ -70,6 +78,7 @@ t_mat4		m4_translate(float x, float y, float z);
 
 // mat_vec4f.c
 t_vec3f		m4_mult_vec3f(t_mat4 mat, t_vec3f vec);
+t_vec4f		m4_mult_vec4f(t_mat4 mat, t_vec4f vec);
 
 // mat_supl.c
 t_mat4		m4_viewmat(float x, float y, float z, t_mat4 translate);

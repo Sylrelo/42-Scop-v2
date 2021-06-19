@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/18 18:02:19 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 14:59:03 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 #include <time.h>
 #include <sys/stat.h> // deplacer
 #include <float.h>
+
+
+#include "stb_image.h"
 
 void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
 {
@@ -31,6 +34,9 @@ void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
 	uniform->tex_size 		= glGetUniformLocation(program, "tex_size");
 	uniform->obj_max_y 		= glGetUniformLocation(program, "obj_max_y");
 	uniform->obj_center 	= glGetUniformLocation(program, "obj_center");
+
+	uniform->tex_basic 		= glGetUniformLocation(program, "basic_texture");
+	uniform->tex_object 	= glGetUniformLocation(program, "ourTexture");
 
 }
 
@@ -54,6 +60,9 @@ void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *scop)
 	glUniformMatrix4fv(uniform.m4_view, 1, GL_FALSE, mat_view.value[0]);
 	mat_perspective = m4_perspective(1.0472, (float) scop->width / (float) scop->height, 0.00001f, 1000.0f);
 	glUniformMatrix4fv(uniform.m4_projection, 1, GL_FALSE, mat_perspective.value[0]);
+
+	glUniform1i(uniform.tex_basic, 0);
+	glUniform1i(uniform.tex_object, 1);
 }
 
 void	send_model_data(t_uniforms uniform, t_objects object)
@@ -75,10 +84,10 @@ void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat material
 	glUniform3f(uniform.kd, material.kd.x, material.kd.y, material.kd.z);
 	glUniform3f(uniform.ka, material.ka.x, material.ka.y, material.ka.z);
 
-	if (s_texturing == 1 && material.tex_id != -1)
+	if ((s_texturing == 1 || s_texturing == 2) && material.tex_id != -1)
 	{
 		tex = textures[material.tex_id];
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE0 + 1);
 		glBindTexture(GL_TEXTURE_2D, tex.gl_texture);
 		glUniform1i(uniform.textured, 1);
 		glUniform2f(uniform.tex_size, tex.width, tex.height);
@@ -127,21 +136,13 @@ void	display_loop(t_scop *scop)
 
 		send_default_uniforms(uniform, glfw_time, scop);
 
-		if (scop->ogl.s_texturing == 2)
-		{
-			glUniform2f(uniform.tex_size, scop->textures[scop->textures_count - 1].width, scop->textures[scop->textures_count - 1].height);
-			glUniform1i(uniform.textured, 2);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, scop->textures[scop->textures_count - 1].gl_texture);
-		}
+
 
 		for (size_t obj_i = 0; obj_i < scop->objects_count; obj_i++)
 		{
 			offset_mat 	= 0;
 			object 		= scop->objects[obj_i];
 			
-			// scop->objects[obj_i].rot.y += 0.005;
-
 			if (obj_i > 0)
 				offset_obj = scop->objects[obj_i - 1].offset;
 			for (size_t mat_i = 0; mat_i < object.nb_mats; mat_i++)
@@ -150,8 +151,15 @@ void	display_loop(t_scop *scop)
 				material = object.materials[mat_i];
 				if (mat_i > 0)
 					offset_mat += object.materials[mat_i - 1].gl_buffer_size;
+				
+				if (scop->ogl.s_texturing == 2)
+				{
+					glUniform2f(uniform.tex_size, scop->textures[scop->textures_count - 1].width, scop->textures[scop->textures_count - 1].height);
+					glUniform1i(uniform.textured, 2);
+					glActiveTexture(GL_TEXTURE0 + 0);
+					glBindTexture(GL_TEXTURE_2D, scop->textures[scop->textures_count - 1].gl_texture);
+				}
 				send_material_data(uniform, scop->textures, material, scop->ogl.s_texturing);
-				// printf("%zu %zu | %zu %zu\n", obj_i, mat_i, (offset_obj + offset_mat) / 8 / 3, (material.gl_buffer_size) / 8 / 3);
 				glDrawArrays(GL_TRIANGLES, (offset_obj + offset_mat) / BUFFER_COMPONENT, (material.gl_buffer_size) / BUFFER_COMPONENT);
 			}
 		}
@@ -232,7 +240,6 @@ void	auto_positions(t_scop *scop)
 			min.y = fmin(min.y, obj->min.y);
 			min.z = fmin(min.z, obj->min.z);
 		}
-		
 	}
 	
 	center = vec_multf(vec_add(min, max), .5);
@@ -266,8 +273,8 @@ int 	main(int argc, char *argv[])
 	scop->textures 			= NULL;
 	scop->cam_pos			= (t_vec3f) {0, 0, 0};
 	scop->cam_rot			= (t_vec3f) {0, 0, 0};
-	scop->width	 			= 1280;
-	scop->height 			= 720;
+	scop->width	 			= 1920;
+	scop->height 			= 1080;
 	scop->multiplier		= 1;
 	scop->ogl.s_texturing	= 0;
 	memset(scop->keys, 0, sizeof(uint32_t) * 348);
@@ -297,27 +304,19 @@ int 	main(int argc, char *argv[])
 	auto_positions(scop);
 
 
-	float pixels[48] = {
-	    0.0f, 0.0f, 0.0f,
-	    1.0f, 1.0f, 1.0f,
-	    1.0f, 1.0f, 1.0f,
-	    0.0f, 0.0f, 0.0f,
-	    0.0f, 0.0f, 0.0f,
-	    1.0f, 1.0f, 1.0f,
-	    1.0f, 1.0f, 1.0f,
-	    0.0f, 0.0f, 0.0f,
-	    0.0f, 0.0f, 0.0f,
-	    1.0f, 1.0f, 1.0f,
-	    1.0f, 1.0f, 1.0f,
-	    0.0f, 0.0f, 0.0f,
-	    0.0f, 0.0f, 0.0f,
-	    1.0f, 1.0f, 1.0f,
-	    1.0f, 1.0f, 1.0f,
-	    0.0f, 0.0f, 0.0f,
-	};
-	generate_gl_texture(scop, 4, 4, pixels, "CHECKER", GL_FLOAT);
+	// pas fini ça la berk
+    unsigned char   *image;
+    int             width;
+    int             height;
+    int             channels;
 
-
+ 	if (!(image = stbi_load("Resources/large_qpupier.png", &width, &height, &channels, 0)))
+    {
+        return (1);
+    }
+	generate_gl_texture(scop, width, height, image, "CHECKER", GL_UNSIGNED_BYTE);
+	// 
+	
 	display_loop(scop);
 	clean_exit(scop);
 }

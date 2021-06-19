@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:04:12 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/18 18:46:38 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 13:49:42 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,22 +50,67 @@ void			init_window(GLFWwindow **window, uint32_t width, uint32_t height)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+#include <math.h>
 static void	get_total_buffer_size(t_scop *scop, size_t *buffer_size, size_t *total_mats)
 {
 	size_t	i           = 0;
 	size_t	j           = 0;
 
+	t_vec3f point;
+	int		offset = 0 * 8;
+	t_vec3f max;
+	t_vec3f center;
+
 	while (i < scop->objects_count)
 	{
+		max = scop->objects[i].max;
+		center = scop->objects[i].center;
+		
 		j = 0;
 		while (j < scop->objects[i].nb_mats)
 		{
+
+			point.x = scop->objects[i].materials[j].gl_buffer[0 + offset];
+			point.y = scop->objects[i].materials[j].gl_buffer[1 + offset];
+			point.z = scop->objects[i].materials[j].gl_buffer[2 + offset];
+			
 			*buffer_size += scop->objects[i].materials[j].gl_buffer_size;
 			j++;
 		}
 		*total_mats += scop->objects[i].nb_mats;
 		i++;
 	}
+	
+	float u, v;
+
+	printf("\n");
+
+	//point.z *= 1;
+	// point.x *= -1;
+	
+	center.x = 0;
+	center.y = 0;
+	center.z = 0;
+
+	point.x = 0;
+	point.y = 0;
+	point.z = 0;
+
+	u = 0.5 + atan2f(point.z - center.z, point.x - center.x) / (M_PI * 2.0f);
+
+	v = point.y / max.y;
+
+	printf("u = .5 + atan2f(%f - %f, %f - %f) / (M_PI * 2.0f)\n", point.z, center.z, point.x, center.x);
+	printf("atan2f : atan2f(%f, %f) = %f\n", point.z - center.z, point.x - center.x, atan2f(point.z - center.z, point.x - center.x));
+
+	printf("v = %f / %f\n", point.y, max.y);
+
+	printf("u: %f\nv: %f\n\n", u, v);
+
+	printf("atan2f (%d, %d) = %f\n", -42, -42, atan2f(-42, -42));
+	printf("atan2f (%d, %d) = %f\n", -42, 42, atan2f(-42, 42));
+	printf("atan2f (%d, %d) = %f\n", 42, -42, atan2f(42, -42));
+	printf("atan2f (%d, %d) = %f\n", 42, 42, atan2f(42, 42));
 }
 
 static void		merge_all_buffers(t_scop *scop, float **buffer)

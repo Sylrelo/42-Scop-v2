@@ -12,11 +12,23 @@ uniform mat4	    Model;
 uniform int         textured;
 uniform vec3        kd;
 
+uniform sampler2D   basic_texture;
 uniform sampler2D   ourTexture;
 
 uniform vec2        tex_size;
 uniform float       obj_max_y;
 uniform vec3        obj_center;
+
+vec2    sphere_mapping(float x, float y, float z)
+{
+    float   u;
+    float   v;
+
+    u = .5 + (atan(x - obj_center.x, z - obj_center.z) / (2.0f * PI));
+    v = .5 - (asin(y - obj_center.y) / PI);
+
+    return (vec2(u, v));
+}
 
 vec2 cylinder_mapping(float x, float y, float z)
 {
@@ -25,13 +37,32 @@ vec2 cylinder_mapping(float x, float y, float z)
 
     // u : atan : calcul de l'angle entre z, et x
     // 2pi = 360 deg
-    u = (0.5 + atan(z - obj_center.z, x - obj_center.x)) / (PI * 0.5);
-    v = y / obj_max_y;
+    u = atan(z - obj_center.z, x - obj_center.x) / (PI * 2.f) + .5;
+    v = ((y - obj_center.y) / obj_max_y) + .5;
 
-    u *= tex_size.x;
-    v *= tex_size.y;
+    //  u /= tex_size.x / 2;
+    //  v /= tex_size.y / 2;
+     v *= -1;
     return (vec2(u, v));
 }
+
+vec2 weird_mapping(float x, float y, float z)
+{
+    float   u;
+    float   v;
+    
+
+    // u : atan : calcul de l'angle entre z, et x
+    // 2pi = 360 deg
+    //u = (0.5 + atan(z - obj_center.z, x - obj_center.x)) / (PI * 2.f);
+    //v = ((y - obj_center.y)) + .5;
+
+    //  u /= tex_size.x / 2;
+    //  v /= tex_size.y / 2;
+    //v *= -1;
+    return (vec2(z, x));
+}
+
 
 
 void main()
@@ -49,7 +80,9 @@ void main()
     else if (textured == 1)
         FragColor = vec4(texture(ourTexture, tex_coords).xyz * d, 1);
     else if (textured == 2)
-       FragColor = vec4(texture(ourTexture, cylinder_mapping(frag_position.x, frag_position.y, frag_position.y)).xyz * d, 1);
+        FragColor = vec4(texture(basic_texture, tex_coords).xyz * d, 1);
+
+       //FragColor = vec4(texture(ourTexture, cylinder_mapping(frag_position.x, frag_position.y, frag_position.y)).xyz * d, 1);
     else
         FragColor = vec4(color * d, 1);
 }

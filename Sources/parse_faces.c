@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:13:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/18 18:46:22 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 14:46:26 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,22 @@ static void     calculate_missing_normal(t_mat *material)
             i += BUFFER_COMPONENT;
         }
     }
+}
+
+static void     calculate_missing_uvcoords(t_mat *material)
+{
+    float   *cbuffer;
+
+    if (material->gl_buffer_size % (BUFFER_COMPONENT * 3) != 0)
+        return ;
+ 
+    cbuffer = &material->gl_buffer[material->gl_buffer_size - (BUFFER_COMPONENT * 3)];
+    *(cbuffer + 6 + (0 * BUFFER_COMPONENT)) = 1;
+    *(cbuffer + 7 + (0 * BUFFER_COMPONENT)) = 1;
+    *(cbuffer + 6 + (1 * BUFFER_COMPONENT)) = 1;
+    *(cbuffer + 7 + (1 * BUFFER_COMPONENT)) = 0;
+    *(cbuffer + 6 + (2 * BUFFER_COMPONENT)) = 0;
+    *(cbuffer + 7 + (2 * BUFFER_COMPONENT)) = 0;
 }
 
 static void     generate_random_color(t_mat *material)
@@ -159,6 +175,8 @@ static size_t   parse_vertex(t_parser *parser, t_mat *material, char *line)
 
     mat_push_buffer(material, buffer);
     generate_random_color(material);
+    if ((face_type & TEXTURE) != TEXTURE)
+        calculate_missing_uvcoords(material);
     if ((face_type & NORMAL) != NORMAL)
         calculate_missing_normal(material);
     return (1);

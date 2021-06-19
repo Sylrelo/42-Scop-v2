@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/18 15:44:41 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 14:54:20 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,9 @@ typedef struct	s_uniforms
 	uint32_t 	tex_size;
 	uint32_t 	obj_max_y;
 	uint32_t 	obj_center;
+
+	uint32_t	tex_basic;
+	uint32_t	tex_object;
 }				t_uniforms;
 
 typedef struct	s_ogl

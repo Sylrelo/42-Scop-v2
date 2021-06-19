@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/18 19:26:44 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 17:55:39 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ static void get_relative_path(char path[256], char *file)
 	char	*file_tmp;
 	char 	*token;
 	size_t	path_len;
+	char	*tmp_strrchr;
 
 	if (!(file_tmp = strdup(file)))
 		die ("Error strdup file_tmp");
@@ -53,7 +54,10 @@ static void get_relative_path(char path[256], char *file)
 	token = strtok(file, "/");
 	while (token != NULL)
 	{
-		if (!strcmp(token, strrchr(file_tmp, '/') + 1)) 
+		tmp_strrchr = strrchr(file_tmp, '/');
+		if (!tmp_strrchr)
+			break ;
+		if (!strcmp(token, tmp_strrchr + 1)) 
 			break ;
 		strcat(path, token);
 		strcat(path, "/");
@@ -114,9 +118,9 @@ void 		parser_init(t_scop *scop, char *file)
 	strcpy(last_mtl, "DEFAULT_NO_MATERIAL");
 	get_relative_path(path, file);
 	
-	parser.vn_count = (st.st_size / 200);
-	parser.v_count 	= (st.st_size / 200);
-	parser.vt_count = (st.st_size / 200);
+	parser.vn_count = st.st_size < 200 ? st.st_size : (st.st_size / 200);
+	parser.v_count 	= st.st_size < 200 ? st.st_size : (st.st_size / 200);
+	parser.vt_count = st.st_size < 200 ? st.st_size : (st.st_size / 200);
 
 	if (!(parser.v 	= calloc(parser.v_count, sizeof(t_vec3f))))
 		die("Error calloc v");

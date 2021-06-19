@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/19 17:17:07 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 18:08:26 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,10 +125,14 @@ static void	start_parser(t_scop *scop, int argc, char *argv[])
 			}
 		}
 		st_result = stat(argv[i], &st);
-		
 		if (st_result)
 		{
 			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mnot found, skipping.\033[0m\n\n", argv[i]);
+			continue ;
+		}
+		if (st.st_size == 0)
+		{
+			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mis empty, skipping.\033[0m\n\n", argv[i]);
 			continue ;
 		}
 		if (!strstr(argv[i], ".obj"))
@@ -145,7 +149,8 @@ static void	start_parser(t_scop *scop, int argc, char *argv[])
 		parser_init(scop, argv[i]);
 		printf("\n");
 		get_total_buffer_size(scop, &buffer_size, &total_mats);
-		if (buffer_size / BUFFER_COMPONENT / 3 > 17500000 || (((buffer_size * sizeof(float)) * 0.000001) * 1.5) >= 4000 || total_mats >= 300)
+		printf(" \n--- >%zu\n", buffer_size / BUFFER_COMPONENT / 3);
+		if (buffer_size / BUFFER_COMPONENT / 3 >= 15000000 || (((buffer_size * sizeof(float)) * 0.000001) * 1.5) >= 4000 || total_mats >= 300)
 		{
 			printf("\033[0;31m- Maximum triangles, materials or memory exceeded. For safety, parsing has been stopped\033[0m\n\n");
 			break ;
@@ -160,6 +165,7 @@ int 		main(int argc, char *argv[])
 {
 	t_scop	*scop;
 
+	printf("/!\ ATTENTION SEGFAULT SUR PATH SANS / A GERER /!\ \n\n");
 	if (!(argc - 1))
 	{
 		printf("Usage : \n");

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:04:12 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/19 13:49:42 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/19 15:02:46 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ void			init_window(GLFWwindow **window, uint32_t width, uint32_t height)
 		die("glfwInit failed.");
 	printf("[OpenGL] Initializing GLFW\n");
 
-	glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint (GLFW_SAMPLES, 4);

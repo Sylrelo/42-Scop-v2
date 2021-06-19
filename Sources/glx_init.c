@@ -42,7 +42,7 @@ void			init_window(GLFWwindow **window, uint32_t width, uint32_t height)
 	}
 	printf("[OpenGL] Initializing GL3W\n");
 	glfwSetInputMode(*window, GLFW_STICKY_KEYS, 1);
-	//glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSwapInterval(1);
 
 	glEnable(GL_CULL_FACE);
@@ -104,7 +104,7 @@ static void		merge_all_buffers(t_scop *scop, float **buffer)
 }
 
 void			init_opengl_buffer_multi(t_scop *scop)
-{;
+{
 	size_t buffer_size		= 0;
 	size_t total_mats 		= 0;
 	float *tmp_buffer 		= NULL;
@@ -116,17 +116,15 @@ void			init_opengl_buffer_multi(t_scop *scop)
 	if (!(tmp_buffer = calloc(buffer_size, sizeof(float))))
 		die ("Error calloc tmp_buffer");
 	_floatset(tmp_buffer, 0.0f, buffer_size);
-	
+
 	merge_all_buffers(scop, &tmp_buffer);
 
 	printf("[OpenGL] Binding bufffer and attribPointer\n");
 	glGenBuffers(1, &scop->vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, scop->vbo);
 
-	printf("%u\n", glGetError());
 	glGenVertexArrays(1, &scop->vao);  
 	glBindVertexArray(scop->vao);
-	printf("%u\n", glGetError());
 
 	glBufferData(GL_ARRAY_BUFFER, (buffer_size * sizeof(float)), (void *) tmp_buffer, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, BUFFER_COMPONENT * sizeof(float), (const void *)0);

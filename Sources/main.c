@@ -150,7 +150,6 @@ static void	start_parser(t_scop *scop, int argc, char *argv[])
 		parser_init(scop, argv[i]);
 		printf("\n");
 		get_total_buffer_size(scop, &buffer_size, &total_mats);
-		printf(" \n--- >%zu\n", buffer_size / BUFFER_COMPONENT / 3);
 		if (buffer_size / BUFFER_COMPONENT / 3 >= 15000000 || (((buffer_size * sizeof(float)) * 0.000001) * 1.5) >= 4000 || total_mats >= 300)
 		{
 			printf("\033[0;31m- Maximum triangles, materials or memory exceeded. For safety, parsing has been stopped\033[0m\n\n");
@@ -164,7 +163,7 @@ static void	start_parser(t_scop *scop, int argc, char *argv[])
 
 int 		main(int argc, char *argv[])
 {
-	t_scop	*scop;
+	t_scop	*scop = NULL;
 
 	if (!(argc - 1))
 	{
@@ -173,19 +172,22 @@ int 		main(int argc, char *argv[])
 		printf("\t ./scop -t texture.jpg object.obj\n");
 		printf("\t You can add multiple object file, separated by space\n");
 		printf("\t\t ./scop object.obj object.obj ...\n");
-		printf("\n");
-		printf("Keybinding and Mouse control : \n");
-		printf("\t Mouse rotate the camera\n");
-		printf("\t WASD to move the camera\n");
 
-		printf("\t 1, 2, 3          : Switch between filled triangle, wireframe, or points rendering\n");
-		printf("\t 4                : Enable or disable face culling\n");
-		printf("\t 5                : Enable or disable depth test\n");
+		printf("\nKeybinding and Mouse control : \n");
+		printf("\t Mouse            : Rotate the camera\n");
+		printf("\t 1 / 2 / 3        : Switch between filled triangle, wireframe, or points rendering.\n");
+		printf("\t 4                : Enable or disable face culling.\n");
+		printf("\t 5                : Enable or disable depth test.\n");
 		printf("\t T                : Switch between material color, material texture, global object texture or per-triangle color.\n");
-		printf("\t Arrow LEFT/RIGHT : Rotate all objects on Y axis around object center.\n");
-		printf("\t Arrow UP/DOWN    : Rotate all objects on X axis around object center.\n");
-		printf("\n");
-		printf("Bonus : \n");
+		printf("\t O                : Switch between selected object.\n");
+		printf("\t Left / Right     : Rotate all or selected object on Y axis around object center.\n");
+		printf("\t Up / Down        : Rotate all or selected object on X axis around object center.\n");
+		printf("\t Comma / Period   : Rotate all or selected object on Z axis around object center.\n");
+		printf("\t W / S            : Translate object(s) or camera on Z axis.\n");
+		printf("\t A / D            : Translate object(s) or camera on X axis.\n");
+		printf("\t R / F            : Translate object(s) or camera on Y axis.\n");
+
+		printf("\nBonus : \n");
 		printf("\t - Auto triangulation of convex polygons\n");
 		printf("\t - Auto UV mapping of incomplete objects\n");
 		printf("\t - Auto normal calculation of incomplete objects\n");
@@ -197,6 +199,7 @@ int 		main(int argc, char *argv[])
 		printf("\t - Keybinding options\n");
 		printf("\t - Directional light\n");
 		printf("\t - Auto positioning when multiple objects are selected\n");
+		printf("\t - Move and rotate independent object on all 3 axes\n");
 		exit (1);
 	}
 
@@ -207,6 +210,8 @@ int 		main(int argc, char *argv[])
 
 	scop->textures_count 	= 0;
 	scop->textures 			= NULL;
+	scop->objects			= NULL;
+	scop->window			= NULL;
 	scop->cam_pos			= (t_vec3f) {0, 0, 0};
 	scop->cam_rot			= (t_vec3f) {0, 0, 0};
 	scop->width	 			= 1280;
@@ -233,6 +238,11 @@ int 		main(int argc, char *argv[])
 	printf("[Scop] Starting parser\n\n");
 	start_parser(scop, argc, argv);
 	
+	if (!scop->objects_count)
+	{
+		clean_exit(scop);
+		exit (1);
+	}
 	printf("[Scop] Starting OpenGL Buffer initialization\n");
 	init_opengl_buffer_multi(scop);
 

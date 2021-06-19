@@ -94,13 +94,15 @@ void 		parser_init(t_scop *scop, char *file)
 	t_stat		st;
 	char		last_mtl[256];
 	char		path[256];
-	char		*line 		= NULL;
-	size_t		f_count 	= 0;
-	size_t		v_count 	= 0;
-	size_t		vn_count 	= 0;
-	size_t		vt_count 	= 0;
-	ssize_t		read 		= 0;
-	size_t		len 		= 0;
+	char		*line 			= NULL;
+	size_t		f_count 		= 0;
+	size_t		v_count 		= 0;
+	size_t		vn_count 		= 0;
+	size_t		vt_count 		= 0;
+	ssize_t		read 			= 0;
+	size_t		len 			= 0;
+	size_t		read_total		= 0;
+	size_t		old_percent		= 0;
 
 	if (stat(file, &st))
 		die ("File not found.");
@@ -111,6 +113,7 @@ void 		parser_init(t_scop *scop, char *file)
 	if (!(fp = fopen(file, "r")))
 		die("Cannot open file");
 
+	scop->objects[scop->objects_count].materials = NULL;
 	parser.max = (t_vec3f){ -FLT_MAX, -FLT_MAX, -FLT_MAX };
 	parser.min = (t_vec3f){ FLT_MAX, FLT_MAX, FLT_MAX };
 
@@ -118,6 +121,10 @@ void 		parser_init(t_scop *scop, char *file)
 	strcpy(last_mtl, "DEFAULT_NO_MATERIAL");
 	get_relative_path(path, file);
 	
+	parser.v 	= NULL;
+	parser.vt 	= NULL;
+	parser.vn 	= NULL;
+
 	parser.vn_count = st.st_size < 200 ? st.st_size : (st.st_size / 200);
 	parser.v_count 	= st.st_size < 200 ? st.st_size : (st.st_size / 200);
 	parser.vt_count = st.st_size < 200 ? st.st_size : (st.st_size / 200);
@@ -129,49 +136,45 @@ void 		parser_init(t_scop *scop, char *file)
 	if (!(parser.vt = calloc(parser.vt_count, sizeof(t_vec2f))))
 		die("Error calloc vt");
 
-	size_t oyo = 0;
-	size_t old = 0;
 	while ((read = getline(&line, &len, (FILE *) fp)) != -1)
 	{
-		oyo += read;
+		read_total += read;
 
 		if (!strncmp(line, "mtllib ", 7))
 			parser_mtl_start(scop, path, line + 7);
 		else if (!strncmp(line, "usemtl ", 7))
 		{
-			print_progress(&old, oyo, st);
+			print_progress(&old_percent, read_total, st);
 			memset(last_mtl, 0, 256);
 			strcpy(last_mtl, _strtrim(line + 7));
 		}
 		else if (!strncmp(line, "v ", 2)) 
 		{
-			print_progress(&old, oyo, st);
+			print_progress(&old_percent, read_total, st);
 			realloc_obj_arrays(&v_count, &parser.v_count, sizeof(t_vec3f), (void *) &parser.v);
 			sscanf(line, "v %f %f %f", &parser.v[v_count].x, &parser.v[v_count].y, &parser.v[v_count].z);
 			v_count++;
 		} 
 		else if (!strncmp(line, "vn ", 3)) 
 		{
-			print_progress(&old, oyo, st);
+			print_progress(&old_percent, read_total, st);
 			realloc_obj_arrays(&vn_count, &parser.vn_count, sizeof(t_vec3f), (void *) &parser.vn);
 			sscanf(line, "vn %f %f %f", &parser.vn[vn_count].x, &parser.vn[vn_count].y, &parser.vn[vn_count].z);
 			vn_count++;
 		}
 		else if (!strncmp(line, "vt ", 3)) 
 		{
-			print_progress(&old, oyo, st);
+			print_progress(&old_percent, read_total, st);
 			realloc_obj_arrays(&vt_count, &parser.vt_count, sizeof(t_vec2f), (void *) &parser.vt);
 			sscanf(line, "vt %f %f", &parser.vt[vt_count].x, &parser.vt[vt_count].y);
 			vt_count++;
 		}
 		else if (!strncmp(line, "f ", 2)) 
 		{
-			print_progress(&old, oyo, st);
+			print_progress(&old_percent, read_total, st);
 			parse_face(&parser, &scop->objects[scop->objects_count].materials, &scop->objects[scop->objects_count].nb_mats, last_mtl, _strtrim(line + 2));
 			f_count++;
 		}
-		// if ()
-		// dprintf(1, "")
 	}
 
 	free_obj_arrays(&parser);
@@ -182,7 +185,5 @@ void 		parser_init(t_scop *scop, char *file)
 	scop->objects[scop->objects_count].center = vec_multf(vec_add(parser.min, parser.max), .5);
 	scop->objects[scop->objects_count].max = parser.max;
 	scop->objects[scop->objects_count].min = parser.min;
-	
 	scop->objects_count++;
-
 }

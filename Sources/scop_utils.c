@@ -38,24 +38,38 @@ void    clean_exit(t_scop *scop)
 {
 	size_t i = 0;
 
-	if (scop->textures_count)
+	if (scop->textures)
 	{
 		free(scop->textures);
 		scop->textures = NULL;
 	}
-	if (scop->objects_count)
+	while (i < scop->objects_count)
 	{
-		while ( i < scop->objects_count )
+		for (size_t mat_i = 0; mat_i < scop->objects[i].nb_mats; mat_i++)
+		{
+			if (scop->objects[i].materials[mat_i].gl_buffer)
+			{
+				free(scop->objects[i].materials[mat_i].gl_buffer);
+				scop->objects[i].materials[mat_i].gl_buffer = NULL;
+			}
+		}
+		if (scop->objects[i].materials)
 		{
 			free(scop->objects[i].materials);
 			scop->objects[i].materials = NULL;
-			i++;
 		}
-		free(scop->objects);
-		scop->objects = NULL;
+		i++;
 	}
-	free(scop);
-	scop = NULL;
+	if (scop->objects)
+	{
+		free(scop->objects);
+		scop->objects = NULL;	
+	}
+	if (scop)
+	{
+		free(scop);
+		scop = NULL;
+	}
 }
 
 void	die(char *string)

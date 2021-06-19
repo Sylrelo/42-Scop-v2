@@ -38,14 +38,14 @@ static void generate_filepath(char filepath[256], char path[256], char *file)
 
 void        init_mat_default_values(t_mat *material)
 {
-    material->tex_id = -1;
-    material->tmp_allocated = 0;
-    material->gl_buffer_size = 0;
-    material->gl_buffer = NULL;
-    material->kd = (t_vec3f) {0.7, 0.7, 0.7};
-    material->ka = (t_vec3f) {0.1, 0.1, 0.1};
-    material->ks = (t_vec3f) {1.0, 1.0, 1.0};
-    material->tf = (t_vec3f) {1.0, 1.0, 1.0};
+    material->tex_id            = -1;
+    material->tmp_allocated     = 0;
+    material->gl_buffer_size    = 0;
+    material->gl_buffer         = NULL;
+    material->kd                = (t_vec3f) {0.7, 0.7, 0.7};
+    material->ka                = (t_vec3f) {0.1, 0.1, 0.1};
+    material->ks                = (t_vec3f) {1.0, 1.0, 1.0};
+    material->tf                = (t_vec3f) {1.0, 1.0, 1.0};
 }
 
 int        parser_mtl_start(t_scop *scop, char path[256], char *file)

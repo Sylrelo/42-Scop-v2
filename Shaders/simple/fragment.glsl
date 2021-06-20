@@ -7,9 +7,14 @@ in vec3             normal;
 in vec2             tex_coords;
 in vec3             color;
 in vec4             frag_position;
+in vec4             frag_world_pos;
 
 uniform mat4	    Model;
+
 uniform vec3        kd;
+uniform vec3        ka;
+uniform vec3        ks;
+uniform float       ns;
 
 uniform int         mapping;
 uniform int         textured;
@@ -20,7 +25,9 @@ uniform vec2        tex_size;
 uniform float       obj_max_y;
 uniform vec3        obj_center;
 
-uniform int        object_selected;
+uniform int         object_selected;
+
+uniform vec3        view_pos;
 
 vec2    sphere_mapping(float x, float y, float z)
 {
@@ -55,16 +62,25 @@ void main()
     vec4 final_color;
 
     vec3 model_normal       = normalize(vec3(Model * vec4(normal, 0)));
-    vec3 light_direction    = normalize(vec3(0, 3.5f, 10.0f));
+    vec3 light_direction    = normalize(vec3(0, 5.5f, 10.0f));
+
+
+    vec3 view_dir           = normalize(view_pos - frag_world_pos.xyz);
+    vec3 reflect_dir        = reflect(light_direction, model_normal); 
+
+    float spec              = pow(max(dot(view_dir, reflect_dir), 0.0), ns);
+    vec3 specular           = .7 * spec * ks;  
+
     float d                 = max(dot(model_normal, light_direction), 0.0);
 
     if (textured == 0)
     {
-        final_color = vec4(kd, 1);
+        // final_color = vec4( (ka + vec3(d, d, d) + specular) * kd, 1);
+        final_color = vec4( (vec3(d, d, d) + specular) * kd, 1);
     }
     else if (textured == 1)
     {
-        final_color = vec4(texture(ourTexture, tex_coords).xyz, 1);
+        final_color = vec4((texture(ourTexture, tex_coords).xyz + specular )* d, 1);
     }
     else if (textured == 2)
     {
@@ -85,22 +101,23 @@ void main()
             default :
                 final_color = vec4(color, 1);
         }
+        final_color *= d;
     }
     else if (textured == 4)
     {
-        final_color = vec4(color, 1);
+        final_color = vec4(color * d, 1);
     }
     else
     {
-        float avg = (color.x + color.y + color.z) * 0.33;
+        float avg = (color.x + color.y + color.z) * 0.33 * d;
         final_color = vec4(avg, avg, avg, 1);
     }
 
     if (object_selected == 1)
-        FragColor = vec4(final_color.xyz * d, 1);
+        FragColor = vec4(final_color.xyz, 1);
     else if (object_selected == 0)
-        FragColor = vec4(final_color.xyz * d * .5, 1);
+        FragColor = vec4(final_color.xyz * .5, 1);
     else
-        FragColor = vec4(final_color.xyz * d, 1);
+        FragColor = vec4(final_color.xyz, 1);
 
 }

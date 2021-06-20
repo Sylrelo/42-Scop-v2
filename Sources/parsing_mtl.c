@@ -44,8 +44,9 @@ void        init_mat_default_values(t_mat *material)
     material->gl_buffer         = NULL;
     material->kd                = (t_vec3f) {0.7, 0.7, 0.7};
     material->ka                = (t_vec3f) {0.1, 0.1, 0.1};
-    material->ks                = (t_vec3f) {1.0, 1.0, 1.0};
+    material->ks                = (t_vec3f) {.5, .5, .5};
     material->tf                = (t_vec3f) {1.0, 1.0, 1.0};
+    material->ns                = 32;
 }
 
 int        parser_mtl_start(t_scop *scop, char path[256], char *file)
@@ -74,11 +75,12 @@ int        parser_mtl_start(t_scop *scop, char path[256], char *file)
 	while ((read = getline(&line, &len, (FILE *) fp)) != -1)
 	{
         material = &obj->materials[tmp_nb_mats - 1];
-
         if (!strncmp(line, "Kd ", 3))
             sscanf(line, "Kd %f %f %f", &material->kd.x, &material->kd.y, &material->kd.z);
         else if (!strncmp(line, "Ks ", 3))
             sscanf(line, "Ks %f %f %f", &material->ks.x, &material->ks.y, &material->ks.z);
+        else if (!strncmp(line, "Ns ", 1))
+            sscanf(line, "Ns %f", &material->ns);
         else if (!strncmp(line, "Ka ", 3))
             sscanf(line, "Ka %f %f %f", &material->ka.x, &material->ka.y, &material->ka.z);
         else if (!strncmp(line, "Tf ", 3))
@@ -92,7 +94,12 @@ int        parser_mtl_start(t_scop *scop, char path[256], char *file)
             init_mat_default_values(&obj->materials[tmp_nb_mats]);
             tmp_nb_mats++;
         }
+        if (material->ns <= 0)
+            material->ns = 1;
+        if (material->ns > 1000)
+            material->ns = 1000;
 	}
+
 	free(line);
     if (!(obj->materials = realloc(obj->materials, sizeof(t_mat) * tmp_nb_mats)))
         die ("Material final realloc failed");

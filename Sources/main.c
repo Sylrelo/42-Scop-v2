@@ -198,6 +198,9 @@ int 		main(int argc, char *argv[])
 		printf("\t - Multiple colors and/or textures per object, based on material\n");
 		printf("\t - Keybinding options\n");
 		printf("\t - Directional light\n");
+		printf("\t - Ambiant light from mtl\n");
+		printf("\t - Diffuse light from mtl\n");
+		printf("\t - Specular light from mtl\n");
 		printf("\t - Auto positioning when multiple objects are selected\n");
 		printf("\t - Move and rotate independent object on all 3 axes\n");
 		exit (1);

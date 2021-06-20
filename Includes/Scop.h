@@ -56,6 +56,7 @@ typedef struct	s_mat
 	size_t		gl_buffer_size;
 	size_t		tmp_allocated;
 	float		*gl_buffer;
+	float		ns;
 	t_vec3f		ka;
 	t_vec3f		kd;
 	t_vec3f		ks;
@@ -84,6 +85,8 @@ typedef struct	s_uniforms
 
 	uint32_t	ka;
 	uint32_t	kd;
+	uint32_t	ks;
+	uint32_t	ns;
 	uint32_t	textured;
 	uint32_t	mapping;
 
@@ -98,6 +101,8 @@ typedef struct	s_uniforms
 	uint32_t	tex_object;
 
 	uint32_t	object_selected;
+
+	uint32_t	view_pos;
 
 }				t_uniforms;
 

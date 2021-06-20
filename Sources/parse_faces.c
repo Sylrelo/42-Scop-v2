@@ -35,7 +35,7 @@ static void     mat_push_buffer(t_mat *material, float *buffer)
         material->gl_buffer = realloc(NULL, sizeof(float) * BUFFER_COMPONENT * MAT_GL_BUFFER_REALLOC_VALUE);
         material->tmp_allocated = MAT_GL_BUFFER_REALLOC_VALUE;
     }
-    else if (material->tmp_allocated + 1 > material->tmp_allocated)
+    else if (material->gl_buffer_size + BUFFER_COMPONENT > material->tmp_allocated)
     {
         material->tmp_allocated += MAT_GL_BUFFER_REALLOC_VALUE;
         material->gl_buffer = realloc(material->gl_buffer, sizeof(float) * BUFFER_COMPONENT * material->tmp_allocated);

@@ -20,7 +20,7 @@
 #include "libc_extends.h"
 
 // Do not edit theses values
-#define MAT_GL_BUFFER_REALLOC_VALUE 5000
+#define MAT_GL_BUFFER_REALLOC_VALUE 10000
 #define BUFFER_COMPONENT 11
 
 typedef enum e_parsing

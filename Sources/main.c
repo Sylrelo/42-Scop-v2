@@ -255,14 +255,6 @@ int 		main(int argc, char *argv[])
 	printf("[Scop] Ready\n");
 	auto_object_position(scop);
 
-
-	for (size_t i = 0; i < scop->objects_count; i++)
-	{
-		for (size_t j = 0; j < scop->objects[i].nb_mats; j++)
-		{
-			printf("%zu %zu | %s %zu | \n", i, j, scop->objects[i].materials[j].material_name, scop->objects[i].materials[j].gl_buffer_size);
-		}
-	}
 	display_loop(scop);
 	clean_exit(scop);
 }

@@ -31,7 +31,6 @@ void                handle_keyboard(GLFWwindow *window, uint32_t keys[349], int 
     const float     glfw_time       = glfwGetTime();
     static float    key_timeout     = 0;
     const float     time_diff       = key_timeout == 0 || glfw_time - key_timeout > 0.3f;
-
     static uint32_t render_option   = GL_FILL;
     static uint8_t  gl_cull_face    = 1;
     static uint8_t  gl_depth_test   = 1;
@@ -84,9 +83,28 @@ void                handle_keyboard(GLFWwindow *window, uint32_t keys[349], int 
     if (glfwGetKey(window, GLFW_KEY_T) && time_diff)
     {
         (*s_texturing)++;
-        if (*s_texturing >= 4)
+        if (*s_texturing >= 5)
             *s_texturing = 0;
         key_timeout = glfw_time;
+        dprintf(1, "Texture mode changed : ");
+        switch (*s_texturing)
+        {
+            case 0:
+                printf("Material colors\n");
+                break ;
+            case 1:
+                printf("Material texture(s)\n");
+                break ;
+            case 2:
+                printf("Auto UV texturing\n");
+                break ;
+            case 3:
+                printf("Black and white triangles\n");
+                break ;
+            case 4:
+                printf("Colored triangles\n");
+                break ;
+        }
     }
     if (glfwGetKey(window, GLFW_KEY_M) && time_diff)
     {
@@ -94,6 +112,22 @@ void                handle_keyboard(GLFWwindow *window, uint32_t keys[349], int 
         if (*s_mapping >= 4)
             *s_mapping = 0;
         key_timeout = glfw_time;
+        dprintf(1, "UV mapping changed : ");
+        switch (*s_mapping)
+        {
+            case 0:
+                printf("Object's UV\n");
+                break ;
+            case 1:
+                printf("Cylinder UV\n");
+                break ;
+            case 2:
+                printf("Sphere UV\n");
+                break ;
+            case 3:
+                printf("Position\n");
+                break ;
+        }
     }
     if (glfwGetKey(window, GLFW_KEY_O) && time_diff)
     {

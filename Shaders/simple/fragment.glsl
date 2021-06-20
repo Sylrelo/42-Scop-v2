@@ -86,9 +86,14 @@ void main()
                 final_color = vec4(color, 1);
         }
     }
-    else
+    else if (textured == 4)
     {
         final_color = vec4(color, 1);
+    }
+    else
+    {
+        float avg = (color.x + color.y + color.z) * 0.33;
+        final_color = vec4(avg, avg, avg, 1);
     }
 
     if (object_selected == 1)

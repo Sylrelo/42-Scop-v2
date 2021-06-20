@@ -28,7 +28,7 @@ CREATE_OBJDIR:
 
 $(NAME): $(OBJS)
 		@gcc ${CFLAGS} $^ ${INC_LIB} -o ${NAME} 
-		@printf "\033[1m[ SCOP ]\033[1m\t\tcompilation complete.\t\033[0m\n"
+		@printf "\033[1mScop \033[1m : compiled.\t\033[0m\n"
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c Includes/Libmatvec/libmatvec.a Includes/Scop.h
 		@gcc $(CFLAGS) $(INC_HDR) -o $@ -c $<
@@ -43,11 +43,11 @@ run:
 clean:
 		@rm -rf $(OBJ_DIR)
 		@make clean -C ./Includes/Libmatvec
-		@echo "\033[1m[ SCOP ]\033[0m\t\tobjects cleared.\033[0m"
+		@echo "\033[1mScop\033[0m : objects cleared.\033[0m"
 
 fclean : clean
 		@rm -f $(NAME)
 		@make fclean -C ./Includes/Libmatvec
-		@echo "\033[1m[ SCOP ]\033[0m\t\tbinary deleted.\033[0m"
+		@echo "\033[1mScop\033[0m : binary deleted.\033[0m"
 
 re:		fclean all

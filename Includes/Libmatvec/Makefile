@@ -10,7 +10,7 @@ OBJS	:= $(patsubst %.c, $(OBJ_DIR)/%.o, $(SRCS))
 
 CFLAGS	:= -Wall -Wextra -Werror -O3 -I$(INC_DIR)
 
-print_lib =  \033[1m[\033[1m\033[33m LIBMATVEC \033[0m\033[1m]\033[0m  
+print_lib =  \033[1mLibmatvec\033[0m
 
 all: CREATE_OBJDIR $(NAME)
 
@@ -20,17 +20,17 @@ CREATE_OBJDIR:
 $(NAME): $(OBJS)
 		@ar -rc $(NAME) $(OBJS)
 		@ranlib $(NAME)
-		@printf "$(print_lib)\033[1m library successfully created.\033[0m\n"
+		@printf "$(print_lib)\033[1m : library successfully created.\033[0m\n"
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c $(INC_DIR)/Libmatvec.h
 		@gcc $(CFLAGS) -o $@ -c $<
 
 clean:
 		@rm -rf ./.Objects/$(OBJS)
-		@printf "$(print_lib) objects cleared.\n"
+		@printf "${print_lib} : objects cleared.\n"
 
 fclean : clean
 		@rm -f $(NAME)
-		@printf "$(print_lib) binary deleted.\n"
+		@printf "${print_lib} : library deleted.\n"
 
 re:		fclean all

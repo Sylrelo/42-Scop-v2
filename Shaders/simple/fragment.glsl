@@ -76,7 +76,7 @@ void main()
     if (textured == 0)
     {
         // final_color = vec4( (ka + vec3(d, d, d) + specular) * kd, 1);
-        final_color = vec4( (vec3(d, d, d) + specular) * kd, 1);
+        final_color = vec4((vec3(d, d, d) + specular) * kd, 1);
     }
     else if (textured == 1)
     {
@@ -105,11 +105,12 @@ void main()
     }
     else if (textured == 4)
     {
-        final_color = vec4(color * d, 1);
+        final_color = vec4((vec3(d, d, d) + specular) * color, 1);
     }
     else
     {
-        float avg = (color.x + color.y + color.z) * 0.33 * d;
+        vec3 ncolor = (vec3(d, d, d) + specular) * color;
+        float avg = (ncolor.x + ncolor.y + ncolor.z) * 0.33;
         final_color = vec4(avg, avg, avg, 1);
     }
 

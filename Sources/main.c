@@ -218,6 +218,7 @@ int 		main(int argc, char *argv[])
 	scop->height 			= 720;
 	scop->multiplier		= 1;
 	scop->ogl.s_texturing	= 0;
+	scop->ogl.s_mapping		= 0;
 	scop->objects_count		= 0;
 	scop->selected_object	= -1;
 	memset(scop->keys, 0, sizeof(uint32_t) * 348);

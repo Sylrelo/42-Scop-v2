@@ -85,6 +85,7 @@ typedef struct	s_uniforms
 	uint32_t	ka;
 	uint32_t	kd;
 	uint32_t	textured;
+	uint32_t	mapping;
 
 	uint32_t	glfw_time;
 	uint32_t	glfw_options;
@@ -103,6 +104,7 @@ typedef struct	s_uniforms
 typedef struct	s_ogl
 {
 	int			s_texturing;
+	int 		s_mapping;
 	GLint		p_render;
 	GLint 		vao;
 	t_uniforms	u_render;
@@ -143,7 +145,7 @@ float		random_float(int min, int max, float prec);
 
 
 // glfw_events.c
-void		handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing, short *selected_object, size_t objects_count);
+void        handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing, int *s_mapping, short *selected_object, size_t objects_count);
 void 		handle_transformations(t_scop *scop);
 void		handle_mouse(GLFWwindow *window, t_vec3f *cam_rot);
 

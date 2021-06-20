@@ -20,6 +20,7 @@ static void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
 	uniform->kd 			= glGetUniformLocation(program, "kd");
 	uniform->ka 			= glGetUniformLocation(program, "ka");
 	uniform->textured 		= glGetUniformLocation(program, "textured");
+	uniform->mapping 		= glGetUniformLocation(program, "mapping");
 	uniform->glfw_time 		= glGetUniformLocation(program, "glfw_time");
 	uniform->glfw_options 	= glGetUniformLocation(program, "glfw_options");
 	uniform->tex_size 		= glGetUniformLocation(program, "tex_size");
@@ -45,6 +46,7 @@ static void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *s
 		glUniform1i(uniform.glfw_options, 1);
 		glUniform1f(uniform.glfw_time, .5);
 	}
+	glUniform1i(uniform.mapping, scop->ogl.s_mapping);
 
 	mat_view = m4_viewmat(scop->cam_rot.x, scop->cam_rot.y, scop->cam_rot.z, m4_translate(scop->cam_pos.x, scop->cam_pos.y, scop->cam_pos.z));
 	glUniformMatrix4fv(uniform.m4_view, 1, GL_FALSE, mat_view.value[0]);
@@ -112,21 +114,25 @@ void	    display_loop(t_scop *scop)
 		
 		glfw_time = glfwGetTime() - base_time;
 		
-		handle_keyboard(scop->window, scop->keys, &scop->ogl.s_texturing, &scop->selected_object, scop->objects_count);
+		handle_keyboard(scop->window, scop->keys, &scop->ogl.s_texturing, &scop->ogl.s_mapping, &scop->selected_object, scop->objects_count);
 		handle_mouse(scop->window, &scop->cam_rot);
 		handle_transformations(scop);
     	
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		send_default_uniforms(uniform, glfw_time, scop);
+
 		for (size_t obj_i = 0; obj_i < scop->objects_count; obj_i++)
 		{
 			offset_mat 	= 0;
 			object 		= scop->objects[obj_i];
 			if ((short) obj_i == scop->selected_object)
 				glUniform1i(uniform.object_selected, 1);
-			else
+			else if (scop->selected_object != -1)
 				glUniform1i(uniform.object_selected, 0);
+			else
+				glUniform1i(uniform.object_selected, -1);
+
 
 			if (obj_i > 0)
 				offset_obj = scop->objects[obj_i - 1].offset;

@@ -12,8 +12,21 @@
 
 #include "Scop.h"
 #include <stdio.h>
+#include <math.h>
 
-void                handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing, short *selected_object, size_t objects_count)
+static void         protect_rotation_overflow(t_vec3f *rot)
+{
+    const float     twopi = 2 * M_PI;
+
+    if (rot->x <= -twopi || rot->x >= twopi)
+        rot->x = 0;
+    if (rot->y <= -twopi || rot->y >= twopi)
+        rot->y = 0;
+    if (rot->z <= -twopi || rot->z >= twopi)
+        rot->z = 0;
+}
+
+void                handle_keyboard(GLFWwindow *window, uint32_t keys[349], int *s_texturing, int *s_mapping, short *selected_object, size_t objects_count)
 {
     const float     glfw_time       = glfwGetTime();
     static float    key_timeout     = 0;
@@ -75,9 +88,16 @@ void                handle_keyboard(GLFWwindow *window, uint32_t keys[349], int 
             *s_texturing = 0;
         key_timeout = glfw_time;
     }
+    if (glfwGetKey(window, GLFW_KEY_M) && time_diff)
+    {
+        (*s_mapping)++;
+        if (*s_mapping >= 4)
+            *s_mapping = 0;
+        key_timeout = glfw_time;
+    }
     if (glfwGetKey(window, GLFW_KEY_O) && time_diff)
     {
-            (*selected_object)++;
+        (*selected_object)++;
         if ((size_t) *selected_object >= objects_count)
             *selected_object = -1;
         key_timeout = glfw_time - .15;
@@ -101,6 +121,7 @@ void                handle_mouse(GLFWwindow *window, t_vec3f *cam_rot)
 
 	cam_rot->x += ((pos_y_old - pos_y) * 0.001);
 	cam_rot->y += ((pos_x_old - pos_x) * 0.001);
+    protect_rotation_overflow(cam_rot);
 	pos_x_old = pos_x;
 	pos_y_old = pos_y;
 }
@@ -117,6 +138,7 @@ static void         rotate_object(t_scop *scop, t_vec3f rot, float scale, float 
             scop->objects[i].scale += scale * multiplier;
             if (scop->objects[i].scale <= 0)
                 scop->objects[i].scale = 0;
+            protect_rotation_overflow(&scop->objects[i].rot);
         }
     }
     else
@@ -125,8 +147,9 @@ static void         rotate_object(t_scop *scop, t_vec3f rot, float scale, float 
         scop->objects[(size_t) scop->selected_object].rot.x += rot.x * multiplier;
         scop->objects[(size_t) scop->selected_object].rot.y += rot.y * multiplier;
         scop->objects[(size_t) scop->selected_object].rot.z += rot.z * multiplier;
-        if (scop->objects[(size_t) scop->selected_object].rot.z <= 0)
-            scop->objects[(size_t) scop->selected_object].rot.z = 0;
+        protect_rotation_overflow(&scop->objects[(size_t) scop->selected_object].rot);
+        if (scop->objects[(size_t) scop->selected_object].scale <= 0)
+            scop->objects[(size_t) scop->selected_object].scale = 0;
     }
 }
 

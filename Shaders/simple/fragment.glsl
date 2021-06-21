@@ -9,25 +9,23 @@ in vec3             color;
 in vec4             frag_position;
 in vec4             frag_world_pos;
 
-uniform mat4	    Model;
 
+uniform sampler2D   basic_texture;
+uniform sampler2D   ourTexture;
+uniform mat4	    Model;
 uniform vec3        kd;
 uniform vec3        ka;
 uniform vec3        ks;
-uniform float       ns;
-
+uniform vec3        obj_center;
+uniform vec3        view_pos;
+uniform vec2        tex_size;
 uniform int         mapping;
 uniform int         textured;
-uniform sampler2D   basic_texture;
-uniform sampler2D   ourTexture;
-
-uniform vec2        tex_size;
-uniform float       obj_max_y;
-uniform vec3        obj_center;
-
 uniform int         object_selected;
+uniform float       obj_max_y;
+uniform float       ns;
 
-uniform vec3        view_pos;
+
 
 vec2    sphere_mapping(float x, float y, float z)
 {
@@ -76,7 +74,7 @@ void main()
     if (textured == 0)
     {
         // final_color = vec4( (ka + vec3(d, d, d) + specular) * kd, 1);
-        final_color = vec4(((ka * 0.2) + d + specular) * kd, 1);
+        final_color = vec4(((ka * 0.2) + vec3(d, d, d) + specular) * kd, 1);
     }
     else if (textured == 1)
     {

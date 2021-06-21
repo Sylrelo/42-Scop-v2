@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:13:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/21 14:44:59 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/21 19:27:06 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,14 +163,14 @@ static size_t   parse_vertex(t_parser *parser, t_mat *material, char *line)
     }
     if (face_type & NORMAL)
     {
-       buffer[3] = parser->vn[index_vn - 1].x;
-       buffer[4] = parser->vn[index_vn - 1].y;
-       buffer[5] = parser->vn[index_vn - 1].z;
+        buffer[3] = parser->vn[index_vn - 1].x;
+        buffer[4] = parser->vn[index_vn - 1].y;
+        buffer[5] = parser->vn[index_vn - 1].z;
     }
     if (face_type & TEXTURE)
     {
-       buffer[6] = parser->vt[index_vt - 1].x;
-       buffer[7] = parser->vt[index_vt - 1].y;
+        buffer[6] = parser->vt[index_vt - 1].x;
+        buffer[7] = parser->vt[index_vt - 1].y;
     }
 
     mat_push_buffer(material, buffer);
@@ -242,7 +242,6 @@ size_t          parse_face(t_parser *parser, t_mat **materials, size_t *material
         else 
             return (0);
     }
-
 
 	if (sides_count > 3)
         return (triangulate(parser, &(*materials)[material_id], sides_count, line));

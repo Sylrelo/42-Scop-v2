@@ -123,6 +123,7 @@ typedef struct s_scop
 	t_ogl			ogl;
 	t_vec3f			cam_rot;
 	GLFWwindow		*window;
+	float 			fade_start_time;
 	t_vec3f			cam_pos;
 	float			multiplier;
 	size_t			textures_count;

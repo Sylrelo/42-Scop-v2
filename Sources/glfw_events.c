@@ -85,7 +85,7 @@ void                handle_keyboard(GLFWwindow *window, uint32_t keys[349], int 
         (*s_texturing)++;
         if (*s_texturing >= 5)
             *s_texturing = 0;
-        key_timeout = glfw_time;
+        key_timeout = glfw_time + 0.8;
         dprintf(1, "Texture mode changed : ");
         switch (*s_texturing)
         {

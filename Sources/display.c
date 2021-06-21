@@ -40,16 +40,9 @@ static void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *s
 	t_mat4	mat_view 		= m4_init();
 	t_mat4	mat_perspective;
 
-	if (glfw_time > .5)
-	{
-		glUniform1i(uniform.glfw_options, 0);
-		glUniform1f(uniform.glfw_time, glfw_time);
-	}
-	else
-	{
-		glUniform1i(uniform.glfw_options, 1);
-		glUniform1f(uniform.glfw_time, .5);
-	}
+
+	glUniform1f(uniform.glfw_time, scop->fade_start_time > 0 ? glfw_time - scop->fade_start_time : glfw_time);
+
 	glUniform1i(uniform.mapping, scop->ogl.s_mapping);
 
 	mat_view = m4_viewmat(scop->cam_rot.x, scop->cam_rot.y, scop->cam_rot.z, m4_translate(scop->cam_pos.x, scop->cam_pos.y, scop->cam_pos.z));
@@ -67,7 +60,7 @@ static void	send_model_data(t_uniforms uniform, t_objects object)
 	const t_mat4	mat_scale 		= m4_scale(object.scale, object.scale, object.scale);
 	const t_mat4	mat_translate 	= m4_translate(object.pos.x, object.pos.y, object.pos.z);
 	const t_mat4	mat_rotate		= m4_rotation_around_center(object.center, object.rot.x, object.rot.y, object.rot.z);
-	const t_mat4	mat_model 		= m4_mult(m4_mult(mat_scale, mat_rotate), mat_translate);
+	const t_mat4	mat_model 		= m4_mult(m4_mult(mat_rotate, mat_scale), mat_translate);
 
 	glUniformMatrix4fv(uniform.m4_model, 1, GL_FALSE, mat_model.value[0]);
 	glUniform1f(uniform.obj_max_y, object.max.y);
@@ -83,7 +76,7 @@ static void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat m
 	glUniform3f(uniform.ks, material.ks.x, material.ks.y, material.ks.z);
 	glUniform1f(uniform.ns, material.ns);
 
-	if ((s_texturing == 1 || s_texturing == 2) && material.tex_id != -1)
+	if ((s_texturing == 1 ) && material.tex_id != -1)
 	{
 		tex = textures[material.tex_id];
 		glActiveTexture(GL_TEXTURE0 + 1);
@@ -95,6 +88,8 @@ static void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat m
 		glUniform1i(uniform.textured, s_texturing != 1 ? s_texturing : 0);
 }
 
+#include <stdio.h>
+
 void	    display_loop(t_scop *scop)
 {
 	t_uniforms 		uniform;
@@ -104,7 +99,9 @@ void	    display_loop(t_scop *scop)
 	size_t		    offset_obj;
 	t_objects	    object;
 	t_mat		    material;
-	
+	int 			old_s_texturing;
+
+
 	get_uniforms_location(&scop->ogl.u_render, scop->ogl.p_render);
 
 	uniform = scop->ogl.u_render;
@@ -112,6 +109,7 @@ void	    display_loop(t_scop *scop)
 	glfw_time = glfwGetTime();
 	base_time = glfw_time;
 	glfw_time -= base_time;
+	old_s_texturing = 0;
 	
     glUseProgram(scop->ogl.p_render);
 
@@ -122,6 +120,18 @@ void	    display_loop(t_scop *scop)
 		
 		glfw_time = glfwGetTime() - base_time;
 		
+		if (scop->ogl.s_texturing != old_s_texturing && scop->fade_start_time == 0.f)
+		{
+			scop->fade_start_time = glfw_time;
+			glUniform1i(uniform.glfw_options, 1);
+			old_s_texturing = scop->ogl.s_texturing;
+		}
+		if (scop->fade_start_time > 0.0f && glfw_time - scop->fade_start_time >= 1.0f)
+		{
+			glUniform1i(uniform.glfw_options, 0);
+			scop->fade_start_time = 0.f;
+		}
+
 		handle_keyboard(scop->window, scop->keys, &scop->ogl.s_texturing, &scop->ogl.s_mapping, &scop->selected_object, scop->objects_count);
 		handle_mouse(scop->window, &scop->cam_rot);
 		handle_transformations(scop);

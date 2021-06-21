@@ -223,6 +223,7 @@ int 		main(int argc, char *argv[])
 	scop->ogl.s_texturing	= 0;
 	scop->ogl.s_mapping		= 0;
 	scop->objects_count		= 0;
+	scop->fade_start_time	= 0;
 	scop->selected_object	= -1;
 	memset(scop->keys, 0, sizeof(uint32_t) * 348);
 		

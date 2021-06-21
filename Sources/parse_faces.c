@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:13:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/19 14:46:26 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/21 14:44:59 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,16 +32,16 @@ static void     mat_push_buffer(t_mat *material, float *buffer)
 {
     if (material->tmp_allocated == 0)
     {
-        material->gl_buffer = realloc(NULL, sizeof(float) * BUFFER_COMPONENT * MAT_GL_BUFFER_REALLOC_VALUE);
-        material->tmp_allocated = MAT_GL_BUFFER_REALLOC_VALUE;
+        material->gl_buffer = calloc(BUFFER_COMPONENT * MAT_GL_BUFFER_REALLOC_VALUE, sizeof(float));
+        material->tmp_allocated = BUFFER_COMPONENT * MAT_GL_BUFFER_REALLOC_VALUE;
     }
     else if (material->gl_buffer_size + BUFFER_COMPONENT > material->tmp_allocated)
     {
-        material->tmp_allocated += MAT_GL_BUFFER_REALLOC_VALUE;
-        material->gl_buffer = realloc(material->gl_buffer, sizeof(float) * BUFFER_COMPONENT * material->tmp_allocated);
+        material->tmp_allocated += BUFFER_COMPONENT * MAT_GL_BUFFER_REALLOC_VALUE;
+        material->gl_buffer = realloc(material->gl_buffer, sizeof(float) * material->tmp_allocated);
     }
-    if (!material->gl_buffer) 
-        die("Realloc failed for mat_push_buffer");
+    if (!material->gl_buffer)
+        die("\nRealloc failed for mat_push_buffer");
     _floatncat(material->gl_buffer, buffer, material->gl_buffer_size, BUFFER_COMPONENT);
     material->gl_buffer_size += BUFFER_COMPONENT;
 }

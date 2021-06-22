@@ -67,6 +67,7 @@ static void	send_model_data(t_uniforms uniform, t_objects object)
 	glUniform3f(uniform.obj_center, object.center.x, object.center.y, object.center.z);
 }
 
+#include <stdio.h>
 static void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat material, int s_texturing)
 {
 	t_textures	tex;

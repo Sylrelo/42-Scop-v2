@@ -18,10 +18,11 @@
 static ssize_t  get_material_id(t_mat *materials, size_t material_count, const char *material_name)
 {
     size_t i = 0;
+    size_t mat_len = strlen(material_name);
 
     while (i < material_count)
     {
-        if (!strncmp(material_name, materials[i].material_name, strlen(materials[i].material_name)))
+        if (mat_len == strlen(materials[i].material_name) && !strncmp(material_name, materials[i].material_name, mat_len))
             return i;
         i++;
     }
@@ -229,7 +230,7 @@ size_t          parse_face(t_parser *parser, t_mat **materials, size_t *material
 
     if (!last_mtl || material_id == -1)
     {
-        printf("%s\n", last_mtl);
+        // printf("%s\n", last_mtl);
         if (material_id == -1 && *material_count == 0)
         {
             *material_count = 1;

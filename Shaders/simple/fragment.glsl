@@ -94,7 +94,7 @@ vec4    get_colors(int texture_mode, float diffuse, vec3 specular)
     else
     {
         vec3 ncolor = (diffuse + specular) * color;
-        float avg = (ncolor.x + ncolor.y + ncolor.z) * 0.33;
+        float avg   = (ncolor.x + ncolor.y + ncolor.z) * 0.33;
         final_color = vec4(avg, avg, avg, 1);
     }
 

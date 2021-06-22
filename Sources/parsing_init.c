@@ -40,31 +40,13 @@ static void	realloc_obj_arrays(size_t *count, size_t *alloc, size_t size, void *
 
 static void get_relative_path(char path[256], char *file)
 {
-	char	*file_tmp;
-	char 	*token;
-	size_t	path_len;
-	char	*tmp_strrchr;
+	size_t i;
+	size_t len = strlen(file);
 
-	if (!(file_tmp = strdup(file)))
-		die ("Error strdup file_tmp");
-
-	memset(path, 0, 256);
-	path_len = 0;
-
-	token = strtok(file, "/");
-	while (token != NULL)
-	{
-		tmp_strrchr = strrchr(file_tmp, '/');
-		if (!tmp_strrchr)
-			break ;
-		if (!strcmp(token, tmp_strrchr + 1)) 
-			break ;
-		strcat(path, token);
-		strcat(path, "/");
-		path_len += strlen(token) + 1;
-		token = strtok(NULL, "/");
-	}
-	free(file_tmp);
+	memset(path, 0, 256 * sizeof(char));
+	for (i = len - 1 ; i > 0; i--)
+		if (file[i] == '/')
+			strncpy(path, file, i + 1);
 }
 
 void		print_progress(size_t *old_percent, size_t current, t_stat st)

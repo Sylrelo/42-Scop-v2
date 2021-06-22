@@ -47,7 +47,7 @@ typedef struct	s_textures
 	uint32_t	gl_texture;
 	uint32_t	width;
 	uint32_t	height;
-	char		filename[256];
+	char		filename[128];
 }				t_textures;
 
 typedef struct	s_mat
@@ -61,7 +61,7 @@ typedef struct	s_mat
 	t_vec3f		kd;
 	t_vec3f		ks;
 	t_vec3f		tf;
-	char		material_name[256];
+	char		material_name[64];
 }				t_mat;
 
 typedef struct	s_objects

@@ -26,6 +26,7 @@ Here's the list of whats working and what not.
 - **Rotation around object center**
 - **Object translation**
 - **Texture display** (with UV mapping)
+- **Texture display** ( **without** UV mapping )
 - Camera transformation
 - Model transformation
 - Polygon triangulation
@@ -36,8 +37,5 @@ Here's the list of whats working and what not.
 - Keybinding to switch between multiple rendering mode
 - Mouse camera rotation
 - Keyboard camera translation
-## Todo
-- **Texture display** ( **without** UV mapping )
-- Directional light + Shadows
-- Blinn Phong reflection model
+- Directional light
 - Automatic multi-object positioning

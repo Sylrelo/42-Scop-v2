@@ -59,15 +59,16 @@ int        parser_mtl_start(t_scop *scop, char path[256], char *file)
     char        filepath[256];
     t_mat       *material;
     FILE 	    *fp;
+    struct stat st;
 
     generate_filepath(filepath, path, file);
 
-	if (!(fp = fopen(filepath, "r")))
+	if (stat(filepath, &st) || !(fp = fopen(filepath, "r")) || (st.st_mode & S_IFDIR) == S_IFDIR)
     {
 		printf("\033[0;31m      Error while parsing MTL file \033[1m%s\033[0m\033[0;31m, using default material.\033[0m\n", filepath);
         return (0);
     }
-    
+
     printf ("    MTL file \033[1m%s\033[0m loaded.\n", filepath);
     obj->nb_mats   = 5;
     obj->materials = calloc(obj->nb_mats, sizeof(t_mat));

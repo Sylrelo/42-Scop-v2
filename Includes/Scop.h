@@ -133,6 +133,7 @@ typedef struct s_scop
 	uint32_t		width;
 	uint32_t		height;
 	int				program;
+	int 			basic_texture_id;
 	short 			selected_object;
 }				t_scop;
 

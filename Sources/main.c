@@ -86,6 +86,7 @@ static void	parse_basic_texture(t_scop *scop, char *file)
         return ;
     }
 	generate_gl_texture(scop, width, height, image, "CHECKER", GL_UNSIGNED_BYTE);
+	scop->basic_texture_id = scop->textures_count - 1;
 	free(image);
 	image = NULL;
 }
@@ -224,6 +225,7 @@ int 		main(int argc, char *argv[])
 	scop->ogl.s_mapping		= 0;
 	scop->objects_count		= 0;
 	scop->fade_start_time	= 0;
+	scop->basic_texture_id 	= -1;
 	scop->selected_object	= -1;
 	memset(scop->keys, 0, sizeof(uint32_t) * 348);
 		
@@ -248,6 +250,7 @@ int 		main(int argc, char *argv[])
 		clean_exit(scop);
 		exit (1);
 	}
+
 	printf("[Scop] Starting OpenGL Buffer initialization\n");
 	init_opengl_buffer_multi(scop);
 

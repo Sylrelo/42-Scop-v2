@@ -67,7 +67,6 @@ static void	send_model_data(t_uniforms uniform, t_objects object)
 	glUniform3f(uniform.obj_center, object.center.x, object.center.y, object.center.z);
 }
 
-#include <stdio.h>
 static void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat material, int s_texturing)
 {
 	t_textures	tex;
@@ -77,7 +76,7 @@ static void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat m
 	glUniform3f(uniform.ks, material.ks.x, material.ks.y, material.ks.z);
 	glUniform1f(uniform.ns, material.ns);
 
-	if ((s_texturing == 1 ) && material.tex_id != -1)
+	if ((s_texturing == 1 || s_texturing == 2) && material.tex_id != -1)
 	{
 		tex = textures[material.tex_id];
 		glActiveTexture(GL_TEXTURE0 + 1);
@@ -89,8 +88,6 @@ static void	send_material_data(t_uniforms uniform, t_textures *textures, t_mat m
 		glUniform1i(uniform.textured, s_texturing != 1 ? s_texturing : 0);
 }
 
-#include <stdio.h>
-
 void	    display_loop(t_scop *scop)
 {
 	t_uniforms 		uniform;
@@ -101,7 +98,6 @@ void	    display_loop(t_scop *scop)
 	t_objects	    object;
 	t_mat		    material;
 	int 			old_s_texturing;
-
 
 	get_uniforms_location(&scop->ogl.u_render, scop->ogl.p_render);
 
@@ -162,12 +158,12 @@ void	    display_loop(t_scop *scop)
 				if (mat_i > 0)
 					offset_mat += object.materials[mat_i - 1].gl_buffer_size;
 				
-				if (scop->ogl.s_texturing == 2 && scop->textures_count)
+				if (scop->ogl.s_texturing == 2 && scop->basic_texture_id != -1)
 				{
-					glUniform2f(uniform.tex_size, scop->textures[scop->textures_count - 1].width, scop->textures[scop->textures_count - 1].height);
+					glUniform2f(uniform.tex_size, scop->textures[scop->basic_texture_id].width, scop->textures[scop->basic_texture_id].height);
 					glUniform1i(uniform.textured, 2);
 					glActiveTexture(GL_TEXTURE0 + 0);
-					glBindTexture(GL_TEXTURE_2D, scop->textures[scop->textures_count - 1].gl_texture);
+					glBindTexture(GL_TEXTURE_2D, scop->textures[scop->basic_texture_id].gl_texture);
 				}
 				send_material_data(uniform, scop->textures, material, scop->ogl.s_texturing);
 				glDrawArrays(GL_TRIANGLES, (offset_obj + offset_mat) / BUFFER_COMPONENT, (material.gl_buffer_size) / BUFFER_COMPONENT);

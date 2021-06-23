@@ -22,11 +22,10 @@ void main()
     color           = vColor;
     normal          = aNormals;
     tex_coords      = aTexCoord;
+    
     frag_position   = vec4(aPos, 1.0f);
     frag_world_pos  = Model * vec4(aPos, 1.0f);
-
     frag_light_pos  = Light * Model * vec4(aPos, 1.0f);
-
     
     gl_Position     = (Persp * View * Model) * vec4(aPos, 1.0f);
 }

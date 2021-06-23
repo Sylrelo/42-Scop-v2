@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:53:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/23 10:05:12 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/23 12:15:13 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,12 @@ void		print_progress(size_t *old_percent, size_t current, t_stat st)
 	if (*old_percent != percent)
 	{
 		*old_percent = percent;
-		printf( "\r");
+		dprintf(1, "\r");
 		for (size_t i = 0; i < percent; i++)
 		{
 			progress[1 + i] = '-';
 		}
-		printf( "%s %zu%%", progress, percent);
+		dprintf(1, "%s %zu%%", progress, percent);
 	}
 }
 

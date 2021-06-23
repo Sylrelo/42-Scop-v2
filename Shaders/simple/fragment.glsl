@@ -60,7 +60,7 @@ vec2    position_mapping(float x, float y, float z)
 
 float   in_shadow()
 {
-    float bias          = 0.005;
+    float bias          = 0.0001;
     vec3 projCoords     = frag_light_pos.xyz / frag_light_pos.w;
     projCoords          = projCoords * 0.5 + 0.5;
     float closestDepth  = texture(shadow_map, projCoords.xy).r; 

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:15:16 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/23 10:59:02 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/23 12:07:27 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,19 +29,19 @@ t_mat4		m4_perspective(float fov, float aspect, float near, float far)
 	return (result);
 }
 
-t_mat4		m4_orthogonal(float near, float far, float left, float right, float bottom, float top)
+t_mat4		m4_orthogonal(float nearz, float farz, float left, float right, float bottom, float top)
 {
 	t_mat4 result 		= m4_init();
 	const float rl		= 1.0f / (right - left);
 	const float tb		= 1.0f / (top - bottom);
-	const float fn		= -1.0f / (far - near);
+	const float fn		= -1.0f / (farz - nearz);
 
 	result.value[0][0] = 2.0f * rl;
 	result.value[1][1] = 2.0f * tb;
 	result.value[2][2] = 2.0f * fn;
 	result.value[3][0] = -(right + left) * rl;
 	result.value[3][1] = -(top + bottom) * tb;
-	result.value[3][2] = (far + near) * fn;
+	result.value[3][2] = (farz + nearz) * fn;
 	result.value[3][3] = 1.0f;
 
 	return (result);
@@ -49,9 +49,9 @@ t_mat4		m4_orthogonal(float near, float far, float left, float right, float bott
 
 t_mat4		m4_look_at(t_vec3f from, t_vec3f to, t_vec3f upv)
 {
-	t_mat4	result 	= m4_init();
+	t_mat4	result;
 	t_vec3f forward = vec_normalize(vec_sub(to, from));
-	t_vec3f side 	= vec_cross(forward, upv);
+	t_vec3f side 	= vec_normalize(vec_cross(forward, upv));
 	t_vec3f up 		= vec_cross(side, forward);
 
 	result.value[0][0] = side.x;

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:15:00 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/16 23:57:17 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/23 12:04:30 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,18 +25,18 @@ t_vec3f		vec_add(t_vec3f u, t_vec3f v)
 
 t_vec3f		vec_sub(t_vec3f u, t_vec3f v)
 {
-	u.x -= v.x;
-	u.y -= v.y;
-	u.z -= v.z;
+	u.x = u.x - v.x;
+	u.y = u.y - v.y;
+	u.z = u.z - v.z;
 
     return (u);
 }
 
 t_vec3f		vec_multf(t_vec3f u, float f)
 {
-	u.x = u.x * f;
-	u.y = u.y * f;
-	u.z = u.z * f;
+	u.x *= f;
+	u.y *= f;
+	u.z *= f;
 
     return (u);
 }
@@ -70,5 +70,5 @@ t_vec3f		vec_normalize(t_vec3f u)
 
 float		vec_dot(t_vec3f u, t_vec3f v)
 {
-	return (fmaf(u.x, v.x, fmaf(u.y, v.y, fmaf(u.z, v.z, 0))));
+	return (u.x * v.x + u.y * v.y + u.z * v.z);
 }

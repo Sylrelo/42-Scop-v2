@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 00:02:39 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/23 10:06:36 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/23 12:15:17 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void                handle_keyboard(GLFWwindow *window, uint32_t keys[349], int 
         if (*s_texturing >= 5)
             *s_texturing = 0;
         key_timeout = glfw_time + 0.8;
-        printf("Texture mode changed : ");
+        dprintf(1, "Texture mode changed : ");
         switch (*s_texturing)
         {
             case 0:
@@ -112,7 +112,7 @@ void                handle_keyboard(GLFWwindow *window, uint32_t keys[349], int 
         if (*s_mapping >= 4)
             *s_mapping = 0;
         key_timeout = glfw_time;
-        printf("UV mapping changed : ");
+        dprintf(1, "UV mapping changed : ");
         switch (*s_mapping)
         {
             case 0:

@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/23 12:39:19 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/23 17:47:02 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,7 +270,6 @@ int 		main(int argc, char *argv[])
 	init_depthmap(scop);
 	scop->ogl.p_render = create_shader_program("Shaders/simple/vertex.glsl", "Shaders/simple/fragment.glsl", NULL);
 	scop->ogl.p_depth = create_shader_program("Shaders/dvert.glsl", "Shaders/dfrag.glsl", NULL);
-	// scop->ogl.p_render = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl", "Shaders/geometry_classic.glsl");
 
 	printf("[Scop] Starting parser\n\n");
 	start_parser(scop, argc, argv);

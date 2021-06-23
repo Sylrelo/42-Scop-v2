@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/04 11:18:58 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/21 16:14:42 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/23 11:05:22 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int        parser_mtl_start(t_scop *scop, char path[256], char *file)
 	size_t	    len 		= 0;
     int         tmp_nb_mats = -1;
     char        filepath[256];
-    t_mat       *material;
+    t_mat       *material   = NULL;
     FILE 	    *fp;
     struct stat st;
 
@@ -99,11 +99,13 @@ int        parser_mtl_start(t_scop *scop, char path[256], char *file)
             sscanf(line, "Tf %f %f %f", &material->tf.x, &material->tf.y, &material->tf.z);
         else if (!strncmp(line, "map_Kd ", 7))
             parse_texture(scop, material, path, _strtrim(line + 7));
-		
-        if (material->ns <= 0)
-            material->ns = 1;
-        if (material->ns > 1000)
-            material->ns = 1000;
+		if (material)
+        {
+            if (material->ns <= 0)
+                material->ns = 1;
+            if (material->ns > 1000)
+                material->ns = 1000;
+        }
 	}
 
 	free(line);

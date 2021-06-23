@@ -65,7 +65,7 @@ float   in_shadow()
     projCoords          = projCoords * 0.5 + 0.5;
     float closestDepth  = texture(shadow_map, projCoords.xy).r; 
     float currentDepth  = projCoords.z;
-    float shadow        = currentDepth  - bias > closestDepth  ? 1.0 : 0.0;
+    float shadow        = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
 
     // float shadow = 0;
 

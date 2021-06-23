@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/19 16:47:33 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/21 19:27:38 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/23 11:13:06 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,50 +21,24 @@ static void get_uniforms_location_depth(t_uniforms *uniform, uint32_t program)
 	uniform->m4_light 		= glGetUniformLocation(program, "Light");
 }
 
-
- #include <cglm/cglm.h>
-
 static void render_depthmap(t_scop *scop, t_uniforms uniform)
 {
-	t_mat4 	mat_final;
-
-
-	t_mat4 mat_ortho 	= m4_orthogonal(1, 7.5, -10, 10, -10, 10);
-	t_mat4 mat_light 	= m4_look_at((t_vec3f) {1, 1.f, 2.0f}, (t_vec3f) {0, 0, 0}, (t_vec3f){0, 1, 0});
-	mat_final 	= m4_mult(mat_ortho, mat_light);
-
-	mat4 ortho, light, final;
-
-	vec3 lpo, zero, up;
-
-	lpo[0] = 1;
-	lpo[1] = 1;
-	lpo[2] = 2;
-
-	zero[0] = 0;
-	zero[1] = 0;
-	zero[2] = 0;
-
-	up[0] = 0;
-	up[1] = 1;
-	up[2] = 0;
-
-	glm_ortho(-10, 10, -10, 10, -100, 200, ortho);
-	glm_lookat(lpo, zero, up, light);
-	glm_mat4_mul(ortho, light, final);
-
 
     glUseProgram(scop->ogl.p_depth);
-
-    // glUniformMatrix4fv(uniform.m4_light, 1, GL_FALSE, mat_final.value[0]);
-
 
 	glBindFramebuffer(GL_FRAMEBUFFER, scop->ogl.fbo_depth);
 	glViewport(0, 0, 1024, 1024);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glUniformMatrix4fv(uniform.m4_light, 1, GL_FALSE, final[0]);
+    // glUniformMatrix4fv(uniform.m4_light, 1, GL_FALSE, final[0]);
 
+
+	t_mat4 mat_ortho 	= m4_orthogonal(-100, 200, -10, 10, -10, 10);
+	t_mat4 mat_light 	= m4_look_at((t_vec3f) {1, 1.f, 2.0f}, (t_vec3f) {0, 0, 0}, (t_vec3f){0, 1, 0});
+	t_mat4 mat_final 	= m4_mult(mat_ortho, mat_light);
+
+    glUniformMatrix4fv(uniform.m4_light, 1, GL_FALSE, mat_final.value[0]);
+	
 	glBindVertexArray(scop->vao);
 	// moche
 
@@ -86,7 +60,6 @@ static void render_depthmap(t_scop *scop, t_uniforms uniform)
 
 		glUniformMatrix4fv(uniform.m4_model, 1, GL_FALSE, mat_model.value[0]);
 
-
 		if (obj_i > 0)
 			offset_obj = scop->objects[obj_i - 1].offset;
 		for (size_t mat_i = 0; mat_i < object.nb_mats; mat_i++)
@@ -99,10 +72,8 @@ static void render_depthmap(t_scop *scop, t_uniforms uniform)
 	}
 	// fin moche
 
-
-	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, scop->width * 2, scop->height * 2);
+	glViewport(0, 0, scop->width, scop->height);
 
 }
 
@@ -143,30 +114,14 @@ static void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *s
 
 	mat_view = m4_viewmat(scop->cam_rot.x, scop->cam_rot.y, scop->cam_rot.z, m4_translate(scop->cam_pos.x, scop->cam_pos.y, scop->cam_pos.z));
 	mat_perspective = m4_perspective(1.0472, (float) scop->width / (float) scop->height, 0.00001f, 1000.0f);
-	// mat_perspective = m4_orthogonal(1, 7.5, -10, 10, -10, 10);
 
+	t_mat4 mat_ortho 	= m4_orthogonal(-100, 200, -10, 10, -10, 10);
+	t_mat4 mat_light 	= m4_look_at((t_vec3f) {1, 1.f, 2.0f}, (t_vec3f) {0, 0, 0}, (t_vec3f){0, 1, 0});
+	t_mat4 mat_final 	= m4_mult(mat_ortho, mat_light);
 
-	vec3 lpo, zero, up;
-	mat4 ortho, light, final;
+    glUniformMatrix4fv(uniform.m4_light, 1, GL_FALSE, mat_final.value[0]);
 
-	lpo[0] = 1;
-	lpo[1] = 1;
-	lpo[2] = 2;
-
-	zero[0] = 0;
-	zero[1] = 0;
-	zero[2] = 0;
-
-	up[0] = 0;
-	up[1] = 1;
-	up[2] = 0;
-
-	glm_ortho(-10, 10, -10, 10, -100, 200, ortho);
-	glm_lookat(lpo, zero, up, light);
-	glm_mat4_mul(ortho, light, final);
-
-	glUniformMatrix4fv(uniform.m4_light, 1, GL_FALSE, final[0]);
-
+	
 	glUniform3f(uniform.view_pos, scop->cam_pos.x, -scop->cam_pos.y, scop->cam_pos.z);
 	glUniformMatrix4fv(uniform.m4_view, 1, GL_FALSE, mat_view.value[0]);
 	glUniformMatrix4fv(uniform.m4_projection, 1, GL_FALSE, mat_perspective.value[0]);
@@ -241,7 +196,7 @@ void	    display_loop(t_scop *scop)
 		
 		render_depthmap(scop, uniform_depth);
 
-    	glUseProgram(scop->ogl.p_render);
+		glUseProgram(scop->ogl.p_render);
 
 		glfw_time = glfwGetTime() - base_time;
 		

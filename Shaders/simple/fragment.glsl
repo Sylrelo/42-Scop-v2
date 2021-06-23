@@ -60,19 +60,21 @@ vec2    position_mapping(float x, float y, float z)
 
 float   in_shadow()
 {
+    float depth;
+    float shadow        = 0.0;
     float bias          = 0.0001;
-    vec3 projCoords     = frag_light_pos.xyz / frag_light_pos.w;
-    projCoords          = projCoords * 0.5 + 0.5;
-    float closestDepth  = texture(shadow_map, projCoords.xy).r; 
-    float currentDepth  = projCoords.z;
-    float shadow        = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+    vec3 coords         = (frag_light_pos.xyz / frag_light_pos.w) * 0.5 + 0.5;
+    vec2 texelSize      = 1.0 / textureSize(shadow_map, 0);
 
-    // float shadow = 0;
-
-    // if ( texture( shadow_map, frag_light_pos.xy ).z  <  frag_light_pos.z){
-    //     shadow = 1;
-    // }
-
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            depth = texture(shadow_map, coords.xy + vec2(x, y) * texelSize).r; 
+            shadow += coords.z - bias > depth ? 1.0 : 0.0;        
+        }    
+    }
+    shadow /= 9.0;
     return shadow;
 }
 
@@ -84,7 +86,7 @@ vec4    get_colors(int texture_mode, float diffuse, vec3 specular)
 
     if (texture_mode == 0)
     {
-        final_color = vec4(((ka * 0.2) + diffuse + specular) * kd * (1 - shadow), 1);
+        final_color = vec4(((ka * 0.2) + diffuse + specular) * kd, 1);
     }
     else if (texture_mode == 1)
     {
@@ -122,7 +124,7 @@ vec4    get_colors(int texture_mode, float diffuse, vec3 specular)
         final_color = vec4(avg, avg, avg, 1);
     }
 
-    return (final_color);
+    return (final_color  * (1 - shadow));
 }
 
 

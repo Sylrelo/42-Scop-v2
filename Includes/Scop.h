@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:53 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/19 16:48:08 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/23 12:27:14 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,17 @@
 // Do not edit theses values
 #define MAT_GL_BUFFER_REALLOC_VALUE 10000
 #define BUFFER_COMPONENT 11
+
+#ifdef _WIN32
+#define dprintf dprintf_windows
+inline int dprintf_windows(int d, const char *format, ...)
+{
+	(void)d;
+	(void)format;
+	return (1);
+}
+#endif
+
 
 typedef enum e_parsing
 {

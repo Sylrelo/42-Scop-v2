@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/19 18:15:22 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/06/23 12:39:19 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,8 @@ static void	start_parser(t_scop *scop, int argc, char *argv[])
 
 void 		init_depthmap(t_scop *scop)
 {
-	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	glGenFramebuffers(1, &scop->ogl.fbo_depth);  
 	glBindFramebuffer(GL_FRAMEBUFFER, scop->ogl.fbo_depth);
@@ -178,6 +179,10 @@ void 		init_depthmap(t_scop *scop)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);  
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor); 
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, scop->ogl.tex_depth, 0);
 	glDrawBuffer(GL_NONE);

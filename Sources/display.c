@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/19 16:47:33 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/23 12:12:32 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/23 12:46:35 by slopez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,12 @@ static void render_depthmap(t_scop *scop, t_uniforms uniform)
     glUseProgram(scop->ogl.p_depth);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, scop->ogl.fbo_depth);
-	glViewport(0, 0, 1024, 1024);
+	glViewport(0, 0, 2048, 2048);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // glUniformMatrix4fv(uniform.m4_light, 1, GL_FALSE, final[0]);
 
-	t_mat4 mat_ortho 	= m4_orthogonal(-100, 200, -10, 10, -10, 10);
+	t_mat4 mat_ortho 	= m4_orthogonal(-500, 1000, -50, 50, -50, 50);
 	t_mat4 mat_light 	= m4_look_at((t_vec3f) {1, 1.f, 2.0f}, (t_vec3f) {0, 0, 0}, (t_vec3f){0, 1, 0});
 	t_mat4 mat_final 	= m4_mult(mat_light, mat_ortho);
 
@@ -113,7 +113,7 @@ static void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *s
 	mat_view = m4_viewmat(scop->cam_rot.x, scop->cam_rot.y, scop->cam_rot.z, m4_translate(scop->cam_pos.x, scop->cam_pos.y, scop->cam_pos.z));
 	mat_perspective = m4_perspective(1.0472, (float) scop->width / (float) scop->height, 0.00001f, 1000.0f);
 
-	t_mat4 mat_ortho 	= m4_orthogonal(-100, 200, -10, 10, -10, 10);
+	t_mat4 mat_ortho 	= m4_orthogonal(-500, 1000, -50, 50, -50, 50);
 	t_mat4 mat_light 	= m4_look_at((t_vec3f) {1, 1.f, 2.0f}, (t_vec3f) {0, 0, 0}, (t_vec3f){0, 1, 0});
 	t_mat4 mat_final 	= m4_mult(mat_light, mat_ortho);
 
@@ -246,10 +246,6 @@ void	    display_loop(t_scop *scop)
 				}
 				send_material_data(uniform, scop->textures, material, scop->ogl.s_texturing);
 				glActiveTexture(GL_TEXTURE0 + 2);
-				glBindTexture(GL_TEXTURE_2D, scop->ogl.tex_depth);
-				glActiveTexture(GL_TEXTURE0 + 1);
-				glBindTexture(GL_TEXTURE_2D, scop->ogl.tex_depth);
-				glActiveTexture(GL_TEXTURE0 + 0);
 				glBindTexture(GL_TEXTURE_2D, scop->ogl.tex_depth);
 
 				glDrawArrays(GL_TRIANGLES, (offset_obj + offset_mat) / BUFFER_COMPONENT, (material.gl_buffer_size) / BUFFER_COMPONENT);

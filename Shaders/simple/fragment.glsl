@@ -26,6 +26,9 @@ uniform float       obj_max_y;
 uniform float       ns;
 uniform float       glfw_time;
 
+in vec4             frag_light_pos;
+uniform sampler2D   shadow_map;
+
 vec2    sphere_mapping(float x, float y, float z)
 {
     float   u;
@@ -54,13 +57,34 @@ vec2    position_mapping(float x, float y, float z)
     return (vec2(x , y));
 }
 
+
+float   in_shadow()
+{
+    float bias          = 0.005;
+    vec3 projCoords     = frag_light_pos.xyz / frag_light_pos.w;
+    projCoords          = projCoords * 0.5 + 0.5;
+    float closestDepth  = texture(shadow_map, projCoords.xy).r; 
+    float currentDepth  = projCoords.z;
+    float shadow        = currentDepth  - bias > closestDepth  ? 1.0 : 0.0;
+
+    // float shadow = 0;
+
+    // if ( texture( shadow_map, frag_light_pos.xy ).z  <  frag_light_pos.z){
+    //     shadow = 1;
+    // }
+
+    return shadow;
+}
+
 vec4    get_colors(int texture_mode, float diffuse, vec3 specular)
 {
     vec4 final_color        = vec4(0, 0, 0, 1);
 
+    float shadow = in_shadow();
+
     if (texture_mode == 0)
     {
-        final_color = vec4(((ka * 0.2) + diffuse + specular) * kd, 1);
+        final_color = vec4(((ka * 0.2) + diffuse + specular) * kd * (1 - shadow), 1);
     }
     else if (texture_mode == 1)
     {
@@ -101,6 +125,7 @@ vec4    get_colors(int texture_mode, float diffuse, vec3 specular)
     return (final_color);
 }
 
+
 void main()
 {
     const float timespan    = 1.0f;
@@ -118,8 +143,6 @@ void main()
     vec3 specular           = 0.8f * spec * ks;  
 
     float d                 = max(dot(model_normal, light_direction), 0.0);
-
-
 
     if (glfw_options == 1)
         mix_value = fract(glfw_time / timespan);

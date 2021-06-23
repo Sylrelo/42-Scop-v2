@@ -162,6 +162,29 @@ static void	start_parser(t_scop *scop, int argc, char *argv[])
 		die ("Realloc object failed");
 }
 
+
+void 		init_depthmap(t_scop *scop)
+{
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+
+	glGenFramebuffers(1, &scop->ogl.fbo_depth);  
+	glBindFramebuffer(GL_FRAMEBUFFER, scop->ogl.fbo_depth);
+	
+	glGenTextures(1, &scop->ogl.tex_depth);
+	glBindTexture(GL_TEXTURE_2D, scop->ogl.tex_depth);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);  
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, scop->ogl.tex_depth, 0);
+	glDrawBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);  
+
+}
+
 int 		main(int argc, char *argv[])
 {
 	t_scop	*scop = NULL;
@@ -239,7 +262,9 @@ int 		main(int argc, char *argv[])
 		exit (0);
 	}
 
+	init_depthmap(scop);
 	scop->ogl.p_render = create_shader_program("Shaders/simple/vertex.glsl", "Shaders/simple/fragment.glsl", NULL);
+	scop->ogl.p_depth = create_shader_program("Shaders/dvert.glsl", "Shaders/dfrag.glsl", NULL);
 	// scop->ogl.p_render = create_shader_program("Shaders/vertex_classic.glsl", "Shaders/fragment_classic.glsl", "Shaders/geometry_classic.glsl");
 
 	printf("[Scop] Starting parser\n\n");

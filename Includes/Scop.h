@@ -82,6 +82,7 @@ typedef struct	s_uniforms
 	uint32_t	m4_projection;
 	uint32_t	m4_view;
 	uint32_t	m4_model;
+	uint32_t	m4_light;
 
 	uint32_t	ka;
 	uint32_t	kd;
@@ -99,9 +100,8 @@ typedef struct	s_uniforms
 
 	uint32_t	tex_basic;
 	uint32_t	tex_object;
-
+	uint32_t 	tex_shadowmap;
 	uint32_t	object_selected;
-
 	uint32_t	view_pos;
 
 }				t_uniforms;
@@ -110,7 +110,13 @@ typedef struct	s_ogl
 {
 	int			s_texturing;
 	int 		s_mapping;
+
+	uint32_t 	fbo_depth;
+	uint32_t 	tex_depth;	
+
 	GLint		p_render;
+	GLint		p_depth;
+
 	GLint 		vao;
 	t_uniforms	u_render;
 }				t_ogl;

@@ -75,7 +75,7 @@ float   in_shadow()
     //     }    
     // }
     // shadow /= 9.0;
-    shadow = coords.z - bias > texture(shadow_map, coords.xy).r ? .5 : 0.0;
+    shadow = coords.z - bias > texture(shadow_map, coords.xy).r ? .8 : 0.0;
     return shadow;
 }
 

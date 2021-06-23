@@ -22,6 +22,7 @@
 // Do not edit theses values
 #define MAT_GL_BUFFER_REALLOC_VALUE 10000
 #define BUFFER_COMPONENT 11
+#define SHADOWMAP_SIZE 2048
 
 #ifdef _WIN32
 #define dprintf dprintf_windows
@@ -129,7 +130,6 @@ typedef struct	s_ogl
 	GLint		p_depth;
 
 	GLint 		vao;
-	t_uniforms	u_render;
 }				t_ogl;
 
 typedef struct s_scop
@@ -156,6 +156,7 @@ typedef struct s_scop
 
 // display.c
 void		display_loop(t_scop *scop);
+void		send_model_data(t_uniforms uniform, t_objects object);
 
 
 // parse_shader.c
@@ -179,6 +180,12 @@ void		init_opengl_buffer(t_scop *scop);
 void		init_opengl_buffer_multi(t_scop *scop);
 void		init_depth_map(t_scop *scop);
 void		get_total_buffer_size(t_scop *scop, size_t *buffer_size, size_t *total_mats);
+
+// shadowmap.c
+t_mat4 		get_light_mat(void);
+void 		get_uniforms_location_depth(t_uniforms *uniform, uint32_t program);
+void 		render_depthmap(t_scop *scop, t_uniforms uniform);
+void 		init_depthmap(t_scop *scop);
 
 
 // parse_fdf.c

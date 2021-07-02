@@ -15,7 +15,7 @@ else
 INC_LIB += -framework OpenGL -lglfw
 endif
 
-CFLAGS	:= -Wall -Wextra -O3 -I$(INC_DIR) -g
+CFLAGS	:= -Wall -Wextra -Werror -O3 -I$(INC_DIR)
 OBJS	:= $(patsubst %.c,$(OBJ_DIR)/%.o, $(SRCS))
 
 all: CREATE_OBJDIR COMPILE_EXTERN_LIBS $(NAME)

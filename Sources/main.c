@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/23 17:47:02 by slopez           ###   ########.fr       */
+/*   Updated: 2021/07/02 11:27:30 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,11 +201,13 @@ int 		main(int argc, char *argv[])
 		printf("\t - Multiple colors and/or textures per object, based on material\n");
 		printf("\t - Keybinding options\n");
 		printf("\t - Directional light\n");
+		printf("\t - Directional shadows\n");
 		printf("\t - Ambiant light from mtl\n");
 		printf("\t - Diffuse light from mtl\n");
 		printf("\t - Specular light from mtl\n");
 		printf("\t - Auto positioning when multiple objects are selected\n");
 		printf("\t - Move and rotate independent object on all 3 axes\n");
+		printf("\t - Probably more that I forgot\n");
 		exit (1);
 	}
 

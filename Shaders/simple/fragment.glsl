@@ -11,6 +11,7 @@ in vec4             frag_world_pos;
 
 uniform sampler2D   basic_texture;
 uniform sampler2D   ourTexture;
+uniform sampler2D   shadow_map;
 uniform mat4	    Model;
 uniform vec3        kd;
 uniform vec3        ka;
@@ -27,7 +28,6 @@ uniform float       ns;
 uniform float       glfw_time;
 
 in vec4             frag_light_pos;
-uniform sampler2D   shadow_map;
 
 vec2    sphere_mapping(float x, float y, float z)
 {
@@ -79,50 +79,50 @@ float   in_shadow()
     return shadow;
 }
 
-vec4    get_colors(int texture_mode, float diffuse, vec3 specular)
+vec3    get_colors(int texture_mode, float diffuse, vec3 specular)
 {
-    vec4 final_color        = vec4(0, 0, 0, 1);
+    vec3 final_color        = vec3(0, 0, 0);
 
     float shadow = in_shadow();
 
     if (texture_mode == 0)
     {
-        final_color = vec4(((ka * 0.2) + diffuse + specular) * kd, 1);
+        final_color = vec3(((ka * 0.2) + diffuse + specular) * kd);
     }
     else if (texture_mode == 1)
     {
-        final_color = vec4((texture(ourTexture, tex_coords).xyz + specular ) * diffuse, 1);
+        final_color = vec3((texture(ourTexture, tex_coords).xyz + specular ) * diffuse);
     }
     else if (texture_mode == 2)
     {
         switch (mapping)
         {
             case 0:
-                final_color = vec4(texture(basic_texture, tex_coords).xyz, 1);
+                final_color = vec3(texture(basic_texture, tex_coords).xyz);
                 break ;
             case 1:
-                final_color = vec4(texture(basic_texture, cylinder_mapping(frag_position.x, frag_position.y, frag_position.y)).xyz, 1);
+                final_color = vec3(texture(basic_texture, cylinder_mapping(frag_position.x, frag_position.y, frag_position.y)).xyz);
                 break ;
             case 2:
-                final_color = vec4(texture(basic_texture, sphere_mapping(frag_position.x, frag_position.y, frag_position.y)).xyz, 1);
+                final_color = vec3(texture(basic_texture, sphere_mapping(frag_position.x, frag_position.y, frag_position.y)).xyz);
                 break ;
             case 3:
-                final_color = vec4(texture(basic_texture, position_mapping(frag_position.x, frag_position.y, frag_position.y)).xyz, 1);
+                final_color = vec3(texture(basic_texture, position_mapping(frag_position.x, frag_position.y, frag_position.y)).xyz);
                 break ;
             default :
-                final_color = vec4(color, 1);
+                final_color = vec3(color);
         }
         final_color *= diffuse;
     }
     else if (texture_mode == 4)
     {
-        final_color = vec4((diffuse + specular) * color, 1);
+        final_color = vec3((diffuse + specular) * color);
     }
     else
     {
         vec3 ncolor = (diffuse + specular) * color;
         float avg   = (ncolor.x + ncolor.y + ncolor.z) * 0.33;
-        final_color = vec4(avg, avg, avg, 1);
+        final_color = vec3(avg, avg, avg);
     }
 
     return (final_color  * (1 - shadow));
@@ -132,7 +132,7 @@ vec4    get_colors(int texture_mode, float diffuse, vec3 specular)
 void main()
 {
     const float timespan    = 1.0f;
-    vec4 final_color        = vec4(0, 0, 0, 1);
+    vec3 final_color        = vec3(0, 0, 0);
     float mix_value         = 0.f;
 
     vec3 model_normal       = normalize(vec3(Model * vec4(normal, 0)));
@@ -147,17 +147,18 @@ void main()
 
     float d                 = max(dot(model_normal, light_direction), 0.0);
 
-    if (glfw_options == 1)
-        mix_value = fract(glfw_time / timespan);
-    else 
-        mix_value = 1.0f;
+    // if (glfw_options == 1)
+        mix_value = glfw_time; //fract(glfw_time / timespan);
+    // else 
+    //     mix_value = 0.0f;
 
     if (textured > 0 && glfw_options == 1)
-        final_color = mix(get_colors(textured - 1, d, specular), get_colors(textured, d, specular), mix_value);
+       final_color = mix(get_colors(textured - 1, d, specular), get_colors(textured, d, specular), mix_value);
     else if (textured == 0 && glfw_options == 1)
-        final_color = mix(get_colors(4, d, specular), get_colors(0, d, specular), mix_value);
+       final_color = mix(get_colors(4, d, specular), get_colors(0, d, specular), mix_value);
     else
-        final_color = get_colors(textured, d, specular);
+        final_color = get_colors(textured, d, specular) ;
+ 
 
     if (object_selected == 1)
         FragColor = vec4(final_color.xyz, 1);

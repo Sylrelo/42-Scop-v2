@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/13 01:13:09 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/21 19:27:06 by slopez           ###   ########.fr       */
+/*   Updated: 2021/06/24 11:50:01 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,9 +148,10 @@ static size_t   parse_vertex(t_parser *parser, t_mat *material, char *line)
         printf("Error face definition\n");
         return (0);
     }
-    if (((face_type & VERTICE) && index_v - 1 >= parser->v_count) 
-        || ((face_type & TEXTURE) && index_vt - 1 >= parser->vt_count) 
-        || ((face_type & NORMAL) && index_vn - 1 >= parser->vn_count))
+
+    if (((face_type & VERTICE) && (index_v - 1 >= parser->v_count || index_v - 1 < 0)) 
+        || ((face_type & TEXTURE) && (index_vt - 1 >= parser->vt_count || index_vt - 1 < 0)) 
+        || ((face_type & NORMAL) && (index_vn - 1 >= parser->vn_count || index_vn - 1 < 0)))
     {
         return (0);
     }

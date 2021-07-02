@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/19 16:47:33 by slopez            #+#    #+#             */
-/*   Updated: 2021/06/23 12:46:35 by slopez           ###   ########.fr       */
+/*   Updated: 2021/07/02 11:26:50 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ static void	get_uniforms_location(t_uniforms *uniform, uint32_t program)
 	uniform->view_pos 		= glGetUniformLocation(program, "view_pos");
 }
 
+# include <stdio.h>
+
 static void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *scop)
 {
 	t_mat4	mat_view 		= m4_init();
@@ -50,7 +52,6 @@ static void	send_default_uniforms(t_uniforms uniform, float glfw_time, t_scop *s
 	
 	glUniform3f(uniform.view_pos, scop->cam_pos.x, -scop->cam_pos.y, scop->cam_pos.z);
 	glUniform1i(uniform.mapping, scop->ogl.s_mapping);
-	glUniform1f(uniform.glfw_time, scop->fade_start_time > 0 ? glfw_time - scop->fade_start_time : glfw_time);
 
 	glUniform1i(uniform.tex_basic, 0);
 	glUniform1i(uniform.tex_object, 1);
@@ -124,14 +125,23 @@ void	    display_loop(t_scop *scop)
 		if (scop->ogl.s_texturing != old_s_texturing && scop->fade_start_time == 0.f)
 		{
 			scop->fade_start_time = glfw_time;
-			glUniform1i(uniform.glfw_options, 1);
 			old_s_texturing = scop->ogl.s_texturing;
+			glUniform1i(uniform.glfw_options, 1);
+			glUniform1f(uniform.glfw_time, 0);
 		}
-		if (scop->fade_start_time > 0.0f && glfw_time - scop->fade_start_time >= 1.0f)
+		if (scop->fade_start_time > 0.f)
+		{
+			glUniform1i(uniform.glfw_options, 1);
+			glUniform1f(uniform.glfw_time, glfw_time - scop->fade_start_time);
+		}
+		
+		if (scop->fade_start_time > 0.f && glfw_time - scop->fade_start_time >= 1.f)
 		{
 			glUniform1i(uniform.glfw_options, 0);
+			glUniform1f(uniform.glfw_time, 1);
 			scop->fade_start_time = 0.f;
 		}
+
 
 		handle_keyboard(scop->window, scop->keys, &scop->ogl.s_texturing, &scop->ogl.s_mapping, &scop->selected_object, scop->objects_count);
 		handle_mouse(scop->window, &scop->cam_rot);

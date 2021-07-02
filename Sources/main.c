@@ -6,7 +6,7 @@
 /*   By: slopez <slopez@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/29 11:50:11 by slopez            #+#    #+#             */
-/*   Updated: 2021/07/02 11:27:30 by slopez           ###   ########lyon.fr   */
+/*   Updated: 2021/07/02 15:56:56 by slopez           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,25 +17,25 @@
 #include <math.h>
 #include "stb_image.h"
 
-static void	auto_object_position(t_scop *scop)
+static void auto_object_position(t_scop *scop)
 {
-	t_objects	*obj;
-	t_objects	*prev_obj;
-	t_vec3f		min;
-	t_vec3f		max;
-	t_vec3f		center;
-	float		max_component;
+	t_objects *obj;
+	t_objects *prev_obj;
+	t_vec3f min;
+	t_vec3f max;
+	t_vec3f center;
+	float max_component;
 
-	max	= (t_vec3f){ -FLT_MAX, -FLT_MAX, -FLT_MAX };
-	min	= (t_vec3f){ FLT_MAX, FLT_MAX, FLT_MAX };
+	max = (t_vec3f){-FLT_MAX, -FLT_MAX, -FLT_MAX};
+	min = (t_vec3f){FLT_MAX, FLT_MAX, FLT_MAX};
 	max_component = -FLT_MAX;
-	
+
 	for (size_t obji = 0; obji < scop->objects_count; obji++)
 	{
 		obj = &scop->objects[obji];
 		obj->scale = 1.0f;
-		obj->pos = (t_vec3f) {-obj->center.x, -obj->min.y, -obj->center.z};
-		obj->rot = (t_vec3f) {0, 0, 0};
+		obj->pos = (t_vec3f){-obj->center.x, -obj->min.y, -obj->center.z};
+		obj->rot = (t_vec3f){0, 0, 0};
 		if (obji > 0)
 		{
 			prev_obj = &scop->objects[obji - 1];
@@ -49,7 +49,7 @@ static void	auto_object_position(t_scop *scop)
 		min.z = fmin(min.z, obj->pos.z);
 		if (scop->objects_count == 1)
 		{
-			obj->pos = (t_vec3f) {-obj->center.x, -obj->center.y / 2, -obj->center.z};
+			obj->pos = (t_vec3f){-obj->center.x, -obj->center.y / 2, -obj->center.z};
 			max.x = fmax(max.x, obj->max.x);
 			max.y = fmax(max.y, obj->max.y);
 			max.z = fmax(max.z, obj->max.z);
@@ -58,7 +58,7 @@ static void	auto_object_position(t_scop *scop)
 			min.z = fmin(min.z, obj->min.z);
 		}
 	}
-	
+
 	center = vec_multf(vec_add(min, max), .5);
 
 	max_component = fmax(max_component, max.x);
@@ -74,32 +74,32 @@ static void	auto_object_position(t_scop *scop)
 	scop->multiplier = fmin(max_component * 0.125, 30);
 }
 
-static void	parse_basic_texture(t_scop *scop, char *file)
+static void parse_basic_texture(t_scop *scop, char *file)
 {
-    unsigned char   *image;
-    int             width;
-    int             height;
-    int             channels;
+	unsigned char *image;
+	int width;
+	int height;
+	int channels;
 
- 	if (!(image = stbi_load(file, &width, &height, &channels, 0)))
-    {
-        return ;
-    }
+	if (!(image = stbi_load(file, &width, &height, &channels, 0)))
+	{
+		return;
+	}
 	generate_gl_texture(scop, width, height, image, "CHECKER", GL_UNSIGNED_BYTE);
 	scop->basic_texture_id = scop->textures_count - 1;
 	free(image);
 	image = NULL;
 }
 
-static void	start_parser(t_scop *scop, int argc, char *argv[])
+static void start_parser(t_scop *scop, int argc, char *argv[])
 {
-	struct stat		st;
-	int				st_result;
-	float			start		= glfwGetTime();
-	float			diff 		= start;
-	size_t			buffer_size = 0;
-	size_t			total_mats	= 0;
-	uint8_t			basic_texture_parsed = 0;
+	struct stat st;
+	int st_result;
+	float start = glfwGetTime();
+	float diff = start;
+	size_t buffer_size = 0;
+	size_t total_mats = 0;
+	uint8_t basic_texture_parsed = 0;
 
 	start -= diff;
 
@@ -111,41 +111,41 @@ static void	start_parser(t_scop *scop, int argc, char *argv[])
 			{
 				printf("\033[0;31m- [-t] Basic texture already parsed. Skipping\033[0m\n\n");
 				i++;
-				continue ;
+				continue;
 			}
 			else if ((argc - 1) - i >= 1)
 			{
 				parse_basic_texture(scop, argv[i + 1]);
 				basic_texture_parsed = 1;
 				i++;
-				continue ;
+				continue;
 			}
 			else
 			{
 				printf("\033[0;31m- [-t] Missing texture path.\033[0m\n\n");
-				continue ;
+				continue;
 			}
 		}
 		st_result = stat(argv[i], &st);
 		if (st_result)
 		{
 			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mnot found, skipping.\033[0m\n\n", argv[i]);
-			continue ;
+			continue;
 		}
 		if (st.st_size == 0)
 		{
 			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mis empty, skipping.\033[0m\n\n", argv[i]);
-			continue ;
+			continue;
 		}
 		if (!strstr(argv[i], ".obj"))
 		{
 			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mextension is invalid, skipping.\033[0m\n\n", argv[i]);
-			continue ;
+			continue;
 		}
 		if (st.st_mode & S_IFDIR)
 		{
 			printf("\033[0;31m- File \033[1m%s\033[0m \033[0;31mis a directory, skipping.\033[0m\n\n", argv[i]);
-			continue ;
+			continue;
 		}
 		printf("+ Loading \033[1m%s\033[0m... (%.2f Mb)\n", argv[i], st.st_size * 0.0000009765625);
 		parser_init(scop, argv[i]);
@@ -154,19 +154,17 @@ static void	start_parser(t_scop *scop, int argc, char *argv[])
 		if (buffer_size / BUFFER_COMPONENT / 3 >= 15000000 || (((buffer_size * sizeof(float)) * 0.000001) * 1.5) >= 4000 || total_mats >= 300)
 		{
 			printf("\033[0;31m- Maximum triangles, materials or memory exceeded. For safety, parsing has been stopped\033[0m\n\n");
-			break ;
+			break;
 		}
 	}
 	printf("Time taken : %.2f\n", (glfwGetTime() - diff) - start);
 	if (!(scop->objects = realloc(scop->objects, scop->objects_count * sizeof(t_objects))))
-		die ("Realloc object failed");
+		die("Realloc object failed");
 }
 
-
-
-int 		main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-	t_scop	*scop = NULL;
+	t_scop *scop = NULL;
 
 	if (!(argc - 1))
 	{
@@ -208,31 +206,31 @@ int 		main(int argc, char *argv[])
 		printf("\t - Auto positioning when multiple objects are selected\n");
 		printf("\t - Move and rotate independent object on all 3 axes\n");
 		printf("\t - Probably more that I forgot\n");
-		exit (1);
+		exit(1);
 	}
 
 	if (!(scop = calloc(1, sizeof(t_scop))))
-		die ("Could not start Scop");
+		die("Could not start Scop");
 
 	srand(time(NULL));
 
-	scop->textures_count 	= 0;
-	scop->textures 			= NULL;
-	scop->objects			= NULL;
-	scop->window			= NULL;
-	scop->cam_pos			= (t_vec3f) {0, 0, 0};
-	scop->cam_rot			= (t_vec3f) {0, 0, 0};
-	scop->width	 			= 1280;
-	scop->height 			= 720;
-	scop->multiplier		= 1;
-	scop->ogl.s_texturing	= 0;
-	scop->ogl.s_mapping		= 0;
-	scop->objects_count		= 0;
-	scop->fade_start_time	= 0;
-	scop->basic_texture_id 	= -1;
-	scop->selected_object	= -1;
+	scop->textures_count = 0;
+	scop->textures = NULL;
+	scop->objects = NULL;
+	scop->window = NULL;
+	scop->cam_pos = (t_vec3f){0, 0, 0};
+	scop->cam_rot = (t_vec3f){0, 0, 0};
+	scop->width = 1920;
+	scop->height = 1080;
+	scop->multiplier = 1;
+	scop->ogl.s_texturing = 0;
+	scop->ogl.s_mapping = 0;
+	scop->objects_count = 0;
+	scop->fade_start_time = 0;
+	scop->basic_texture_id = -1;
+	scop->selected_object = -1;
 	memset(scop->keys, 0, sizeof(uint32_t) * 348);
-		
+
 	printf("[Scop] Starting OpenGL initialization\n");
 	init_window(&scop->window, scop->width, scop->height);
 
@@ -240,7 +238,7 @@ int 		main(int argc, char *argv[])
 	{
 		printf("Error calloc objects\n");
 		free(scop);
-		exit (0);
+		exit(0);
 	}
 
 	init_depthmap(scop);
@@ -249,11 +247,11 @@ int 		main(int argc, char *argv[])
 
 	printf("[Scop] Starting parser\n\n");
 	start_parser(scop, argc, argv);
-	
+
 	if (!scop->objects_count)
 	{
 		clean_exit(scop);
-		exit (1);
+		exit(1);
 	}
 
 	printf("[Scop] Starting OpenGL Buffer initialization\n");
